@@ -169,7 +169,7 @@ public partial class VirtualMachine
                 {
                     if (bytecodeObj.Fields.TryGetValue(fieldName, out var value))
                     {
-                        ValidateFieldAccess(bytecodeObj.ClassName, fieldName, isStatic: false, instruction);
+                        ValidateFieldAccess(bytecodeObj.ClassName, fieldName, isStatic: false, instruction, bytecodeObj.Metadata);
                         _stack.PushObject(value);
                     }
                     else
@@ -383,9 +383,9 @@ public partial class VirtualMachine
                 // 如果是 BytecodeObjectInstance（Old8Lang 对象）
                 else if (obj is BytecodeObjectInstance bytecodeObj)
                 {
-                    ValidateFieldAccess(bytecodeObj.ClassName, fieldName, isStatic: false, instruction);
+                    ValidateFieldAccess(bytecodeObj.ClassName, fieldName, isStatic: false, instruction, bytecodeObj.Metadata);
                     // 检查字段类型
-                    ValidateFieldType(bytecodeObj.ClassName, fieldName, value, instruction);
+                    ValidateFieldType(bytecodeObj.ClassName, fieldName, value, instruction, bytecodeObj.Metadata);
                     bytecodeObj.Fields[fieldName] = value;
                 }
                 // 如果是字典对象（兼容旧代码）
@@ -576,88 +576,8 @@ public partial class VirtualMachine
                     throw new ClassNotFoundError(GetPosition(instruction), className);
                 }
 
-                // 创建对象实例
-                var obj = new BytecodeObjectInstance(className);
-
-                // 初始化接口信息（包括父类实现的接口）
-                var allInterfaces = new HashSet<string>();
-                var currentClassForInterfaces = classMetadata;
-                while (currentClassForInterfaces != null)
-                {
-                    // 添加当前类实现的接口
-                    foreach (var interfaceName in currentClassForInterfaces.InterfaceNames)
-                        allInterfaces.Add(interfaceName);
-                    foreach (var interfaceName in currentClassForInterfaces.ImplementsInterfaces)
-                        allInterfaces.Add(interfaceName);
-
-                    // 查找父类
-                    if (!string.IsNullOrEmpty(currentClassForInterfaces.BaseClassName))
-                    {
-                        currentClassForInterfaces = _bytecodeFile.Classes.FirstOrDefault(c => c.Name == currentClassForInterfaces.BaseClassName);
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-                obj.Interfaces = allInterfaces.ToList();
-
-                // 初始化所有字段为默认值（包括父类字段）
-                // 收集当前类及所有父类的字段
-                var allFields = new List<FieldMetadata>();
-                var currentClass = classMetadata;
-                while (currentClass != null)
-                {
-                    allFields.AddRange(currentClass.Fields);
-
-                    // 查找父类
-                    if (!string.IsNullOrEmpty(currentClass.BaseClassName))
-                    {
-                        currentClass = _bytecodeFile.Classes.FirstOrDefault(c => c.Name == currentClass.BaseClassName);
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-
-                // 初始化所有字段
-                foreach (var field in allFields)
-                {
-                    // 避免重复初始化同名字段（子类覆盖父类字段的情况）
-                    if (!obj.Fields.ContainsKey(field.Name))
-                    {
-                        // 获取字段的默认值
-                        object? defaultValue = null;
-                        if (field.DefaultValueIndex >= 0 && field.DefaultValueIndex < _bytecodeFile.ConstantPool.Count)
-                        {
-                            defaultValue = _bytecodeFile.ConstantPool.GetConstant(field.DefaultValueIndex);
-                        }
-                        else if (field.IsDefaultNull)
-                        {
-                            defaultValue = null;
-                        }
-                        obj.Fields[field.Name] = defaultValue;
-                    }
-                }
-
-                // 应用 Mixin 方法到对象
-                if (classMetadata.Mixins is { Count: > 0 })
-                {
-                    foreach (var mixinName in classMetadata.Mixins)
-                    {
-                        var mixinMetadata = _bytecodeFile.Mixins.FirstOrDefault(m => m.Name == mixinName);
-                        if (mixinMetadata != null)
-                        {
-                            // Mixin 方法在运行时通过方法查找自动可用
-                            // 这里只需要记录 Mixin 关联即可
-                            obj.Mixins.Add(mixinName);
-                        }
-                    }
-                }
-
-                // 将对象压入栈
-                _stack.PushRef(obj);
+                var classFile = FindClassModule(classMetadata)?.BytecodeFile ?? _bytecodeFile;
+                _stack.PushRef(AllocateObjectInstance(classMetadata, classFile));
             }
                 break;
 
@@ -843,7 +763,8 @@ public partial class VirtualMachine
                 else if (obj is BytecodeObjectInstance bytecodeObj)
                 {
                     // Old8Lang 对象，查找类方法
-                    var classMetadata = _bytecodeFile.Classes.FirstOrDefault(c => c.Name == bytecodeObj.ClassName);
+                    var classMetadata = bytecodeObj.Metadata ??
+                        _bytecodeFile.Classes.FirstOrDefault(c => c.Name == bytecodeObj.ClassName);
 
                     // 如果在当前字节码文件中没找到，从全局变量和已加载模块中查找
                     if (classMetadata == null)
@@ -880,6 +801,9 @@ public partial class VirtualMachine
                         throw new ClassNotFoundError(GetPosition(instruction), bytecodeObj.ClassName);
                     }
 
+                    var moduleFile = FindClassModule(classMetadata)?.BytecodeFile;
+                    var classFile = moduleFile ?? _bytecodeFile;
+
                     // 在类的方法列表中查找方法（包括父类方法）
                     MethodMetadata? methodMetadata = null;
                     var currentClass = classMetadata;
@@ -893,7 +817,7 @@ public partial class VirtualMachine
                         {
                             // 在父类中继续查找
                             currentClass =
-                                _bytecodeFile.Classes.FirstOrDefault(c => c.Name == currentClass.BaseClassName);
+                                classFile.Classes.FirstOrDefault(c => c.Name == currentClass.BaseClassName);
                         }
                         else
                         {
@@ -906,7 +830,7 @@ public partial class VirtualMachine
                     {
                         foreach (var mixinName in bytecodeObj.Mixins)
                         {
-                            var mixinMetadata = _bytecodeFile.Mixins.FirstOrDefault(m => m.Name == mixinName);
+                            var mixinMetadata = classFile.Mixins.FirstOrDefault(m => m.Name == mixinName);
                             if (mixinMetadata != null)
                             {
                                 methodMetadata = mixinMetadata.Methods.FirstOrDefault(m => m.Name == methodName);
@@ -965,7 +889,7 @@ public partial class VirtualMachine
                     ValidateParameterTypes(methodMetadata.Function, methodArgs, instruction);
 
                     // 调用方法（返回值会自动压入栈）
-                    CallFunction(methodMetadata.Function, methodArgs);
+                    CallFunction(methodMetadata.Function, methodArgs, moduleFile?.ConstantPool);
                 }
                 else
                 {

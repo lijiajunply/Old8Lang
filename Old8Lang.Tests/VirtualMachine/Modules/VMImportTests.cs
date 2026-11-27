@@ -56,6 +56,44 @@ public class VMImportTests
         }
     }
 
+    [Theory]
+    [InlineData("import cast_fixture", "Pair", "")]
+    [InlineData("import { Pair as ImportedPair } from \"cast_fixture\"", "ImportedPair", "class Pair {}")]
+    public void CastDictionaryToImportedClass_UsesModuleDefaultsAndMethods(string import, string target, string localClass)
+    {
+        var directory = Directory.CreateTempSubdirectory();
+        try
+        {
+            File.WriteAllText(Path.Combine(directory.FullName, "cast_fixture.old8"), """
+                class BasePair {
+                    second <- 3
+
+                    func Describe() {
+                        return "sum=" + (this.first + this.second)
+                    }
+                }
+
+                class Pair extends BasePair {
+                    first <- 1
+                }
+                """);
+
+            var code = $$"""
+                {{import}}
+                {{localClass}}
+                fields <- {"first": 2}
+                pair <- fields as {{target}}
+                PrintLine(pair.Describe())
+                """;
+
+            Assert.Equal("sum=5", ExecuteVMCode(code, directory.FullName));
+        }
+        finally
+        {
+            directory.Delete(recursive: true);
+        }
+    }
+
     [Fact]
     public void TestSimpleImport_ExecutesCorrectly()
     {

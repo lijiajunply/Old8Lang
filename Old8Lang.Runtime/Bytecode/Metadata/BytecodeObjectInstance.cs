@@ -8,6 +8,8 @@ public class BytecodeObjectInstance(string className)
     /// <summary>类名</summary>
     public string ClassName { get; set; } = className;
 
+    internal ClassMetadata? Metadata { get; init; }
+
     /// <summary>字段值字典</summary>
     public Dictionary<string, object?> Fields { get; set; } = new();
 

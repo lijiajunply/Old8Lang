@@ -47,11 +47,13 @@ public partial class VirtualMachine
     /// <summary>
     /// 验证实例/静态字段的访问权限（private / protected）。
     /// </summary>
-    private void ValidateFieldAccess(string className, string fieldName, bool isStatic, Instruction instruction)
+    private void ValidateFieldAccess(string className, string fieldName, bool isStatic, Instruction instruction,
+        ClassMetadata? objectClass = null)
     {
-        var startClass = FindClassMetadata(className);
+        var startClass = objectClass ?? FindClassMetadata(className);
         if (startClass == null) return;
 
+        var moduleClasses = FindClassModule(startClass)?.BytecodeFile.Classes;
         ClassMetadata? declaringClass = null;
         FieldMetadata? fieldMetadata = null;
         var currentClass = startClass;
@@ -67,7 +69,9 @@ public partial class VirtualMachine
 
             if (!string.IsNullOrEmpty(currentClass.BaseClassName))
             {
-                currentClass = FindClassMetadata(currentClass.BaseClassName);
+                var baseClassName = currentClass.BaseClassName;
+                currentClass = moduleClasses?.FirstOrDefault(candidate => candidate.Name == baseClassName)
+                    ?? FindClassMetadata(baseClassName);
             }
             else
             {
@@ -75,31 +79,32 @@ public partial class VirtualMachine
             }
         }
 
-        if (fieldMetadata == null || declaringClass == null || fieldMetadata.AccessModifier == AccessModifier.Public)
+        if (fieldMetadata != null && declaringClass != null)
+            ValidateFieldAccess(declaringClass, fieldMetadata, instruction);
+    }
+
+    private void ValidateFieldAccess(ClassMetadata declaringClass, FieldMetadata field, Instruction instruction)
+    {
+        if (field.AccessModifier == AccessModifier.Public)
         {
             return;
         }
 
-        var allowDerived = fieldMetadata.AccessModifier == AccessModifier.Protected;
+        var allowDerived = field.AccessModifier == AccessModifier.Protected;
         if (IsAccessAllowedFromCallStack(declaringClass.Name, allowDerived))
         {
             return;
         }
 
-        var modifierName = fieldMetadata.AccessModifier == AccessModifier.Private ? "private" : "protected";
-        throw new AccessViolationError(GetPosition(instruction), fieldName, declaringClass.Name, modifierName);
+        var modifierName = field.AccessModifier == AccessModifier.Private ? "private" : "protected";
+        throw new AccessViolationError(GetPosition(instruction), field.Name, declaringClass.Name, modifierName);
     }
 
     private ClassMetadata? FindClassMetadata(string className)
     {
         var metadata = _bytecodeFile.Classes.FirstOrDefault(c => c.Name == className);
         if (metadata != null) return metadata;
-        if (TryGetGlobalValue(className, out var globalVal) && globalVal is ClassMetadata importedClass)
-        {
-            return importedClass;
-        }
-
-        return null;
+        return TryResolveClassByName(className, out var importedClass) ? importedClass : null;
     }
 
     private bool IsAccessAllowedFromCallStack(string declaringClassName, bool allowDerived)
@@ -135,34 +140,29 @@ public partial class VirtualMachine
     /// 验证字段赋值类型
     /// </summary>
 
-    private void ValidateFieldType(string className, string fieldName, object? value, Instruction instruction)
+    private void ValidateFieldType(string className, string fieldName, object? value, Instruction instruction,
+        ClassMetadata? objectClass = null)
     {
         // 查找类元数据
-        var classMetadata = _bytecodeFile.Classes.FirstOrDefault(c => c.Name == className);
+        var classMetadata = objectClass ?? _bytecodeFile.Classes.FirstOrDefault(c => c.Name == className);
         if (classMetadata == null)
             return;
 
-        // 查找字段元数据（包括父类字段）
-        FieldMetadata? fieldMetadata = null;
-        var currentClass = classMetadata;
-        while (currentClass != null && fieldMetadata == null)
-        {
-            fieldMetadata = currentClass.Fields.FirstOrDefault(f => f.Name == fieldName);
-            if (fieldMetadata == null && !string.IsNullOrEmpty(currentClass.BaseClassName))
-            {
-                currentClass = _bytecodeFile.Classes.FirstOrDefault(c => c.Name == currentClass.BaseClassName);
-            }
-            else
-            {
-                break;
-            }
-        }
+        var classFile = FindClassModule(classMetadata)?.BytecodeFile ?? _bytecodeFile;
+        var fieldMetadata = GetClassHierarchy(classMetadata, classFile)
+            .SelectMany(metadata => metadata.Fields)
+            .FirstOrDefault(field => field.Name == fieldName);
+        if (fieldMetadata != null)
+            ValidateFieldType(classMetadata, fieldMetadata, value, instruction);
+    }
 
-        if (fieldMetadata == null || string.IsNullOrEmpty(fieldMetadata.TypeName))
+    private void ValidateFieldType(ClassMetadata classMetadata, FieldMetadata field, object? value, Instruction instruction)
+    {
+        if (string.IsNullOrEmpty(field.TypeName))
             return;
 
         // 如果字段类型包含泛型类型参数，尝试从类的泛型类型映射中替换
-        var fieldTypeName = fieldMetadata.TypeName;
+        var fieldTypeName = field.TypeName;
         if (classMetadata.GenericTypeMapping is { Count: > 0 })
         {
             // 检查 GenericTypeMapping 中是否包含泛型类型参数（如 Wrapper<T>）
@@ -176,7 +176,7 @@ public partial class VirtualMachine
             }
 
             // 使用类的泛型类型映射替换字段类型中的泛型类型参数
-            fieldTypeName = ResolveGenericType(fieldMetadata.TypeName, classMetadata.GenericTypeMapping);
+            fieldTypeName = ResolveGenericType(fieldTypeName, classMetadata.GenericTypeMapping);
         }
 
         // 检查类型匹配
@@ -187,7 +187,7 @@ public partial class VirtualMachine
                 GetPosition(instruction),
                 fieldTypeName,
                 actualType,
-                $"字段 '{className}.{fieldName}' 类型不匹配"
+                $"字段 '{classMetadata.Name}.{field.Name}' 类型不匹配"
             );
         }
     }

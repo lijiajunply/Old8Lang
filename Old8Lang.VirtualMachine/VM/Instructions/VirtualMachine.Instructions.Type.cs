@@ -1,5 +1,6 @@
 using System.Collections;
 using Old8Lang.AST.Expression.AnyValues;
+using Old8Lang.AST.Expression.Value;
 using Old8Lang.Bytecode.Core;
 using Old8Lang.Error;
 
@@ -58,6 +59,11 @@ public partial class VirtualMachine
                         "list" => ConvertToList(value),
                         "array" => ConvertToArray(value),
                         "dict" => ConvertToDict(value),
+                        _ when value is IDictionary or DictionaryLangValue &&
+                               TryResolveClassByName(targetTypeName, out var targetClass) =>
+                            ConvertDictionaryToObject(
+                                value is DictionaryLangValue dictionary ? UnwrapDictionary(dictionary) : (IDictionary)value,
+                                targetClass, instruction),
                         _ => value // 其他类型直接返回原值
                     };
                     _stack.PushObject(convertedValue);
@@ -65,7 +71,7 @@ public partial class VirtualMachine
                 catch (Exception ex)
                 {
                     throw new CastError(GetPosition(instruction), DescribeValueType(value), targetTypeName,
-                        ex.Message);
+                        ex is Old8Exception error ? error.OriginalMessage : ex.Message);
                 }
             }
                 break;

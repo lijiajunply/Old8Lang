@@ -1,4 +1,6 @@
+using Old8Lang.AST.Expression.Value;
 using Old8Lang.Bytecode;
+using Old8Lang.Error;
 using Old8Lang.Interpreter;
 using VM = Old8Lang.Bytecode.VM.VirtualMachine;
 
@@ -236,6 +238,77 @@ public class VMTypeConversionTests
         var result = vm.GetGlobalVariable("result");
         Assert.NotNull(result);
         Assert.Equal(10, result);
+    }
+
+    [Fact]
+    public void TypeConversion_DictionaryToClass_SetsFieldsWithoutCallingConstructor()
+    {
+        const string code = """
+            class Pair {
+                first <- 1
+                second <- 3
+
+                func init() {
+                    this.second <- 99
+                }
+
+                func Sum() {
+                    return this.first + this.second
+                }
+            }
+
+            fields <- {"first": 2, 0: 100}
+            pair <- fields as Pair
+            result <- pair.Sum()
+            """;
+
+        var vm = new VM(CompileHelper.CompileToBytecode(code));
+        vm.Execute();
+
+        Assert.Equal(5, vm.GetGlobalVariable("result"));
+    }
+
+    [Theory]
+    [InlineData("unknown", "unknown")]
+    [InlineData("secret", "private")]
+    [InlineData("number", "类型不匹配")]
+    public void TypeConversion_DictionaryToClass_ValidatesFieldAssignments(string field, string expected)
+    {
+        var code = $$"""
+            class Pair {
+                private secret <- 1
+                number:int <- 2
+            }
+
+            fields <- {"{{field}}": "invalid"}
+            pair <- fields as Pair
+            """;
+
+        var vm = new VM(CompileHelper.CompileToBytecode(code));
+
+        Assert.Contains(expected, Assert.Throws<CastError>(() => vm.Execute()).Message);
+    }
+
+    [Fact]
+    public void TypeConversion_WrappedDictionaryToClass_UnwrapsFieldValues()
+    {
+        const string code = """
+            class Pair {
+                first:int <- 1
+            }
+
+            func First(fields) {
+                pair <- fields as Pair
+                return pair.first
+            }
+            """;
+        var bytecode = CompileHelper.CompileToBytecode(code);
+        var vm = new VM(bytecode);
+        var fields = new DictionaryLangValue();
+        fields.Value.Add((new StringLangValue("first"), new IntLangValue(2)));
+
+        var function = Assert.Single(bytecode.Functions, function => function.Name == "First");
+        Assert.Equal(2, vm.ExecuteFunction(function, [fields]));
     }
 
     [Fact]

@@ -119,6 +119,65 @@ public partial class VirtualMachine
         }
     }
 
+    private LoadedModule? FindClassModule(ClassMetadata classMetadata)
+    {
+        if (_classByName.TryGetValue(classMetadata.Name, out var localClass) &&
+            ReferenceEquals(localClass, classMetadata))
+            return null;
+
+        foreach (var moduleName in _moduleRegistry.GetLoadedModuleNames())
+        {
+            var module = _moduleRegistry.GetModule(moduleName);
+            if (module?.BytecodeFile.Classes.Contains(classMetadata) == true)
+                return module;
+        }
+
+        return null;
+    }
+
+    private static IEnumerable<ClassMetadata> GetClassHierarchy(ClassMetadata classMetadata, BytecodeFile classFile)
+    {
+        var visited = new HashSet<ClassMetadata>();
+        ClassMetadata? current = classMetadata;
+        while (current != null && visited.Add(current))
+        {
+            yield return current;
+            var baseClassName = current.BaseClassName;
+            current = baseClassName == null
+                ? null
+                : classFile.Classes.FirstOrDefault(candidate => candidate.Name == baseClassName);
+        }
+    }
+
+    private static BytecodeObjectInstance AllocateObjectInstance(ClassMetadata classMetadata, BytecodeFile classFile)
+    {
+        var instance = new BytecodeObjectInstance(classMetadata.Name) { Metadata = classMetadata };
+        var interfaces = new HashSet<string>();
+        foreach (var current in GetClassHierarchy(classMetadata, classFile))
+        {
+            interfaces.UnionWith(current.InterfaceNames);
+            interfaces.UnionWith(current.ImplementsInterfaces);
+
+            foreach (var field in current.Fields)
+            {
+                var index = field.DefaultValueIndex;
+                var value = index >= 0 && index < classFile.ConstantPool.Count
+                    ? classFile.ConstantPool.GetConstant(index)
+                    : null;
+                instance.Fields.TryAdd(field.Name, value);
+            }
+        }
+
+        instance.Interfaces = interfaces.ToList();
+        foreach (var mixinName in classMetadata.Mixins ?? [])
+        {
+            if (classFile.Mixins.Any(mixin => mixin.Name == mixinName))
+                instance.Mixins.Add(mixinName);
+        }
+
+        return instance;
+    }
+
     /// <summary>
     /// 创建对象实例（用于从模块导入的类的实例化）
     /// </summary>

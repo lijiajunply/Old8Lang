@@ -3,6 +3,7 @@ using System.Runtime.CompilerServices;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Bytecode.Core;
+using Old8Lang.Bytecode.Metadata;
 using Old8Lang.Error;
 
 // ReSharper disable once CheckNamespace
@@ -13,6 +14,37 @@ namespace Old8Lang.Bytecode.VM;
 /// </summary>
 public partial class VirtualMachine
 {
+    private BytecodeObjectInstance ConvertDictionaryToObject(
+        IDictionary dictionary, ClassMetadata targetClass, Instruction instruction)
+    {
+        var classFile = FindClassModule(targetClass)?.BytecodeFile ?? _bytecodeFile;
+        var instance = AllocateObjectInstance(targetClass, classFile);
+
+        foreach (DictionaryEntry entry in dictionary)
+        {
+            var fieldName = entry.Key switch
+            {
+                string name => name,
+                StringLangValue name => name.Value,
+                _ => null
+            };
+            if (fieldName == null)
+                continue;
+
+            var (declaringClass, field) = GetClassHierarchy(targetClass, classFile)
+                .SelectMany(metadata => metadata.Fields.Select(field => (metadata, field)))
+                .FirstOrDefault(candidate => candidate.field.Name == fieldName);
+            if (field == null)
+                throw new AttributeError(GetPosition(instruction), fieldName, targetClass.Name);
+
+            ValidateFieldAccess(declaringClass, field, instruction);
+            ValidateFieldType(targetClass, field, entry.Value, instruction);
+            instance.Fields[fieldName] = entry.Value;
+        }
+
+        return instance;
+    }
+
     private Dictionary<object, object?> ConvertToDict(object? value)
     {
         if (value == null) return new Dictionary<object, object?>();

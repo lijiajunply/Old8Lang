@@ -765,13 +765,14 @@ public partial class VirtualMachine : IVirtualMachine
     /// <summary>
     /// 调用函数
     /// </summary>
-    private void CallFunction(FunctionMetadata function, object?[] arguments)
+    private void CallFunction(FunctionMetadata function, object?[] arguments, ConstantPool? constantPool = null)
     {
         var processedArguments = NormalizeArguments(function, arguments, new SourcePosition());
         var locals = RentLocalsBuffer(function.LocalCount);
 
         var frame = RentCallFrame(function, locals, function.LocalCount, usesPooledLocals: function.LocalCount > 0);
         frame.Arguments = processedArguments;
+        frame.ConstantPool = constantPool;
 
         // 将参数复制到局部变量槽(前N个局部变量是参数)
         for (int i = 0; i < processedArguments.Length && i < function.LocalCount; i++)

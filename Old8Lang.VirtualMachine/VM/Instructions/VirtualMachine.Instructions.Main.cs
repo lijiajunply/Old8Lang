@@ -1044,8 +1044,13 @@ public partial class VirtualMachine
             if (normalizedGenericInstanceName == normalizedGenericTypeName) return true;
 
             // Check inheritance
-            var metadata = _bytecodeFile.Classes.FirstOrDefault(m => m.Name == instance.ClassName || m.Name == normalizedInstanceName);
-            while (metadata != null)
+            var classMetadata = instance.Metadata ?? _bytecodeFile.Classes
+                .FirstOrDefault(m => m.Name == instance.ClassName || m.Name == normalizedInstanceName);
+            if (classMetadata == null)
+                return false;
+
+            var classFile = FindClassModule(classMetadata)?.BytecodeFile ?? _bytecodeFile;
+            foreach (var metadata in GetClassHierarchy(classMetadata, classFile))
             {
                 var metadataName = metadata.Name.TrimEnd('?');
                 if (metadataName == normalizedTypeName) return true;
@@ -1053,15 +1058,6 @@ public partial class VirtualMachine
                 if (metadata.InterfaceNames.Contains(typeName)) return true; // Check interfaces
                 if (metadata.Mixins.Contains(typeName)) return true; // Check mixins
                 if (metadata.BaseClassName != null && metadata.BaseClassName.TrimEnd('?') == normalizedTypeName) return true;
-
-                if (metadata.BaseClassName != null)
-                {
-                    metadata = _bytecodeFile.Classes.FirstOrDefault(m => m.Name == metadata.BaseClassName);
-                }
-                else
-                {
-                    break;
-                }
             }
         }
 
