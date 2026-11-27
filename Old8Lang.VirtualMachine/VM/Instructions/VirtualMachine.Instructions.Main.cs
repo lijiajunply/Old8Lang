@@ -255,6 +255,26 @@ public partial class VirtualMachine
         }
     }
 
+    private VmValue ResolveGlobalVmValue(ClosureEnvironment closureEnv, string varName, Instruction instruction)
+    {
+        if (closureEnv.TryGetLocalIndex(varName, out var closureLocalIndex))
+        {
+            return closureEnv.GetLocalVmValue(closureLocalIndex);
+        }
+
+        if (closureEnv.TryGetVmValue(varName, out var closureValue))
+        {
+            return closureValue;
+        }
+
+        if (TryGetGlobalVmValue(varName, out var globalResolvedValue))
+        {
+            return globalResolvedValue;
+        }
+
+        throw new NameError(GetPosition(instruction), varName);
+    }
+
     private object? ResolveGlobalValue(CallFrame frame, string varName, Instruction instruction)
     {
         if (frame.ClosureEnvironment != null &&
@@ -291,6 +311,52 @@ public partial class VirtualMachine
     }
 
     // === 辅助方法 ===
+
+    /// <summary>
+    /// 类型化值快速类型匹配（零装箱处理基础类型，复杂/泛型/自定义类型回落到 <see cref="CheckTypeMatch(string, object?)"/>）。
+    /// </summary>
+    private bool CheckTypeMatch(string typeName, VmValue val)
+    {
+        switch (typeName)
+        {
+            case "int":
+                if (val.Kind == VmValueKind.Int) return true;
+                if (val.Kind != VmValueKind.Object) return false;
+                return val.ObjectRef is AST.Expression.Value.IntLangValue;
+            case "double":
+                if (val.Kind is VmValueKind.Double or VmValueKind.Int) return true;
+                if (val.Kind != VmValueKind.Object) return false;
+                return val.ObjectRef is AST.Expression.Value.DoubleLangValue or AST.Expression.Value.IntLangValue;
+            case "bool":
+                if (val.Kind == VmValueKind.Bool) return true;
+                if (val.Kind != VmValueKind.Object) return false;
+                return val.ObjectRef is AST.Expression.Value.BoolLangValue;
+            case "char":
+                if (val.Kind == VmValueKind.Char) return true;
+                if (val.Kind != VmValueKind.Object) return false;
+                return val.ObjectRef is AST.Expression.Value.CharLangValue;
+            case "string":
+                return val.Kind == VmValueKind.Object &&
+                       val.ObjectRef is string or AST.Expression.Value.StringLangValue;
+            case "any":
+            case "object":
+                return true;
+            case "null":
+                return val.Kind == VmValueKind.Null ||
+                       (val.Kind == VmValueKind.Object && val.ObjectRef is AST.Expression.Value.NullLangValue);
+            case "array":
+                return val.Kind == VmValueKind.Object && val.ObjectRef is Array;
+            case "list":
+                return val.Kind == VmValueKind.Object && val.ObjectRef is IList;
+            case "dict":
+                return val.Kind == VmValueKind.Object &&
+                       val.ObjectRef is IDictionary or AST.Expression.Value.DictionaryLangValue;
+            case "tuple":
+                return val.Kind == VmValueKind.Object && val.ObjectRef is Tuple<object?, object?>;
+        }
+
+        return CheckTypeMatch(typeName, val.ToObject());
+    }
 
     private bool CheckTypeMatch(string typeName, object? val)
     {
@@ -505,6 +571,21 @@ public partial class VirtualMachine
         }
     }
 
+    private static bool FastTypeMatches(FunctionMetadata.FastParameterTypeKind kind, VmValue value)
+    {
+        return kind switch
+        {
+            FunctionMetadata.FastParameterTypeKind.Int => value.Kind == VmValueKind.Int,
+            FunctionMetadata.FastParameterTypeKind.Double => value.Kind is VmValueKind.Double or VmValueKind.Int,
+            FunctionMetadata.FastParameterTypeKind.String => value.Kind == VmValueKind.Object && value.ObjectRef is string,
+            FunctionMetadata.FastParameterTypeKind.Bool => value.Kind == VmValueKind.Bool,
+            FunctionMetadata.FastParameterTypeKind.Char => value.Kind == VmValueKind.Char,
+            FunctionMetadata.FastParameterTypeKind.Any => true,
+            FunctionMetadata.FastParameterTypeKind.Object => true,
+            _ => false
+        };
+    }
+
     private static bool FastTypeMatches(FunctionMetadata.FastParameterTypeKind kind, object? value)
     {
         return kind switch
@@ -607,6 +688,25 @@ public partial class VirtualMachine
             Old8Lang.AST.Expression.Value.CharLangValue c => c.Value,
             Old8Lang.AST.Expression.Value.NullLangValue => null,
             _ => val
+        };
+    }
+
+    /// <summary>
+    /// 获取类型化值的类型名称（零装箱处理基础类型）
+    /// </summary>
+    private string GetValueTypeName(VmValue value)
+    {
+        return value.Kind switch
+        {
+            VmValueKind.Null => "null",
+            VmValueKind.Int => "int",
+            VmValueKind.Double => "double",
+            VmValueKind.Bool => "bool",
+            VmValueKind.Char => "char",
+            VmValueKind.Long => "Int64",
+            VmValueKind.Object => GetValueTypeName(value.ObjectRef),
+            VmValueKind.UpValue => GetValueTypeName(value.AsUpValue.Value),
+            _ => GetValueTypeName(value.ToObject())
         };
     }
 

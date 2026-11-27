@@ -19,7 +19,7 @@ public partial class VirtualMachine
         {
             case OpCode.GetIterator:
             {
-                var collection = _stack.Pop();
+                var collection = _stack.PopObject();
 
                 // 字典要放在 IEnumerable 之前判断：Dictionary 本身也是 IEnumerable，
                 // 落到下面那支会拿到 KeyValuePair 而不是 (键, 值) 元组。
@@ -33,18 +33,18 @@ public partial class VirtualMachine
                         pairs.Add(new Tuple<object?, object?>(entry.Key, entry.Value));
                     }
 
-                    _stack.Push(pairs.GetEnumerator());
+                    _stack.PushObject(pairs.GetEnumerator());
                 }
                 else if (collection is IEnumerable enumerable)
                 {
                     var enumerator = enumerable.GetEnumerator();
-                    _stack.Push(enumerator);
+                    _stack.PushRef(enumerator);
                 }
                 else if (collection is ILangList langList)
                 {
                     // Old8Lang 列表只实现 ILangList（既不是 IList 也不是 IEnumerable），
                     // 必须单独处理，否则 await Task.WhenAll(...) 之类产出的列表值无法 for-in。
-                    _stack.Push(langList.GetItems().GetEnumerator());
+                    _stack.PushRef(langList.GetItems().GetEnumerator());
                 }
                 else
                 {
@@ -57,14 +57,14 @@ public partial class VirtualMachine
             {
                 // 栈顶应该是迭代器，调用MoveNext后将bool结果压入栈
                 // 注意：迭代器对象保持在栈上，以便后续的IteratorCurrent使用
-                if (_stack.Peek() is IEnumerator enumerator)
+                if (_stack.PeekObject() is IEnumerator enumerator)
                 {
                     bool hasNext = enumerator.MoveNext();
-                    _stack.Push(hasNext);
+                    _stack.PushBool(hasNext);
                 }
                 else
                 {
-                    var top = _stack.Count > 0 ? _stack.Peek() : null;
+                    var top = _stack.Count > 0 ? _stack.PeekObject() : null;
                     var topType = top?.GetType().FullName ?? "null";
                     throw new StateError(GetPosition(instruction), $"栈顶不是迭代器对象，而是: {topType}");
                 }
@@ -79,15 +79,16 @@ public partial class VirtualMachine
                     throw new StateError(GetPosition(instruction), "IteratorCurrent: 栈为空");
                 }
 
-                var top = _stack.Peek();
+                var top = _stack.PeekObject();
                 if (top is IEnumerator enumerator)
                 {
-                    _stack.Push(enumerator.Current);
+                    _stack.PushObject(enumerator.Current);
                 }
                 else
                 {
                     // 调试：输出栈的详细信息
-                    var stackContents = string.Join(", ", _stack.Select(x => x is null ? "null" : DescribeValueType(x)));
+                    var stackContents = string.Join(", ",
+                        _stack.ToObjectArrayTopToBottom().Select(x => x is null ? "null" : DescribeValueType(x)));
                     var topType = top?.GetType().FullName ?? "null";
                     throw new StateError(GetPosition(instruction),
                         $"IteratorCurrent 失败: 栈顶类型是 {topType}, 栈内容({_stack.Count}): [{stackContents}]");
@@ -98,33 +99,32 @@ public partial class VirtualMachine
             case OpCode.Slice:
             {
                 // 栈顶: step, end, start, collection
-                var step = _stack.Pop();
-                var end = _stack.Pop();
-                var start = _stack.Pop();
-                var collection = _stack.Pop();
+                var stepVal = _stack.Pop();
+                var endVal = _stack.Pop();
+                var startVal = _stack.Pop();
+                var collection = _stack.PopObject();
 
-                int startIdx = Convert.ToInt32(start);
-                int endIdx = end != null ? Convert.ToInt32(end) : int.MaxValue;
-                int stepVal = step != null ? Convert.ToInt32(step) : 1;
+                int startIdx = startVal.ToInt32();
+                int endIdx = !endVal.IsNull ? endVal.ToInt32() : int.MaxValue;
+                int stepValInt = !stepVal.IsNull ? stepVal.ToInt32() : 1;
 
                 if (collection is Array array)
                 {
-                    var result = SliceArray(array, startIdx, endIdx, stepVal);
-                    _stack.Push(result);
+                    var result = SliceArray(array, startIdx, endIdx, stepValInt);
+                    _stack.PushObject(result);
                 }
                 else if (collection is IList list)
                 {
-                    var result = SliceList(list, startIdx, endIdx, stepVal);
-                    _stack.Push(result);
+                    var result = SliceList(list, startIdx, endIdx, stepValInt);
+                    _stack.PushObject(result);
                 }
                 else if (collection is string str)
                 {
-                    var result = SliceString(str, startIdx, endIdx, stepVal);
-                    _stack.Push(result);
+                    var result = SliceString(str, startIdx, endIdx, stepValInt);
+                    _stack.PushObject(result);
                 }
                 else if (collection is Tuple<object?, object?> tuple)
                 {
-                    // 1. 展平 Tuple 为 List
                     var tupleAsList = new List<object?>();
                     var traverseStack = new Stack<object?>();
                     traverseStack.Push(tuple);
@@ -143,8 +143,7 @@ public partial class VirtualMachine
                         }
                     }
 
-                    // 2. 对 List 进行切片
-                    var sliceResult = SliceList(tupleAsList, startIdx, endIdx, stepVal);
+                    var sliceResult = SliceList(tupleAsList, startIdx, endIdx, stepValInt);
                     var slicedList = sliceResult as List<object?>;
 
                     if (slicedList == null)
@@ -159,7 +158,6 @@ public partial class VirtualMachine
                         }
                     }
 
-                    // 3. 将切片后的 List 重新构建为 Tuple
                     object? resultTuple;
 
                     if (slicedList.Count == 0)
@@ -176,8 +174,6 @@ public partial class VirtualMachine
                     }
                     else
                     {
-                        // 构建嵌套元组: (1, 2, 3) -> (1, (2, 3))
-                        // 从后往前构建
                         object current = new Tuple<object?, object?>(slicedList[^2],
                             slicedList[^1]);
 
@@ -189,7 +185,7 @@ public partial class VirtualMachine
                         resultTuple = current;
                     }
 
-                    _stack.Push(resultTuple);
+                    _stack.PushObject(resultTuple);
                 }
                 else
                 {
@@ -200,43 +196,35 @@ public partial class VirtualMachine
 
             case OpCode.NewGroupDict:
             {
-                // 创建一个分组字典 Dictionary<object, List<object>>
                 var groupDict = new Dictionary<object, List<object?>>(new ObjectEqualityComparer());
-                _stack.Push(groupDict);
+                _stack.PushRef(groupDict);
             }
                 break;
 
             case OpCode.AddToGroup:
             {
-                // 栈顶: element, key, groupDict
-                var element = _stack.Pop();
-                var key = _stack.Pop();
-                var groupDict = _stack.Pop() as Dictionary<object, List<object?>>;
+                var element = _stack.PopObject();
+                var key = _stack.PopObject();
+                var groupDict = _stack.PopObject() as Dictionary<object, List<object?>>;
 
                 if (groupDict == null)
                 {
                     throw new TypeError(GetPosition(instruction), "AddToGroup 操作需要一个分组字典");
                 }
 
-                // 如果键不存在,创建新的列表
                 var actualKey = key ?? NullGroupKey;
                 if (!groupDict.ContainsKey(actualKey))
                 {
                     groupDict[actualKey] = [];
                 }
 
-                // 将元素添加到对应键的列表中
                 groupDict[actualKey].Add(element);
-
-                // 注意: 不需要将字典重新压栈,因为字典是引用类型,修改会直接反映到原对象
             }
                 break;
 
             case OpCode.GroupDictToList:
             {
-                // 将分组字典转换为分组列表
-                // 每个分组是一个包含 Key 和 Values 的对象
-                var groupDict = _stack.Pop() as Dictionary<object, List<object?>>;
+                var groupDict = _stack.PopObject() as Dictionary<object, List<object?>>;
 
                 if (groupDict == null)
                 {
@@ -247,7 +235,6 @@ public partial class VirtualMachine
 
                 foreach (var kvp in groupDict)
                 {
-                    // 创建一个分组对象,包含 Key 和 Values
                     var group = new Dictionary<string, object?>
                     {
                         ["Key"] = ReferenceEquals(kvp.Key, NullGroupKey) ? null : kvp.Key,
@@ -256,10 +243,9 @@ public partial class VirtualMachine
                     resultList.Add(group);
                 }
 
-                _stack.Push(resultList);
+                _stack.PushRef(resultList);
             }
                 break;
-
         }
     }
 }

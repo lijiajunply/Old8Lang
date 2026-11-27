@@ -21,7 +21,7 @@ namespace Old8Lang.Bytecode.VM;
 public partial class VirtualMachine : IVirtualMachine
 {
     // 使用 ThreadLocal 为每个线程创建独立的栈和调用栈
-    private readonly ThreadLocal<Stack<object?>> _threadStack = new(() => new Stack<object?>());
+    private readonly ThreadLocal<VmStack> _threadStack = new(() => new VmStack());
     private readonly ThreadLocal<Stack<CallFrame>> _threadCallStack = new(() => new Stack<CallFrame>());
     private readonly ThreadLocal<Stack<ExceptionHandler>> _threadExceptionHandlers = new(() => new Stack<ExceptionHandler>());
 
@@ -31,6 +31,7 @@ public partial class VirtualMachine : IVirtualMachine
     // 线程安全的全局变量表：名字 -> 槽位。
     // 槽位解析结果会被指令缓存（见 GlobalSlot），热路径不再按名字查表。
     private readonly ConcurrentDictionary<string, GlobalSlot> _globals;
+    private readonly GlobalTableState _globalsState;
     private readonly int _globalsOwnerId;
     private static int _nextGlobalsOwnerId;
     private readonly BytecodeFile _bytecodeFile;
@@ -39,7 +40,7 @@ public partial class VirtualMachine : IVirtualMachine
     private readonly ConcurrentDictionary<(string ModuleName, string SymbolName), object> _moduleSymbolCache;
 
     // 便捷属性，获取当前线程的栈
-    private Stack<object?> _stack => _threadStack.Value!;
+    private VmStack _stack => _threadStack.Value!;
     private Stack<CallFrame> _callStack => _threadCallStack.Value!;
     private Stack<ExceptionHandler> _exceptionHandlers => _threadExceptionHandlers.Value!;
 
@@ -74,7 +75,7 @@ public partial class VirtualMachine : IVirtualMachine
         BytecodeFile bytecodeFile,
         string? baseDirectory = null,
         StandardLibraryCatalog? standardLibraries = null)
-        : this(bytecodeFile, baseDirectory, null, 0, null, null, null,
+        : this(bytecodeFile, baseDirectory, null, null, 0, null, null, null,
             standardLibraries ?? StandardLibraryRegistry.DefaultCatalog, initializeRuntimeMetadata: true)
     {
     }
@@ -83,6 +84,7 @@ public partial class VirtualMachine : IVirtualMachine
         BytecodeFile bytecodeFile,
         string? baseDirectory,
         ConcurrentDictionary<string, GlobalSlot>? sharedGlobals,
+        GlobalTableState? sharedGlobalsState,
         int sharedGlobalsOwnerId,
         Dictionary<string, FunctionMetadata>? sharedFunctionByName,
         Dictionary<string, ClassMetadata>? sharedClassByName,
@@ -95,6 +97,7 @@ public partial class VirtualMachine : IVirtualMachine
         _standardLibraries = standardLibraries;
         _moduleLoader = new ModuleLoader(_baseDirectory, _standardLibraries);
         _globals = sharedGlobals ?? new ConcurrentDictionary<string, GlobalSlot>(StringComparer.Ordinal);
+        _globalsState = sharedGlobalsState ?? new GlobalTableState();
         _globalsOwnerId = sharedGlobals != null
             ? sharedGlobalsOwnerId
             : Interlocked.Increment(ref _nextGlobalsOwnerId);
@@ -149,10 +152,13 @@ public partial class VirtualMachine : IVirtualMachine
 
     private VirtualMachine CreateWorkerVirtualMachine()
     {
+        // 在派生 worker 虚拟机之前开启全局槽位并发无撕裂保护，确保后续跨线程读写 VmValue 安全。
+        _globalsState.IsConcurrent = true;
         return new VirtualMachine(
             _bytecodeFile,
             _baseDirectory,
             _globals,
+            _globalsState,
             _globalsOwnerId,
             _functionByName,
             _classByName,
@@ -266,12 +272,35 @@ public partial class VirtualMachine : IVirtualMachine
     {
         return _globals.GetOrAdd(
             name,
-            static (_, owner) => new GlobalSlot(owner, null),
-            _globalsOwnerId);
+            static (_, state) => new GlobalSlot(state.OwnerId, state.TableState, VmValue.Null),
+            (OwnerId: _globalsOwnerId, TableState: _globalsState));
     }
 
     /// <summary>
-    /// 按名字读取全局变量（冷路径）。
+    /// 按名字读取类型化全局变量（零装箱）。
+    /// </summary>
+    private bool TryGetGlobalVmValue(string name, out VmValue value)
+    {
+        if (_globals.TryGetValue(name, out var slot))
+        {
+            value = slot.GetValue();
+            return true;
+        }
+
+        value = VmValue.Null;
+        return false;
+    }
+
+    /// <summary>
+    /// 按名字写入类型化全局变量（零装箱）。
+    /// </summary>
+    private void SetGlobalVmValue(string name, VmValue value)
+    {
+        GetOrCreateGlobalSlot(name).SetValue(value);
+    }
+
+    /// <summary>
+    /// 按名字读取全局变量（冷路径边界视图）。
     /// </summary>
     private bool TryGetGlobalValue(string name, out object? value)
     {
@@ -286,11 +315,11 @@ public partial class VirtualMachine : IVirtualMachine
     }
 
     /// <summary>
-    /// 按名字写入全局变量（冷路径；热路径直接写缓存槽位）。
+    /// 按名字写入全局变量（冷路径边界视图；热路径直接写缓存槽位）。
     /// </summary>
     private void SetGlobalValue(string name, object? value)
     {
-        GetOrCreateGlobalSlot(name).Value = value;
+        GetOrCreateGlobalSlot(name).SetValue(VmValue.FromObject(value));
     }
 
     /// <summary>
@@ -322,7 +351,7 @@ public partial class VirtualMachine : IVirtualMachine
     /// <summary>
     /// 从线程本地池租借 CallFrame（如池为空则新建），并用指定参数初始化
     /// </summary>
-    private CallFrame RentCallFrame(FunctionMetadata function, object?[] locals, int localCount, bool usesPooledLocals)
+    private CallFrame RentCallFrame(FunctionMetadata function, VmValue[] locals, int localCount, bool usesPooledLocals)
     {
         var pool = _threadFramePool.Value!;
         if (pool.Count > 0)
@@ -348,14 +377,14 @@ public partial class VirtualMachine : IVirtualMachine
         }
     }
 
-    private static object?[] RentLocalsBuffer(int localCount)
+    private static VmValue[] RentLocalsBuffer(int localCount)
     {
         if (localCount <= 0)
         {
-            return Array.Empty<object?>();
+            return Array.Empty<VmValue>();
         }
 
-        var buffer = ArrayPool<object?>.Shared.Rent(localCount);
+        var buffer = ArrayPool<VmValue>.Shared.Rent(localCount);
         Array.Clear(buffer, 0, localCount);
         return buffer;
     }
@@ -368,7 +397,7 @@ public partial class VirtualMachine : IVirtualMachine
         }
 
         Array.Clear(frame.Locals, 0, frame.LocalCount);
-        ArrayPool<object?>.Shared.Return(frame.Locals, clearArray: false);
+        ArrayPool<VmValue>.Shared.Return(frame.Locals, clearArray: false);
     }
 
     private void ExecuteFrameLoop(CallFrame frame)
@@ -377,10 +406,12 @@ public partial class VirtualMachine : IVirtualMachine
         var instructions = function.Instructions;
         var instructionCount = instructions.Count;
         // 求值栈是 ThreadLocal 属性，逐指令访问要走一次线程本地查找。
-        // 同一次 ExecuteFrameLoop 内当前线程不会变化，因此把栈引用提到循环外，
-        // 让下面内联的极热指令零额外开销地读写栈。
+        // 同一次 ExecuteFrameLoop 内当前线程与常量池不会变化，把它们提到循环外，
+        // 让下面内联的极热指令零额外开销、零装箱地读写栈与变量槽。
         var stack = _stack;
         var locals = frame.Locals;
+        var constantPool = frame.ConstantPool ?? _bytecodeFile.ConstantPool;
+        var closureEnv = frame.ClosureEnvironment is { IsEmpty: false } env ? env : null;
         while (frame.IP < instructionCount)
         {
             var instructionIndex = frame.IP;
@@ -399,24 +430,23 @@ public partial class VirtualMachine : IVirtualMachine
                 switch (instruction.OpCode)
                 {
                     case OpCode.LoadConst:
-                        stack.Push((frame.ConstantPool ?? _bytecodeFile.ConstantPool)
-                            .GetConstant((int)instruction.Operand!));
+                        stack.Push(constantPool.GetConstantValue(instruction.IntOperand));
                         continue;
 
                     case OpCode.LoadLocal:
                     {
-                        var localValue = locals[(int)instruction.Operand!];
-                        stack.Push(localValue is UpValueCell cell ? cell.Value : localValue);
+                        var localValue = locals[instruction.IntOperand];
+                        stack.Push(localValue.Kind == VmValueKind.UpValue ? localValue.AsUpValue.Value : localValue);
                         continue;
                     }
 
                     case OpCode.StoreLocal:
                     {
-                        int localIndex = (int)instruction.Operand!;
+                        int localIndex = instruction.IntOperand;
                         var localValue = stack.Pop();
-                        if (locals[localIndex] is UpValueCell cell)
+                        if (locals[localIndex].Kind == VmValueKind.UpValue)
                         {
-                            cell.Value = localValue;
+                            locals[localIndex].AsUpValue.Value = localValue;
                         }
                         else
                         {
@@ -428,10 +458,10 @@ public partial class VirtualMachine : IVirtualMachine
 
                     case OpCode.RefreshLocalBinding:
                     {
-                        int localIndex = (int)instruction.Operand!;
-                        if (locals[localIndex] is UpValueCell existing)
+                        int localIndex = instruction.IntOperand;
+                        if (locals[localIndex].Kind == VmValueKind.UpValue)
                         {
-                            locals[localIndex] = new UpValueCell(existing.Value);
+                            locals[localIndex] = VmValue.FromUpValue(new UpValueCell(locals[localIndex].AsUpValue.Value));
                         }
 
                         continue;
@@ -441,9 +471,9 @@ public partial class VirtualMachine : IVirtualMachine
                     {
                         var varName = (string)instruction.Operand!;
                         // 闭包环境优先：捕获了同名变量的帧必须读闭包里的值，不能走槽位缓存。
-                        if (frame.ClosureEnvironment != null)
+                        if (closureEnv != null)
                         {
-                            stack.Push(ResolveGlobalValue(frame, varName, instruction));
+                            stack.Push(ResolveGlobalVmValue(closureEnv, varName, instruction));
                             continue;
                         }
 
@@ -454,7 +484,7 @@ public partial class VirtualMachine : IVirtualMachine
                             instruction.CachedGlobalSlot = slot;
                         }
 
-                        stack.Push(slot.Value);
+                        stack.Push(slot.GetValue());
                         continue;
                     }
 
@@ -462,7 +492,7 @@ public partial class VirtualMachine : IVirtualMachine
                     {
                         var varName = (string)instruction.Operand!;
                         var globalValue = stack.Pop();
-                        if (frame.ClosureEnvironment == null)
+                        if (closureEnv == null)
                         {
                             var slot = instruction.CachedGlobalSlot;
                             if (slot == null || slot.Owner != _globalsOwnerId)
@@ -471,37 +501,37 @@ public partial class VirtualMachine : IVirtualMachine
                                 instruction.CachedGlobalSlot = slot;
                             }
 
-                            slot.Value = globalValue;
+                            slot.SetValue(globalValue);
                             continue;
                         }
 
                         // 被闭包捕获的名字写进共享单元；否则写全局表。
-                        if (!frame.ClosureEnvironment.TrySetValue(varName, globalValue))
+                        if (!closureEnv.TrySetVmValue(varName, globalValue))
                         {
-                            SetGlobalValue(varName, globalValue);
+                            SetGlobalVmValue(varName, globalValue);
                         }
 
                         continue;
                     }
 
                     case OpCode.LoadNull:
-                        stack.Push(null);
+                        stack.PushNull();
                         continue;
 
                     case OpCode.LoadTrue:
-                        stack.Push(VmBoxed.True);
+                        stack.PushBool(true);
                         continue;
 
                     case OpCode.LoadFalse:
-                        stack.Push(VmBoxed.False);
+                        stack.PushBool(false);
                         continue;
 
                     case OpCode.Pop:
-                        stack.Pop();
+                        stack.PopDiscard();
                         continue;
 
                     case OpCode.Dup:
-                        stack.Push(stack.Peek());
+                        stack.Dup();
                         continue;
 
                     case OpCode.Add:
@@ -540,7 +570,7 @@ public partial class VirtualMachine : IVirtualMachine
                     {
                         var b = stack.Pop();
                         var a = stack.Pop();
-                        stack.Push(VmBoxed.Bool(Equals(a, b)));
+                        stack.PushBool(Equals(a, b));
                         continue;
                     }
 
@@ -548,7 +578,7 @@ public partial class VirtualMachine : IVirtualMachine
                     {
                         var b = stack.Pop();
                         var a = stack.Pop();
-                        stack.Push(VmBoxed.Bool(!Equals(a, b)));
+                        stack.PushBool(!Equals(a, b));
                         continue;
                     }
 
@@ -556,7 +586,7 @@ public partial class VirtualMachine : IVirtualMachine
                     {
                         var b = stack.Pop();
                         var a = stack.Pop();
-                        stack.Push(VmBoxed.Bool(Less(a, b)));
+                        stack.PushBool(Less(a, b));
                         continue;
                     }
 
@@ -564,7 +594,7 @@ public partial class VirtualMachine : IVirtualMachine
                     {
                         var b = stack.Pop();
                         var a = stack.Pop();
-                        stack.Push(VmBoxed.Bool(LessEqual(a, b)));
+                        stack.PushBool(LessEqual(a, b));
                         continue;
                     }
 
@@ -572,7 +602,7 @@ public partial class VirtualMachine : IVirtualMachine
                     {
                         var b = stack.Pop();
                         var a = stack.Pop();
-                        stack.Push(VmBoxed.Bool(Greater(a, b)));
+                        stack.PushBool(Greater(a, b));
                         continue;
                     }
 
@@ -580,20 +610,19 @@ public partial class VirtualMachine : IVirtualMachine
                     {
                         var b = stack.Pop();
                         var a = stack.Pop();
-                        stack.Push(VmBoxed.Bool(GreaterEqual(a, b)));
+                        stack.PushBool(GreaterEqual(a, b));
                         continue;
                     }
 
                     case OpCode.Jump:
-                        frame.IP = (int)instruction.Operand!;
+                        frame.IP = instruction.IntOperand;
                         continue;
 
                     case OpCode.JumpIfFalse:
                     {
-                        var targetIP = (int)instruction.Operand!;
                         if (!ToBool(stack.Pop()))
                         {
-                            frame.IP = targetIP;
+                            frame.IP = instruction.IntOperand;
                         }
 
                         continue;
@@ -601,10 +630,9 @@ public partial class VirtualMachine : IVirtualMachine
 
                     case OpCode.JumpIfTrue:
                     {
-                        var targetIP = (int)instruction.Operand!;
                         if (ToBool(stack.Pop()))
                         {
-                            frame.IP = targetIP;
+                            frame.IP = instruction.IntOperand;
                         }
 
                         continue;
@@ -618,12 +646,10 @@ public partial class VirtualMachine : IVirtualMachine
                         var exceptionValue = stack.Pop();
                         if (TryHandleExceptionInline(exceptionValue, frame, function))
                         {
-                            // 内联分发可能已经把 IP 改到 catch 块，重取局部变量数组无必要，
-                            // 但 frame.IP 的变更会自然反映到循环条件上。
                             continue;
                         }
 
-                        throw new VmException(exceptionValue);
+                        throw new VmException(exceptionValue.ToObject());
                     }
 
                     case OpCode.Return:
@@ -631,7 +657,7 @@ public partial class VirtualMachine : IVirtualMachine
                         // 返回值已在栈上；声明了非 void 返回类型时校验类型。
                         if (!string.IsNullOrEmpty(function.ReturnType) && function.ReturnType != "void")
                         {
-                            var returnValue = stack.Count > 0 ? stack.Peek() : null;
+                            var returnValue = stack.Count > 0 ? stack.Peek() : VmValue.Null;
                             if (!CheckTypeMatch(function.ReturnType, returnValue))
                             {
                                 var actualType = GetValueTypeName(returnValue);
@@ -661,6 +687,12 @@ public partial class VirtualMachine : IVirtualMachine
             }
             catch (Exception ex)
             {
+                // 整数除/模零在 C# 侧是原生异常（无位置信息），换成语言错误并带上源码位置
+                if (ex is DivideByZeroException)
+                {
+                    ex = new ZeroDivisionError(GetPosition(instruction));
+                }
+
                 // 异常发生时，先执行所有 defer 块
                 if (frame.HasDeferredInstructions)
                 {
@@ -700,13 +732,13 @@ public partial class VirtualMachine : IVirtualMachine
 
             // 调用约定：一次调用在求值栈上恰好留下一个值。
             // 无返回值的函数（ReturnVoid，或函数体执行到末尾）不会压入任何值，
-            // 这里补一个 VoidLangValue，使 "r <- f()" 这类把无返回值调用当作值使用的写法不再读到空栈。
+            // 这里补一个 VoidLangValue 单例，使 "r <- f()" 这类把无返回值调用当作值使用的写法不再读到空栈。
             // 用 VoidLangValue 而不是 null：解释器模式下无返回值的调用同样产生 VoidLangValue，
             // 因此 "f() == null" 为 false、"print(f())" 不输出内容，两种模式行为一致。
             // 注意必须放在 ExecuteFrameLoop 正常返回之后：若函数抛出异常则不补值。
             if (!frame.LeftReturnValue)
             {
-                _stack.Push(new VoidLangValue());
+                _stack.PushRef(VoidLangValue.Instance);
             }
         }
         finally
@@ -744,7 +776,7 @@ public partial class VirtualMachine : IVirtualMachine
         // 将参数复制到局部变量槽(前N个局部变量是参数)
         for (int i = 0; i < processedArguments.Length && i < function.LocalCount; i++)
         {
-            frame.Locals[i] = processedArguments[i];
+            frame.Locals[i] = VmValue.FromObject(processedArguments[i]);
         }
 
         ExecuteFrame(frame);
@@ -766,7 +798,7 @@ public partial class VirtualMachine : IVirtualMachine
             // 如果栈上有返回值，弹出并返回
             if (_stack.Count > stackSnapshot)
             {
-                return _stack.Pop();
+                return _stack.PopObject();
             }
 
             return null;
@@ -776,7 +808,7 @@ public partial class VirtualMachine : IVirtualMachine
             // 恢复栈状态
             while (_stack.Count > stackSnapshot)
             {
-                _stack.Pop();
+                _stack.PopDiscard();
             }
             throw;
         }
@@ -798,7 +830,7 @@ public partial class VirtualMachine : IVirtualMachine
         // 将参数复制到局部变量槽(前N个局部变量是参数)
         for (int i = 0; i < processedArguments.Length && i < function.LocalCount; i++)
         {
-            frame.Locals[i] = processedArguments[i];
+            frame.Locals[i] = VmValue.FromObject(processedArguments[i]);
         }
 
         ExecuteFrame(frame);
@@ -930,7 +962,7 @@ public partial class VirtualMachine : IVirtualMachine
             // 返回栈顶的值（如果有）
             if (_stack.Count > 0)
             {
-                return _stack.Pop();
+                return _stack.PopObject();
             }
             return null;
         }
@@ -939,6 +971,11 @@ public partial class VirtualMachine : IVirtualMachine
             // 恢复之前的虚拟机上下文（而不是清理）
             VMContext.CurrentVM = previousVM;
         }
+    }
+
+    public void EnableConcurrentGlobals()
+    {
+        _globalsState.IsConcurrent = true;
     }
 
     public object? ExecuteFunctionObjectInWorker(object? funcObj, object?[] arguments)

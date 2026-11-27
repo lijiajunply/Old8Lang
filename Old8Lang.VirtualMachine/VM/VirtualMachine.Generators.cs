@@ -1,4 +1,5 @@
 using Old8Lang.AST.Expression;
+using Old8Lang.Bytecode.Closures;
 using Old8Lang.Bytecode.Core;
 using Old8Lang.Bytecode.Generators;
 
@@ -6,6 +7,30 @@ namespace Old8Lang.Bytecode.VM;
 
 public partial class VirtualMachine
 {
+    private static object?[] CopyLocalsToObjects(VmValue[] locals, int count)
+    {
+        var len = Math.Min(count, locals.Length);
+        var result = new object?[len];
+        for (int i = 0; i < len; i++)
+        {
+            result[i] = locals[i].Kind == VmValueKind.UpValue
+                ? locals[i].AsUpValue
+                : locals[i].ToObject();
+        }
+
+        return result;
+    }
+
+    private static void RestoreLocalsFromObjects(object?[] source, VmValue[] target)
+    {
+        var len = Math.Min(source.Length, target.Length);
+        for (int i = 0; i < len; i++)
+        {
+            target[i] = source[i] is UpValueCell cell
+                ? VmValue.FromUpValue(cell)
+                : VmValue.FromObject(source[i]);
+        }
+    }
     /// <summary>
     /// 恢复生成器执行
     /// </summary>
@@ -61,20 +86,17 @@ public partial class VirtualMachine
         };
 
         // 设置局部变量
-        for (int i = 0; i < locals.Length && i < frame.Locals.Length; i++)
-        {
-            frame.Locals[i] = locals[i];
-        }
+        RestoreLocalsFromObjects(locals, frame.Locals);
 
         // 保存调用者的栈状态和调用栈
-        var callerStack = new Stack<object?>(_stack.Reverse());
+        var callerStack = _stack.SnapshotBottomToTop();
         var callerCallStackCount = _callStack.Count;
 
         // 恢复生成器的栈
         _stack.Clear();
         foreach (var item in stack.Reverse())
         {
-            _stack.Push(item);
+            _stack.PushObject(item);
         }
 
         _callStack.Push(frame);
@@ -119,11 +141,7 @@ public partial class VirtualMachine
             _callStack.Pop();
 
             // 恢复调用者的栈状态
-            _stack.Clear();
-            foreach (var item in callerStack.Reverse())
-            {
-                _stack.Push(item);
-            }
+            _stack.RestoreFromBottom(callerStack);
         }
     }
 }

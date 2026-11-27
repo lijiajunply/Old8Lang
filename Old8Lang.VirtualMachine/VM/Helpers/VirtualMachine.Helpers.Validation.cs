@@ -220,6 +220,23 @@ public partial class VirtualMachine
     /// 验证逻辑运算符的操作数类型
     /// </summary>
 
+    private void ValidateLogicalOperand(VmValue value, string operatorName, Instruction instruction)
+    {
+        if (value.Kind == VmValueKind.Bool)
+            return;
+
+        if (value.Kind == VmValueKind.Object && value.ObjectRef is BoolLangValue)
+            return;
+
+        var actualType = GetValueTypeName(value);
+        throw new TypeError(
+            GetPosition(instruction),
+            "bool",
+            actualType,
+            $"逻辑运算符 '{operatorName}' 的操作数必须是布尔类型"
+        );
+    }
+
     private void ValidateLogicalOperand(object? value, string operatorName, Instruction instruction)
     {
         // 如果值是布尔类型，直接返回
@@ -246,7 +263,7 @@ public partial class VirtualMachine
     public object? ExecuteFunctionAndGetResult(FunctionMetadata function, object?[] args)
     {
         CallFunction(function, args);
-        return _stack.Count > 0 ? _stack.Pop() : null;
+        return _stack.Count > 0 ? _stack.PopObject() : null;
     }
 }
 

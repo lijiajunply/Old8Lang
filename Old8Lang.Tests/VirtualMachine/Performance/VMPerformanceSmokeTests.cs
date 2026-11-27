@@ -1,5 +1,6 @@
 using Old8Lang.AST.Expression.Value;
 using System.Diagnostics;
+using Xunit.Abstractions;
 using VM = Old8Lang.Bytecode.VM.VirtualMachine;
 
 namespace Old8Lang.Tests.VirtualMachine.Performance;
@@ -18,11 +19,11 @@ namespace Old8Lang.Tests.VirtualMachine.Performance;
 /// </remarks>
 [Collection("Sequential")]
 [Trait("Category", "PerformanceSmoke")]
-public class VMPerformanceSmokeTests
+public class VMPerformanceSmokeTests(ITestOutputHelper output)
 {
     /// <summary>
     /// HighArgCount — 30k 次 8 参数函数调用。
-    /// 实测约 15~40ms / 7.2MB，上限取 400ms / 30MB。
+    /// 类型化值表示改造后实测约 15~35ms / ~1.6KB（原 7.2MB），上限取 400ms / 1MB。
     /// </summary>
     [Fact]
     public void HighArgCount_CallHotPath_StaysWithinSmokeLimits()
@@ -40,18 +41,19 @@ public class VMPerformanceSmokeTests
         ";
 
         var (elapsed, allocated, result) = ExecuteMeasured(code, "result");
+        output.WriteLine($"HighArgCount_CallHotPath: {elapsed.TotalMilliseconds:F2} ms, {allocated} B");
 
         // Σ(i + 28), i ∈ [0, 30000)
         Assert.Equal(450_825_000, GetIntValue(result));
         Assert.True(elapsed.TotalMilliseconds < 400,
             $"HighArgCount_CallHotPath 超出 smoke 上限: {elapsed.TotalMilliseconds:F1}ms (上限 400ms)");
-        Assert.True(allocated < 30L * 1024 * 1024,
-            $"HighArgCount_CallHotPath 分配超限: {allocated / 1024.0 / 1024.0:F1}MB (上限 30MB)");
+        Assert.True(allocated < 1L * 1024 * 1024,
+            $"HighArgCount_CallHotPath 分配超限: {allocated / 1024.0:F1}KB (上限 1MB)");
     }
 
     /// <summary>
     /// HighThrowRate — 40k 迭代、10k 次 throw（每 4 次一次）。
-    /// 实测约 8~13ms / 5.0MB，上限取 300ms / 20MB。
+    /// 类型化值表示改造后实测约 4~12ms / ~1.3KB（原 5.0MB），上限取 300ms / 1MB。
     /// </summary>
     [Fact]
     public void HighThrowRate_TryCatch_StaysWithinSmokeLimits()
@@ -72,18 +74,19 @@ public class VMPerformanceSmokeTests
         ";
 
         var (elapsed, allocated, result) = ExecuteMeasured(code, "result");
+        output.WriteLine($"HighThrowRate_TryCatch: {elapsed.TotalMilliseconds:F2} ms, {allocated} B");
 
         // 非 4 的倍数之和 + 3 × 被 4 整除的个数(10000)
         Assert.Equal(600_030_000, GetIntValue(result));
         Assert.True(elapsed.TotalMilliseconds < 300,
             $"HighThrowRate_TryCatch 超出 smoke 上限: {elapsed.TotalMilliseconds:F1}ms (上限 300ms)");
-        Assert.True(allocated < 20L * 1024 * 1024,
-            $"HighThrowRate_TryCatch 分配超限: {allocated / 1024.0 / 1024.0:F1}MB (上限 20MB)");
+        Assert.True(allocated < 1L * 1024 * 1024,
+            $"HighThrowRate_TryCatch 分配超限: {allocated / 1024.0:F1}KB (上限 1MB)");
     }
 
     /// <summary>
     /// LargeClosureCapture — 50k 次高频闭包调用（外层 8 个捕获变量）。
-    /// 实测约 16~40ms / 14.8MB，上限取 400ms / 45MB。
+    /// 类型化值表示改造后实测约 11~35ms / ~1.9KB（原 14.8MB），上限取 400ms / 1MB。
     /// </summary>
     [Fact]
     public void LargeClosureCapture_HighFreq_StaysWithinSmokeLimits()
@@ -110,13 +113,14 @@ public class VMPerformanceSmokeTests
         ";
 
         var (elapsed, allocated, result) = ExecuteMeasured(code, "result");
+        output.WriteLine($"LargeClosureCapture_HighFreq: {elapsed.TotalMilliseconds:F2} ms, {allocated} B");
 
         // Σ(i + 36), i ∈ [0, 50000)
         Assert.Equal(1_251_775_000, GetIntValue(result));
         Assert.True(elapsed.TotalMilliseconds < 400,
             $"LargeClosureCapture_HighFreq 超出 smoke 上限: {elapsed.TotalMilliseconds:F1}ms (上限 400ms)");
-        Assert.True(allocated < 45L * 1024 * 1024,
-            $"LargeClosureCapture_HighFreq 分配超限: {allocated / 1024.0 / 1024.0:F1}MB (上限 45MB)");
+        Assert.True(allocated < 1L * 1024 * 1024,
+            $"LargeClosureCapture_HighFreq 分配超限: {allocated / 1024.0:F1}KB (上限 1MB)");
     }
 
     /// <summary>

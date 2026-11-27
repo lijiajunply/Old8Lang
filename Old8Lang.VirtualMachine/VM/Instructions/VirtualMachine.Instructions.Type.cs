@@ -18,15 +18,16 @@ public partial class VirtualMachine
             case OpCode.Cast:
             {
                 var targetTypeName = (string)instruction.Operand!;
-                var value = _stack.Pop();
+                var vmValue = _stack.Pop();
 
                 // 1. 如果类型完全匹配（包括泛型检查），直接返回原值
-                if (CheckTypeMatch(targetTypeName, value))
+                if (CheckTypeMatch(targetTypeName, vmValue))
                 {
-                    _stack.Push(value);
+                    _stack.Push(vmValue);
                     break;
                 }
 
+                var value = vmValue.ToObject();
                 try
                 {
                     // 语言值（EnumLangValue / IntLangValue 等）先取出底层原生值，
@@ -59,7 +60,7 @@ public partial class VirtualMachine
                         "dict" => ConvertToDict(value),
                         _ => value // 其他类型直接返回原值
                     };
-                    _stack.Push(convertedValue);
+                    _stack.PushObject(convertedValue);
                 }
                 catch (Exception ex)
                 {
@@ -73,57 +74,32 @@ public partial class VirtualMachine
             {
                 var targetTypeName = (string)instruction.Operand!;
                 var value = _stack.Pop();
-                _stack.Push(CheckTypeMatch(targetTypeName, value));
+                _stack.PushBool(CheckTypeMatch(targetTypeName, value));
             }
                 break;
 
             case OpCode.TypeOf:
             {
-                var value = _stack.Pop();
-                string typeName;
+                var vmValue = _stack.Pop();
+                string typeName = vmValue.Kind switch
+                {
+                    VmValueKind.Null => "null",
+                    VmValueKind.Int => "int",
+                    VmValueKind.Double => "double",
+                    VmValueKind.Bool => "bool",
+                    VmValueKind.Char => "char",
+                    _ => vmValue.ToObject() switch
+                    {
+                        null => "null",
+                        string => "string",
+                        Array => "array",
+                        IList => "list",
+                        IDictionary => "dict",
+                        var obj => DescribeValueType(obj)
+                    }
+                };
 
-                if (value == null)
-                {
-                    typeName = "null";
-                }
-                else if (value is int)
-                {
-                    typeName = "int";
-                }
-                else if (value is double)
-                {
-                    typeName = "double";
-                }
-                else if (value is string)
-                {
-                    typeName = "string";
-                }
-                else if (value is bool)
-                {
-                    typeName = "bool";
-                }
-                else if (value is char)
-                {
-                    typeName = "char";
-                }
-                else if (value is Array)
-                {
-                    typeName = "array";
-                }
-                else if (value is IList)
-                {
-                    typeName = "list";
-                }
-                else if (value is IDictionary)
-                {
-                    typeName = "dict";
-                }
-                else
-                {
-                    typeName = DescribeValueType(value);
-                }
-
-                _stack.Push(typeName);
+                _stack.PushRef(typeName);
             }
                 break;
 
@@ -164,10 +140,7 @@ public partial class VirtualMachine
             case OpCode.DefineMixin:
             case OpCode.ApplyMixin:
             case OpCode.CheckInterface:
-                // 接口和Mixin在编译时处理，运行时不需要额外操作
-                // 这些指令主要用于元数据记录和类型检查
                 break;
-
         }
     }
 }

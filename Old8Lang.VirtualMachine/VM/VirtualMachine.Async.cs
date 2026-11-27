@@ -69,21 +69,18 @@ public partial class VirtualMachine
         };
 
         // 设置局部变量
-        for (int i = 0; i < locals.Length && i < frame.Locals.Length; i++)
-        {
-            frame.Locals[i] = locals[i];
-        }
+        RestoreLocalsFromObjects(locals, frame.Locals);
 
         // 保存调用方的求值栈：生成器执行期间 _stack 要交给生成器自己的栈使用，
         // 与同步生成器 ResumeGenerator 的做法一致。不保存的话，调用方压在栈上的
         // 迭代器对象会被生成器的栈覆盖，恢复后就再也找不回来。
-        var callerStack = new Stack<object?>(_stack.Reverse());
+        var callerStack = _stack.SnapshotBottomToTop();
 
         // 恢复栈
         _stack.Clear();
         foreach (var item in stack.Reverse())
         {
-            _stack.Push(item);
+            _stack.PushObject(item);
         }
 
         _callStack.Push(frame);
@@ -146,11 +143,7 @@ public partial class VirtualMachine
             _callStack.Pop();
 
             // 还原调用方的求值栈
-            _stack.Clear();
-            foreach (var item in callerStack.Reverse())
-            {
-                _stack.Push(item);
-            }
+            _stack.RestoreFromBottom(callerStack);
         }
     }
 
@@ -182,7 +175,7 @@ public partial class VirtualMachine
             case OpCode.Await:
             {
                 // 从栈中弹出 TaskLangValue (或 Task ID)
-                var value = _stack.Pop();
+                var value = _stack.PopObject();
 
                 TaskLangValue taskLangValue;
                 if (value is TaskLangValue t)
@@ -203,7 +196,7 @@ public partial class VirtualMachine
                 var result = taskLangValue.Await();
 
                 // 将结果压入栈（还原成栈上的原生表示）
-                _stack.Push(UnwrapToVmValue(result));
+                _stack.PushObject(UnwrapToVmValue(result));
             }
                 break;
 
@@ -211,7 +204,7 @@ public partial class VirtualMachine
             {
                 // 异步生成器的 yield 操作
                 // 从栈中弹出要 yield 的值
-                var yieldValue = _stack.Pop();
+                var yieldValue = _stack.PopObject();
 
                 // 获取当前异步生成器状态
                 if (frame.AsyncGeneratorId.HasValue)
@@ -220,7 +213,7 @@ public partial class VirtualMachine
                     if (_asyncGenerators.TryGetValue(asyncGeneratorId, out var asyncGeneratorState))
                     {
                         // 保存当前执行状态
-                        var stackArray = _stack.ToArray();
+                        var stackArray = _stack.ToObjectArrayTopToBottom();
                         var stackCopy = new Stack<LangValueType>();
                         foreach (var item in stackArray.Reverse())
                         {
@@ -229,7 +222,10 @@ public partial class VirtualMachine
                         }
 
                         // 保存状态并标记为暂停
-                        asyncGeneratorState.SaveState(frame.IP, frame.Locals, stackCopy);
+                        asyncGeneratorState.SaveState(
+                            frame.IP,
+                            CopyLocalsToObjects(frame.Locals, frame.LocalCount),
+                            stackCopy);
 
                         // 将 yield 的值转换为 LangValueType（无损），并保留栈上的原生表示供迭代使用
                         asyncGeneratorState.CurrentValue = yieldValue as LangValueType ??

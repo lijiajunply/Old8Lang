@@ -42,10 +42,10 @@ public partial class VirtualMachine
 
     /// <summary>
     /// 内联异常分发 - 当 throw 指令的异常能被当前帧捕获时，直接跳转到 catch 块，
-    /// 完全跳过 new VmException + .NET 异常机制（快速路径）。
+    /// 完全跳过 new VmException + .NET 异常机制（快速路径，零装箱）。
     /// </summary>
     /// <returns>如果在当前帧内处理了异常返回 true，否则返回 false（需走跨帧慢路径）</returns>
-    private bool TryHandleExceptionInline(object? exceptionValue, CallFrame frame, FunctionMetadata function)
+    private bool TryHandleExceptionInline(VmValue exceptionValue, CallFrame frame, FunctionMetadata function)
     {
         if (function.ExceptionTable.Count == 0)
             return false;
@@ -70,7 +70,8 @@ public partial class VirtualMachine
                     continue;
                 }
 
-                if (inTryBlock && IsExceptionTypeMatch(exceptionValue, entry.ExceptionType))
+                if (inTryBlock &&
+                    (string.IsNullOrEmpty(entry.ExceptionType) || IsExceptionTypeMatch(exceptionValue.ToObject(), entry.ExceptionType)))
                 {
                     if (entry.CatchStart >= 0)
                     {
@@ -144,7 +145,7 @@ public partial class VirtualMachine
                     if (entry.CatchStart >= 0)
                     {
                         // 将异常对象压入栈
-                        _stack.Push(exceptionValue);
+                        _stack.PushObject(exceptionValue);
                         frame.IP = entry.CatchStart;
                         return true;
                     }

@@ -1,4 +1,6 @@
 using System.Collections;
+using System.Runtime.CompilerServices;
+using Old8Lang.Bytecode.Core;
 
 namespace Old8Lang.Bytecode.Metadata;
 
@@ -8,6 +10,7 @@ namespace Old8Lang.Bytecode.Metadata;
 public class ConstantPool : IEnumerable<object>
 {
     private readonly List<object> _constants = [];
+    private readonly List<VmValue> _vmConstants = [];
     private readonly Dictionary<object, int> _constantIndexMap = new();
 
     /// <summary>常量数量</summary>
@@ -28,6 +31,7 @@ public class ConstantPool : IEnumerable<object>
         // 添加新常量
         int index = _constants.Count;
         _constants.Add(value);
+        _vmConstants.Add(VmValue.FromObject(value));
         _constantIndexMap[value] = index;
         return index;
     }
@@ -41,6 +45,18 @@ public class ConstantPool : IEnumerable<object>
             throw new ArgumentOutOfRangeException(nameof(index), $"常量池索引越界: {index}");
 
         return _constants[index];
+    }
+
+    /// <summary>
+    /// 获取指定索引的类型化常量值（VM <c>LoadConst</c> 热路径使用，避免重复类型判断与拆箱）。
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public VmValue GetConstantValue(int index)
+    {
+        if ((uint)index >= (uint)_vmConstants.Count)
+            throw new ArgumentOutOfRangeException(nameof(index), $"常量池索引越界: {index}");
+
+        return _vmConstants[index];
     }
 
     /// <summary>
@@ -120,6 +136,7 @@ public class ConstantPool : IEnumerable<object>
             };
 
             pool._constants.Add(constant);
+            pool._vmConstants.Add(VmValue.FromObject(constant));
             pool._constantIndexMap[constant] = i;
         }
 

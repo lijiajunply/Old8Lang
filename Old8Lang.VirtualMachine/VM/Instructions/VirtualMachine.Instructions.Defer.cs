@@ -48,7 +48,7 @@ public partial class VirtualMachine
 
                 // 创建 extern 函数包装器
                 var externFunc = new ExternFunctionWrapper(dllName, funcName, externType, callingConv, signatureStr);
-                _stack.Push(externFunc);
+                _stack.PushRef(externFunc);
             }
                 break;
 
@@ -71,12 +71,12 @@ public partial class VirtualMachine
                 var args = new object?[argCount];
                 for (int i = argCount - 1; i >= 0; i--)
                 {
-                    args[i] = _stack.Pop();
+                    args[i] = _stack.PopObject();
                 }
 
                 // 调用 extern 函数
                 var result = externFunc.Invoke(args);
-                _stack.Push(result);
+                _stack.PushObject(result);
             }
                 break;
 
@@ -84,7 +84,7 @@ public partial class VirtualMachine
             {
                 // DisposeResource 指令：释放 using 语句的资源
                 // 从栈顶弹出资源并调用相应的 Dispose 方法
-                var resource = _stack.Pop();
+                var resource = _stack.PopObject();
 
                 // 1. 如果是整数值（资源ID），尝试通过 ResourceManager 释放
                 if (resource is int resourceId)

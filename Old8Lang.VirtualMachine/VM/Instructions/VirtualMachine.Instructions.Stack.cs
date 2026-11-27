@@ -1,6 +1,5 @@
 using Old8Lang.Bytecode.Closures;
 using Old8Lang.Bytecode.Core;
-using Old8Lang.Error;
 using System.Runtime.CompilerServices;
 
 // ReSharper disable once CheckNamespace
@@ -22,32 +21,29 @@ public partial class VirtualMachine
 
             case OpCode.LoadConst:
             {
-                int constIndex = (int)instruction.Operand!;
                 // 优先使用调用帧的常量池（用于模块导入的函数）
                 var constantPool = frame.ConstantPool ?? _bytecodeFile.ConstantPool;
-                var constant = constantPool.GetConstant(constIndex);
-                _stack.Push(constant);
+                _stack.Push(constantPool.GetConstantValue(instruction.IntOperand));
             }
                 break;
 
             case OpCode.LoadLocal:
             {
-                int localIndex = (int)instruction.Operand!;
                 // 被闭包按引用捕获的局部变量槽位里放的是共享单元，读取时解引用
-                var localValue = frame.Locals[localIndex];
-                _stack.Push(localValue is UpValueCell cell ? cell.Value : localValue);
+                var localValue = frame.Locals[instruction.IntOperand];
+                _stack.Push(localValue.Kind == VmValueKind.UpValue ? localValue.AsUpValue.Value : localValue);
             }
                 break;
 
             case OpCode.StoreLocal:
             {
-                int localIndex = (int)instruction.Operand!;
+                int localIndex = instruction.IntOperand;
                 var localValue = _stack.Pop();
                 // 已装箱的槽位要写进共享单元，而不是把盒子本身替换掉，
                 // 否则闭包持有的盒子会与外层脱离，写回失效
-                if (frame.Locals[localIndex] is UpValueCell cell)
+                if (frame.Locals[localIndex].Kind == VmValueKind.UpValue)
                 {
-                    cell.Value = localValue;
+                    frame.Locals[localIndex].AsUpValue.Value = localValue;
                 }
                 else
                 {
@@ -60,10 +56,10 @@ public partial class VirtualMachine
             {
                 // 循环变量每轮迭代换一个新的共享单元：已经装箱时换成新盒子，
                 // 此前创建的闭包继续持有旧盒子（各自保留当轮的值）；未装箱则无事发生。
-                int localIndex = (int)instruction.Operand!;
-                if (frame.Locals[localIndex] is UpValueCell existing)
+                int localIndex = instruction.IntOperand;
+                if (frame.Locals[localIndex].Kind == VmValueKind.UpValue)
                 {
-                    frame.Locals[localIndex] = new UpValueCell(existing.Value);
+                    frame.Locals[localIndex] = VmValue.FromUpValue(new UpValueCell(frame.Locals[localIndex].AsUpValue.Value));
                 }
             }
                 break;
@@ -71,9 +67,9 @@ public partial class VirtualMachine
             case OpCode.LoadGlobal:
             {
                 string varName = (string)instruction.Operand!;
-                if (frame.ClosureEnvironment != null)
+                if (frame.ClosureEnvironment is { IsEmpty: false } closureEnv)
                 {
-                    _stack.Push(ResolveGlobalValue(frame, varName, instruction));
+                    _stack.Push(ResolveGlobalVmValue(closureEnv, varName, instruction));
                     break;
                 }
 
@@ -84,7 +80,7 @@ public partial class VirtualMachine
                     instruction.CachedGlobalSlot = slot;
                 }
 
-                _stack.Push(slot.Value);
+                _stack.Push(slot.GetValue());
             }
                 break;
 
@@ -93,7 +89,7 @@ public partial class VirtualMachine
                 string varName = (string)instruction.Operand!;
                 var globalValue = _stack.Pop();
                 // 被闭包捕获的名字写进共享单元；否则写全局表
-                if (frame.ClosureEnvironment == null)
+                if (frame.ClosureEnvironment is null or { IsEmpty: true })
                 {
                     var slot = instruction.CachedGlobalSlot;
                     if (slot == null || slot.Owner != _globalsOwnerId)
@@ -102,44 +98,38 @@ public partial class VirtualMachine
                         instruction.CachedGlobalSlot = slot;
                     }
 
-                    slot.Value = globalValue;
+                    slot.SetValue(globalValue);
                 }
-                else if (!frame.ClosureEnvironment.TrySetValue(varName, globalValue))
+                else if (!frame.ClosureEnvironment.TrySetVmValue(varName, globalValue))
                 {
-                    SetGlobalValue(varName, globalValue);
+                    SetGlobalVmValue(varName, globalValue);
                 }
             }
                 break;
 
             case OpCode.Pop:
-                _stack.Pop();
+                _stack.PopDiscard();
                 break;
 
             case OpCode.Dup:
-                _stack.Push(_stack.Peek());
+                _stack.Dup();
                 break;
 
             case OpCode.LoadNull:
-                _stack.Push(null);
+                _stack.PushNull();
                 break;
 
             case OpCode.LoadTrue:
-                _stack.Push(VmBoxed.True);
+                _stack.PushBool(true);
                 break;
 
             case OpCode.LoadFalse:
-                _stack.Push(VmBoxed.False);
+                _stack.PushBool(false);
                 break;
 
             case OpCode.Swap:
-            {
-                var a = _stack.Pop();
-                var b = _stack.Pop();
-                _stack.Push(a);
-                _stack.Push(b);
-            }
+                _stack.Swap();
                 break;
-
         }
     }
 }

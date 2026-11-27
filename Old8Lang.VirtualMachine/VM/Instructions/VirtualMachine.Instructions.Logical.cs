@@ -19,7 +19,7 @@ public partial class VirtualMachine
                 // 检查操作数是否为布尔类型
                 ValidateLogicalOperand(a, "&&", instruction);
                 ValidateLogicalOperand(b, "&&", instruction);
-                _stack.Push(ToBool(a) && ToBool(b));
+                _stack.PushBool(ToBool(a) && ToBool(b));
             }
                 break;
 
@@ -30,7 +30,7 @@ public partial class VirtualMachine
                 // 检查操作数是否为布尔类型
                 ValidateLogicalOperand(a, "||", instruction);
                 ValidateLogicalOperand(b, "||", instruction);
-                _stack.Push(ToBool(a) || ToBool(b));
+                _stack.PushBool(ToBool(a) || ToBool(b));
             }
                 break;
 
@@ -39,10 +39,9 @@ public partial class VirtualMachine
                 var a = _stack.Pop();
                 // 检查操作数是否为布尔类型
                 ValidateLogicalOperand(a, "!", instruction);
-                _stack.Push(!ToBool(a));
+                _stack.PushBool(!ToBool(a));
             }
                 break;
-
         }
     }
 }

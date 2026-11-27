@@ -3,13 +3,35 @@ namespace Old8Lang.Bytecode.Core;
 /// <summary>
 /// 字节码指令
 /// </summary>
-public class Instruction(OpCode opCode, object? operand = null)
+public class Instruction
 {
+    private object? _operand;
+
     /// <summary>操作码</summary>
-    public OpCode OpCode { get; set; } = opCode;
+    public OpCode OpCode { get; set; }
+
+    /// <summary>
+    /// 整数操作数快速缓存（当 <see cref="Operand"/> 为 <see cref="int"/> 时自动同步，
+    /// 供 VM 热路径直接读取，避免每条指令执行 <c>(int)Operand</c> 拆箱）。
+    /// </summary>
+    internal int IntOperand;
 
     /// <summary>操作数(可选)</summary>
-    public object? Operand { get; set; } = operand;
+    public object? Operand
+    {
+        get => _operand;
+        set
+        {
+            _operand = value;
+            IntOperand = value is int intVal ? intVal : 0;
+        }
+    }
+
+    public Instruction(OpCode opCode, object? operand = null)
+    {
+        OpCode = opCode;
+        Operand = operand;
+    }
 
     /// <summary>源文件路径(用于调试)</summary>
     public string? SourceFile { get; set; }

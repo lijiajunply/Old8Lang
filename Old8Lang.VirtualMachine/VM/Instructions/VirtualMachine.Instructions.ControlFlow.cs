@@ -1,11 +1,6 @@
 using Old8Lang.Bytecode.Core;
 using Old8Lang.Bytecode.Closures;
-using Old8Lang.Bytecode.Generators;
-using Old8Lang.Bytecode.Interop;
-using Old8Lang.Bytecode.Metadata;
 using Old8Lang.Error;
-using Old8Lang.GlobalFunctions.Core;
-using ClassMetadata = Old8Lang.Bytecode.Metadata.ClassMetadata;
 
 // ReSharper disable once CheckNamespace
 namespace Old8Lang.Bytecode.VM;
@@ -21,29 +16,24 @@ public partial class VirtualMachine
         {
             case OpCode.Jump:
             {
-                int targetIP = (int)instruction.Operand!;
-                frame.IP = targetIP;
+                frame.IP = instruction.IntOperand;
             }
                 break;
 
             case OpCode.JumpIfFalse:
             {
-                int targetIP = (int)instruction.Operand!;
-                var condition = _stack.Pop();
-                if (!ToBool(condition))
+                if (!ToBool(_stack.Pop()))
                 {
-                    frame.IP = targetIP;
+                    frame.IP = instruction.IntOperand;
                 }
             }
                 break;
 
             case OpCode.JumpIfTrue:
             {
-                int targetIP = (int)instruction.Operand!;
-                var condition = _stack.Pop();
-                if (ToBool(condition))
+                if (ToBool(_stack.Pop()))
                 {
-                    frame.IP = targetIP;
+                    frame.IP = instruction.IntOperand;
                 }
             }
                 break;
@@ -53,7 +43,6 @@ public partial class VirtualMachine
                 ExecuteCallInstruction(instruction, frame);
             }
                 break;
-
 
             case OpCode.CallNative:
             {
@@ -70,13 +59,13 @@ public partial class VirtualMachine
                     var args = new object?[argCount];
                     for (int i = argCount - 1; i >= 0; i--)
                     {
-                        args[i] = _stack.Pop();
+                        args[i] = _stack.PopObject();
                     }
 
                     // 调用原生函数
                     // 必须无条件压入：原生函数常常没有返回值（如 PrintLine、Sleep），
                     // 但调用方按"一次调用在栈上留下一个值"的约定消费，漏压会导致栈失衡
-                    _stack.Push(CallNativeFunction(funcName, args));
+                    _stack.PushObject(CallNativeFunction(funcName, args));
                 }
                 else
                 {
@@ -90,19 +79,19 @@ public partial class VirtualMachine
                     var namedArgValues = new object?[namedCount];
                     for (int i = namedCount - 1; i >= 0; i--)
                     {
-                        namedArgValues[i] = _stack.Pop();
+                        namedArgValues[i] = _stack.PopObject();
                     }
 
                     var positionalArgs = new object?[positionalCount];
                     for (int i = positionalCount - 1; i >= 0; i--)
                     {
-                        positionalArgs[i] = _stack.Pop();
+                        positionalArgs[i] = _stack.PopObject();
                     }
 
                     // 调用原生函数
                     // 必须无条件压入：原生函数常常没有返回值（如 PrintLine、Sleep），
                     // 但调用方按"一次调用在栈上留下一个值"的约定消费，漏压会导致栈失衡
-                    _stack.Push(CallNamedNativeFunction(funcName, positionalArgs, namedArgNames, namedArgValues));
+                    _stack.PushObject(CallNamedNativeFunction(funcName, positionalArgs, namedArgNames, namedArgValues));
                 }
             }
                 break;
@@ -119,7 +108,7 @@ public partial class VirtualMachine
                 // 检查返回值类型
                 if (!string.IsNullOrEmpty(frame.Function.ReturnType) && frame.Function.ReturnType != "void")
                 {
-                    var returnValue = _stack.Count > 0 ? _stack.Peek() : null;
+                    var returnValue = _stack.Count > 0 ? _stack.Peek() : VmValue.Null;
                     if (!CheckTypeMatch(frame.Function.ReturnType, returnValue))
                     {
                         var actualType = GetValueTypeName(returnValue);
@@ -157,12 +146,12 @@ public partial class VirtualMachine
 
             case OpCode.MakeFunction:
             {
-                int funcIndex = (int)instruction.Operand!;
+                int funcIndex = instruction.IntOperand;
                 // Get function metadata from bytecode file
                 if (funcIndex >= 0 && funcIndex < _bytecodeFile.Functions.Count)
                 {
                     var funcMeta = _bytecodeFile.Functions[funcIndex];
-                    _stack.Push(funcMeta);
+                    _stack.PushRef(funcMeta);
                 }
                 else
                 {
@@ -208,7 +197,7 @@ public partial class VirtualMachine
                     switch (captureKind)
                     {
                         case 0:
-                            // 按引用捕获：把外层帧的槽位原地装箱，闭包与外层此后共用同一个共享单元，
+                            // 按引用捕获：把外层帧的槽位原地包装为共享单元，闭包与外层此后共用同一个盒子，
                             // 因此外层之后再赋值闭包也能读到，闭包内的赋值也能传回外层。
                             localCapturedNames[localCaptureIndex] = captureName;
                             localCapturedCells[localCaptureIndex] =
@@ -227,16 +216,17 @@ public partial class VirtualMachine
                 }
 
                 ClosureEnvironment closureEnvironment = localCaptureCount == 0
-                    ? new ClosureEnvironment([], [], frame.ClosureEnvironment)
+                    ? (frame.ClosureEnvironment == null
+                        ? ClosureEnvironment.Empty
+                        : new ClosureEnvironment([], [], frame.ClosureEnvironment))
                     : new ClosureEnvironment(
                         localCapturedNames,
                         localCapturedCells,
                         frame.ClosureEnvironment);
                 var closure = new ClosureValue(funcMeta, closureEnvironment);
-                _stack.Push(closure);
+                _stack.PushRef(closure);
             }
                 break;
-
         }
     }
 }

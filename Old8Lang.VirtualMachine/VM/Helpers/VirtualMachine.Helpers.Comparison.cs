@@ -1,6 +1,8 @@
+using System.Runtime.CompilerServices;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.AnyValues;
 using Old8Lang.AST.Expression.Value;
+using Old8Lang.Bytecode.Core;
 using Old8Lang.Bytecode.Metadata;
 using Old8Lang.Error;
 
@@ -8,10 +10,50 @@ using Old8Lang.Error;
 namespace Old8Lang.Bytecode.VM;
 
 /// <summary>
-/// VirtualMachine - 比较运算
+/// VirtualMachine - 比较运算（类型化热路径 + 动态/重载慢路径）
 /// </summary>
 public partial class VirtualMachine
 {
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private bool Equals(VmValue a, VmValue b)
+    {
+        if (a.Kind == VmValueKind.Int && b.Kind == VmValueKind.Int)
+            return a.AsInt == b.AsInt;
+
+        if (a.Kind == VmValueKind.Null && b.Kind == VmValueKind.Null)
+            return true;
+
+        if (a.Kind == VmValueKind.Null || b.Kind == VmValueKind.Null)
+            return false;
+
+        if (a.Kind == VmValueKind.Bool && b.Kind == VmValueKind.Bool)
+            return a.AsBool == b.AsBool;
+
+        if (a.Kind == VmValueKind.Double && b.Kind == VmValueKind.Double)
+            return Math.Abs(a.AsDouble - b.AsDouble) < 1e-10;
+
+        if (a.Kind == VmValueKind.Char && b.Kind == VmValueKind.Char)
+            return a.AsChar == b.AsChar;
+
+        if (a.Kind == VmValueKind.Long && b.Kind == VmValueKind.Long)
+            return a.AsLong == b.AsLong;
+
+        // 混合基础数值类型：与既有逻辑一致（3 == 3.0 为 true）
+        if (a.Kind is VmValueKind.Int or VmValueKind.Long or VmValueKind.Double &&
+            b.Kind is VmValueKind.Int or VmValueKind.Long or VmValueKind.Double)
+        {
+            return a.ToDoubleValue() == b.ToDoubleValue();
+        }
+
+        if (a.Kind == VmValueKind.Object && b.Kind == VmValueKind.Object &&
+            a.ObjectRef is string sa && b.ObjectRef is string sb)
+        {
+            return string.Equals(sa, sb, StringComparison.Ordinal);
+        }
+
+        return Equals(a.ToObject(), b.ToObject());
+    }
+
     private new bool Equals(object? a, object? b)
     {
         if (a == null && b == null) return true;
@@ -44,7 +86,6 @@ public partial class VirtualMachine
             return langValueA.Equal(bValue);
         }
 
-        if (a is int ia && b is int ib) return ia == ib;
         if (a is double da && b is double db) return Math.Abs(da - db) < 1e-10;
         // 混合数值类型按数值比较：解释器里 `3 == 3.0` 为 true。
         // 这里不处理会落到 object.Equals，int 与 double 永远是 false，
@@ -66,7 +107,6 @@ public partial class VirtualMachine
         return object.Equals(a, b);
     }
 
-
     /// <summary>
     /// 判断值是否是 CLR 原生数值（用于混合数值类型的相等比较）。
     /// </summary>
@@ -74,11 +114,42 @@ public partial class VirtualMachine
         value is byte or sbyte or short or ushort or int or uint or long or ulong
             or float or double or decimal;
 
-    private bool Greater(object? a, object? b)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private bool Greater(VmValue a, VmValue b)
     {
-        // 热路径：整数比较优先判定
-        if (a is int fastIa && b is int fastIb) return fastIa > fastIb;
+        if (a.Kind == VmValueKind.Int && b.Kind == VmValueKind.Int)
+            return a.AsInt > b.AsInt;
 
+        if (a.Kind == VmValueKind.Double && b.Kind == VmValueKind.Double)
+            return a.AsDouble > b.AsDouble;
+
+        if (a.Kind == VmValueKind.Int && b.Kind == VmValueKind.Double)
+            return a.AsInt > b.AsDouble;
+
+        if (a.Kind == VmValueKind.Double && b.Kind == VmValueKind.Int)
+            return a.AsDouble > b.AsInt;
+
+        if (a.Kind == VmValueKind.Long && b.Kind == VmValueKind.Long)
+            return a.AsLong > b.AsLong;
+
+        if (a.Kind == VmValueKind.Int && b.Kind == VmValueKind.Long)
+            return (long)a.AsInt > b.AsLong;
+
+        if (a.Kind == VmValueKind.Long && b.Kind == VmValueKind.Int)
+            return a.AsLong > (long)b.AsInt;
+
+        if (a.Kind == VmValueKind.Long && b.Kind == VmValueKind.Double)
+            return a.AsLong > b.AsDouble;
+
+        if (a.Kind == VmValueKind.Double && b.Kind == VmValueKind.Long)
+            return a.AsDouble > b.AsLong;
+
+        return GreaterSlow(a.ToObject(), b.ToObject());
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private bool GreaterSlow(object? a, object? b)
+    {
         // 检查是否是 BytecodeObjectInstance（运算符重载）
         if (a is BytecodeObjectInstance objA)
         {
@@ -102,20 +173,46 @@ public partial class VirtualMachine
             return langValueA.Greater(bValue);
         }
 
-        if (a is int ia && b is int ib) return ia > ib;
-        if (a is double da && b is double db) return da > db;
-        if (a is int ia2 && b is double db2) return ia2 > db2;
-        if (a is double da2 && b is int ib2) return da2 > ib2;
         if (a is string sa && b is string sb) return string.CompareOrdinal(sa, sb) > 0;
         throw new InvalidOperationError(new SourcePosition(), $"无法对类型 {DescribeValueType(a)} 和 {DescribeValueType(b)} 执行大于比较");
     }
 
-
-    private bool Less(object? a, object? b)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private bool Less(VmValue a, VmValue b)
     {
-        // 热路径：整数比较优先判定
-        if (a is int fastIa && b is int fastIb) return fastIa < fastIb;
+        if (a.Kind == VmValueKind.Int && b.Kind == VmValueKind.Int)
+            return a.AsInt < b.AsInt;
 
+        if (a.Kind == VmValueKind.Double && b.Kind == VmValueKind.Double)
+            return a.AsDouble < b.AsDouble;
+
+        if (a.Kind == VmValueKind.Int && b.Kind == VmValueKind.Double)
+            return a.AsInt < b.AsDouble;
+
+        if (a.Kind == VmValueKind.Double && b.Kind == VmValueKind.Int)
+            return a.AsDouble < b.AsInt;
+
+        if (a.Kind == VmValueKind.Long && b.Kind == VmValueKind.Long)
+            return a.AsLong < b.AsLong;
+
+        if (a.Kind == VmValueKind.Int && b.Kind == VmValueKind.Long)
+            return (long)a.AsInt < b.AsLong;
+
+        if (a.Kind == VmValueKind.Long && b.Kind == VmValueKind.Int)
+            return a.AsLong < (long)b.AsInt;
+
+        if (a.Kind == VmValueKind.Long && b.Kind == VmValueKind.Double)
+            return a.AsLong < b.AsDouble;
+
+        if (a.Kind == VmValueKind.Double && b.Kind == VmValueKind.Long)
+            return a.AsDouble < b.AsLong;
+
+        return LessSlow(a.ToObject(), b.ToObject());
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private bool LessSlow(object? a, object? b)
+    {
         // 检查是否是 BytecodeObjectInstance（运算符重载）
         if (a is BytecodeObjectInstance objA)
         {
@@ -139,17 +236,43 @@ public partial class VirtualMachine
             return langValueA.Less(bValue);
         }
 
-        if (a is int ia && b is int ib) return ia < ib;
-        if (a is double da && b is double db) return da < db;
-        if (a is int ia2 && b is double db2) return ia2 < db2;
-        if (a is double da2 && b is int ib2) return da2 < ib2;
         if (a is string sa && b is string sb) return string.CompareOrdinal(sa, sb) < 0;
         throw new InvalidOperationError(new SourcePosition(), $"无法对类型 {DescribeValueType(a)} 和 {DescribeValueType(b)} 执行小于比较");
     }
 
-
-    private bool GreaterEqual(object? a, object? b)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private bool GreaterEqual(VmValue a, VmValue b)
     {
+        if (a.Kind == VmValueKind.Int && b.Kind == VmValueKind.Int)
+            return a.AsInt >= b.AsInt;
+
+        if (a.Kind == VmValueKind.Double && b.Kind == VmValueKind.Double)
+            return a.AsDouble >= b.AsDouble || Math.Abs(a.AsDouble - b.AsDouble) < 1e-10;
+
+        if (a.Kind == VmValueKind.Int && b.Kind == VmValueKind.Double)
+            return a.AsInt >= b.AsDouble;
+
+        if (a.Kind == VmValueKind.Double && b.Kind == VmValueKind.Int)
+            return a.AsDouble >= b.AsInt;
+
+        if (a.Kind == VmValueKind.Long && b.Kind == VmValueKind.Long)
+            return a.AsLong >= b.AsLong;
+
+        if (a.Kind == VmValueKind.Int && b.Kind == VmValueKind.Long)
+            return (long)a.AsInt >= b.AsLong;
+
+        if (a.Kind == VmValueKind.Long && b.Kind == VmValueKind.Int)
+            return a.AsLong >= (long)b.AsInt;
+
+        return GreaterEqualSlow(a, b);
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private bool GreaterEqualSlow(VmValue aVal, VmValue bVal)
+    {
+        var a = aVal.ToObject();
+        var b = bVal.ToObject();
+
         // 检查是否是 BytecodeObjectInstance（运算符重载）
         if (a is BytecodeObjectInstance objA)
         {
@@ -157,7 +280,7 @@ public partial class VirtualMachine
             if (result is bool boolResult)
                 return boolResult;
             // 如果没有 _ge 方法，尝试使用 _gt 和 _eq
-            return Greater(a, b) || Equals(a, b);
+            return GreaterSlow(a, b) || Equals(a, b);
         }
 
         // 检查是否是 AnyLangValue（运算符重载）
@@ -174,12 +297,42 @@ public partial class VirtualMachine
             return langValueA.GreaterEqual(bValue);
         }
 
-        return Greater(a, b) || Equals(a, b);
+        return Greater(aVal, bVal) || Equals(aVal, bVal);
     }
 
-
-    private bool LessEqual(object? a, object? b)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private bool LessEqual(VmValue a, VmValue b)
     {
+        if (a.Kind == VmValueKind.Int && b.Kind == VmValueKind.Int)
+            return a.AsInt <= b.AsInt;
+
+        if (a.Kind == VmValueKind.Double && b.Kind == VmValueKind.Double)
+            return a.AsDouble <= b.AsDouble || Math.Abs(a.AsDouble - b.AsDouble) < 1e-10;
+
+        if (a.Kind == VmValueKind.Int && b.Kind == VmValueKind.Double)
+            return a.AsInt <= b.AsDouble;
+
+        if (a.Kind == VmValueKind.Double && b.Kind == VmValueKind.Int)
+            return a.AsDouble <= b.AsInt;
+
+        if (a.Kind == VmValueKind.Long && b.Kind == VmValueKind.Long)
+            return a.AsLong <= b.AsLong;
+
+        if (a.Kind == VmValueKind.Int && b.Kind == VmValueKind.Long)
+            return (long)a.AsInt <= b.AsLong;
+
+        if (a.Kind == VmValueKind.Long && b.Kind == VmValueKind.Int)
+            return a.AsLong <= (long)b.AsInt;
+
+        return LessEqualSlow(a, b);
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private bool LessEqualSlow(VmValue aVal, VmValue bVal)
+    {
+        var a = aVal.ToObject();
+        var b = bVal.ToObject();
+
         // 检查是否是 BytecodeObjectInstance（运算符重载）
         if (a is BytecodeObjectInstance objA)
         {
@@ -187,7 +340,7 @@ public partial class VirtualMachine
             if (result is bool boolResult)
                 return boolResult;
             // 如果没有 _le 方法，尝试使用 _lt 和 _eq
-            return Less(a, b) || Equals(a, b);
+            return LessSlow(a, b) || Equals(a, b);
         }
 
         // 检查是否是 AnyLangValue（运算符重载）
@@ -204,8 +357,6 @@ public partial class VirtualMachine
             return langValueA.LessEqual(bValue);
         }
 
-        return Less(a, b) || Equals(a, b);
+        return Less(aVal, bVal) || Equals(aVal, bVal);
     }
-
-
 }

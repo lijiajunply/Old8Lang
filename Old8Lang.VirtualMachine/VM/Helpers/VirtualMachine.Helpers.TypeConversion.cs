@@ -1,6 +1,8 @@
 using System.Collections;
+using System.Runtime.CompilerServices;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Value;
+using Old8Lang.Bytecode.Core;
 using Old8Lang.Error;
 
 // ReSharper disable once CheckNamespace
@@ -27,6 +29,27 @@ public partial class VirtualMachine
         }
 
         throw new InvalidCastException($"无法将类型 {DescribeValueType(value)} 转换为 dict");
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static bool ToBool(VmValue value)
+    {
+        return value.Kind switch
+        {
+            VmValueKind.Bool => value.AsBool,
+            VmValueKind.Int => value.AsInt != 0,
+            VmValueKind.Null => false,
+            VmValueKind.Double => Math.Abs(value.AsDouble) > 1e-10,
+            VmValueKind.Long => value.AsLong != 0,
+            VmValueKind.Char => true,
+            _ => value.ObjectRef switch
+            {
+                null => false,
+                BoolLangValue boolLangValue => boolLangValue.Value,
+                string s => !string.IsNullOrEmpty(s),
+                _ => true
+            }
+        };
     }
 
     private bool ToBool(object? value)

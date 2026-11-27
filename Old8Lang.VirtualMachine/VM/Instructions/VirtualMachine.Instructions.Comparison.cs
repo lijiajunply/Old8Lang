@@ -17,7 +17,7 @@ public partial class VirtualMachine
             {
                 var b = _stack.Pop();
                 var a = _stack.Pop();
-                _stack.Push(VmBoxed.Bool(Equals(a, b)));
+                _stack.PushBool(Equals(a, b));
             }
                 break;
 
@@ -25,7 +25,7 @@ public partial class VirtualMachine
             {
                 var b = _stack.Pop();
                 var a = _stack.Pop();
-                _stack.Push(VmBoxed.Bool(!Equals(a, b)));
+                _stack.PushBool(!Equals(a, b));
             }
                 break;
 
@@ -33,7 +33,7 @@ public partial class VirtualMachine
             {
                 var b = _stack.Pop();
                 var a = _stack.Pop();
-                _stack.Push(VmBoxed.Bool(Greater(a, b)));
+                _stack.PushBool(Greater(a, b));
             }
                 break;
 
@@ -41,7 +41,7 @@ public partial class VirtualMachine
             {
                 var b = _stack.Pop();
                 var a = _stack.Pop();
-                _stack.Push(VmBoxed.Bool(Less(a, b)));
+                _stack.PushBool(Less(a, b));
             }
                 break;
 
@@ -49,7 +49,7 @@ public partial class VirtualMachine
             {
                 var b = _stack.Pop();
                 var a = _stack.Pop();
-                _stack.Push(VmBoxed.Bool(GreaterEqual(a, b)));
+                _stack.PushBool(GreaterEqual(a, b));
             }
                 break;
 
@@ -57,18 +57,17 @@ public partial class VirtualMachine
             {
                 var b = _stack.Pop();
                 var a = _stack.Pop();
-                _stack.Push(VmBoxed.Bool(LessEqual(a, b)));
+                _stack.PushBool(LessEqual(a, b));
             }
                 break;
 
             case OpCode.In:
             {
-                var collection = _stack.Pop();
-                var value = _stack.Pop();
-                _stack.Push(VmBoxed.Bool(ContainsIn(value, collection)));
+                var collection = _stack.PopObject();
+                var value = _stack.PopObject();
+                _stack.PushBool(ContainsIn(value, collection));
             }
                 break;
-
         }
     }
 
@@ -91,7 +90,7 @@ public partial class VirtualMachine
                 {
                     char character => text.Contains(character),
                     string substring => text.Contains(substring, StringComparison.Ordinal),
-                    _ => text.Contains(value.ToString() ?? string.Empty, StringComparison.Ordinal)
+                    _ => text.Contains(value?.ToString() ?? string.Empty, StringComparison.Ordinal)
                 };
             case ILangList langList:
                 return langList.In(ConvertToLangValueType(value));

@@ -207,14 +207,14 @@ public partial class VirtualMachine
         var parameters = frame.Function.Parameters;
         for (int i = 0; i < parameters.Count && i < frame.Locals.Length; i++)
         {
-            result[parameters[i]] = frame.Locals[i];
+            result[parameters[i]] = frame.Locals[i].ToObject();
         }
 
         foreach (var (index, name) in frame.Function.LocalVariableNames)
         {
             if (index >= 0 && index < frame.Locals.Length && index < frame.LocalCount)
             {
-                result[name] = frame.Locals[index];
+                result[name] = frame.Locals[index].ToObject();
             }
         }
 

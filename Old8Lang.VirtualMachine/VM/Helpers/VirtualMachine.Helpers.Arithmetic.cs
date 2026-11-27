@@ -1,5 +1,7 @@
+using System.Runtime.CompilerServices;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.AnyValues;
+using Old8Lang.Bytecode.Core;
 using Old8Lang.Bytecode.Metadata;
 using Old8Lang.Error;
 
@@ -7,25 +9,55 @@ using Old8Lang.Error;
 namespace Old8Lang.Bytecode.VM;
 
 /// <summary>
-/// VirtualMachine - 算术运算
+/// VirtualMachine - 算术运算（类型化热路径 + 动态/重载慢路径）
 /// </summary>
 public partial class VirtualMachine
 {
-    private object? Add(object? a, object? b)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private VmValue Add(VmValue a, VmValue b)
     {
-        // 热路径：整数加法优先判定，避免每次都先走运算符重载分支。
-        // 溢出时与后面的通用分支一致地升级为 long。
-        if (a is int fastIa && b is int fastIb)
+        // 极热路径：32 位整数加法，溢出时升级为 long
+        if (a.Kind == VmValueKind.Int && b.Kind == VmValueKind.Int)
         {
-            long fastResult = (long)fastIa + (long)fastIb;
+            long fastResult = (long)a.AsInt + (long)b.AsInt;
             if (fastResult > int.MaxValue || fastResult < int.MinValue)
             {
-                return fastResult;
+                return VmValue.FromLong(fastResult);
             }
 
-            return (int)fastResult;
+            return VmValue.FromInt((int)fastResult);
         }
 
+        if (a.Kind == VmValueKind.Double && b.Kind == VmValueKind.Double)
+            return VmValue.FromDouble(a.AsDouble + b.AsDouble);
+
+        if (a.Kind == VmValueKind.Int && b.Kind == VmValueKind.Double)
+            return VmValue.FromDouble(a.AsInt + b.AsDouble);
+
+        if (a.Kind == VmValueKind.Double && b.Kind == VmValueKind.Int)
+            return VmValue.FromDouble(a.AsDouble + b.AsInt);
+
+        if (a.Kind == VmValueKind.Long && b.Kind == VmValueKind.Long)
+            return VmValue.FromLong(a.AsLong + b.AsLong);
+
+        if (a.Kind == VmValueKind.Int && b.Kind == VmValueKind.Long)
+            return VmValue.FromLong((long)a.AsInt + b.AsLong);
+
+        if (a.Kind == VmValueKind.Long && b.Kind == VmValueKind.Int)
+            return VmValue.FromLong(a.AsLong + (long)b.AsInt);
+
+        if (a.Kind == VmValueKind.Long && b.Kind == VmValueKind.Double)
+            return VmValue.FromDouble(a.AsLong + b.AsDouble);
+
+        if (a.Kind == VmValueKind.Double && b.Kind == VmValueKind.Long)
+            return VmValue.FromDouble(a.AsDouble + b.AsLong);
+
+        return VmValue.FromObject(AddSlow(a.ToObject(), b.ToObject()));
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private object? AddSlow(object? a, object? b)
+    {
         // 检查是否是 BytecodeObjectInstance（运算符重载）
         if (a is BytecodeObjectInstance objA)
         {
@@ -80,15 +112,6 @@ public partial class VirtualMachine
             }
         }
 
-        // 原有的基本类型处理逻辑
-        if (a is long la && b is long lb) return la + lb;
-        if (a is int ia3 && b is long lb2) return (long)ia3 + lb2;
-        if (a is long la2 && b is int ib3) return la2 + (long)ib3;
-        if (a is double da && b is double db) return da + db;
-        if (a is int ia2 && b is double db2) return ia2 + db2;
-        if (a is double da2 && b is int ib2) return da2 + ib2;
-        if (a is long la3 && b is double db3) return la3 + db3;
-        if (a is double da3 && b is long lb3) return da3 + lb3;
         // 字符串 + 任意值：按语言显示规则转换（bool -> true、列表 -> [1, 2]、null -> null），
         // 与解释器/IL 一致；CLR ToString 会得到 True / System.Int32[]。
         if (a is string || b is string)
@@ -118,12 +141,42 @@ public partial class VirtualMachine
         throw new InvalidOperationError(new SourcePosition(), $"无法对类型 {DescribeValueType(a)} 和 {DescribeValueType(b)} 执行加法");
     }
 
-
-    private object? Sub(object? a, object? b)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private VmValue Sub(VmValue a, VmValue b)
     {
-        // 热路径：整数减法优先判定
-        if (a is int fastIa && b is int fastIb) return fastIa - fastIb;
+        if (a.Kind == VmValueKind.Int && b.Kind == VmValueKind.Int)
+            return VmValue.FromInt(a.AsInt - b.AsInt);
 
+        if (a.Kind == VmValueKind.Double && b.Kind == VmValueKind.Double)
+            return VmValue.FromDouble(a.AsDouble - b.AsDouble);
+
+        if (a.Kind == VmValueKind.Int && b.Kind == VmValueKind.Double)
+            return VmValue.FromDouble(a.AsInt - b.AsDouble);
+
+        if (a.Kind == VmValueKind.Double && b.Kind == VmValueKind.Int)
+            return VmValue.FromDouble(a.AsDouble - b.AsInt);
+
+        if (a.Kind == VmValueKind.Long && b.Kind == VmValueKind.Long)
+            return VmValue.FromLong(a.AsLong - b.AsLong);
+
+        if (a.Kind == VmValueKind.Int && b.Kind == VmValueKind.Long)
+            return VmValue.FromLong((long)a.AsInt - b.AsLong);
+
+        if (a.Kind == VmValueKind.Long && b.Kind == VmValueKind.Int)
+            return VmValue.FromLong(a.AsLong - (long)b.AsInt);
+
+        if (a.Kind == VmValueKind.Long && b.Kind == VmValueKind.Double)
+            return VmValue.FromDouble(a.AsLong - b.AsDouble);
+
+        if (a.Kind == VmValueKind.Double && b.Kind == VmValueKind.Long)
+            return VmValue.FromDouble(a.AsDouble - b.AsLong);
+
+        return VmValue.FromObject(SubSlow(a.ToObject(), b.ToObject()));
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private object? SubSlow(object? a, object? b)
+    {
         // 检查是否是 BytecodeObjectInstance（运算符重载）
         if (a is BytecodeObjectInstance objA)
         {
@@ -161,33 +214,53 @@ public partial class VirtualMachine
             }
         }
 
-        if (a is int ia && b is int ib) return ia - ib;
-        if (a is long la && b is long lb) return la - lb;
-        if (a is int ia3 && b is long lb2) return (long)ia3 - lb2;
-        if (a is long la2 && b is int ib3) return la2 - (long)ib3;
-        if (a is double da && b is double db) return da - db;
-        if (a is int ia2 && b is double db2) return ia2 - db2;
-        if (a is double da2 && b is int ib2) return da2 - ib2;
-        if (a is long la3 && b is double db3) return la3 - db3;
-        if (a is double da3 && b is long lb3) return da3 - lb3;
         throw new InvalidOperationError(new SourcePosition(), $"无法对类型 {DescribeValueType(a)} 和 {DescribeValueType(b)} 执行减法");
     }
 
-
-    private object? Mul(object? a, object? b)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private VmValue Mul(VmValue a, VmValue b)
     {
-        // 热路径：整数乘法优先判定，溢出时与通用分支一致地升级为 long
-        if (a is int fastIa && b is int fastIb)
+        if (a.Kind == VmValueKind.Int && b.Kind == VmValueKind.Int)
         {
-            long fastResult = (long)fastIa * (long)fastIb;
+            long fastResult = (long)a.AsInt * (long)b.AsInt;
             if (fastResult > int.MaxValue || fastResult < int.MinValue)
             {
-                return fastResult;
+                return VmValue.FromLong(fastResult);
             }
 
-            return (int)fastResult;
+            return VmValue.FromInt((int)fastResult);
         }
 
+        if (a.Kind == VmValueKind.Double && b.Kind == VmValueKind.Double)
+            return VmValue.FromDouble(a.AsDouble * b.AsDouble);
+
+        if (a.Kind == VmValueKind.Int && b.Kind == VmValueKind.Double)
+            return VmValue.FromDouble(a.AsInt * b.AsDouble);
+
+        if (a.Kind == VmValueKind.Double && b.Kind == VmValueKind.Int)
+            return VmValue.FromDouble(a.AsDouble * b.AsInt);
+
+        if (a.Kind == VmValueKind.Long && b.Kind == VmValueKind.Long)
+            return VmValue.FromLong(a.AsLong * b.AsLong);
+
+        if (a.Kind == VmValueKind.Int && b.Kind == VmValueKind.Long)
+            return VmValue.FromLong((long)a.AsInt * b.AsLong);
+
+        if (a.Kind == VmValueKind.Long && b.Kind == VmValueKind.Int)
+            return VmValue.FromLong(a.AsLong * (long)b.AsInt);
+
+        if (a.Kind == VmValueKind.Long && b.Kind == VmValueKind.Double)
+            return VmValue.FromDouble(a.AsLong * b.AsDouble);
+
+        if (a.Kind == VmValueKind.Double && b.Kind == VmValueKind.Long)
+            return VmValue.FromDouble(a.AsDouble * b.AsLong);
+
+        return VmValue.FromObject(MulSlow(a.ToObject(), b.ToObject()));
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private object? MulSlow(object? a, object? b)
+    {
         // 检查是否是 BytecodeObjectInstance（运算符重载）
         if (a is BytecodeObjectInstance objA)
         {
@@ -225,27 +298,44 @@ public partial class VirtualMachine
             }
         }
 
-        if (a is int ia && b is int ib)
-        {
-            // 检查是否会溢出，如果会则使用 long
-            long result = (long)ia * (long)ib;
-            if (result > int.MaxValue || result < int.MinValue)
-                return result;
-            return (int)result;
-        }
-        if (a is long la && b is long lb) return la * lb;
-        if (a is int ia3 && b is long lb2) return (long)ia3 * lb2;
-        if (a is long la2 && b is int ib3) return la2 * (long)ib3;
-        if (a is double da && b is double db) return da * db;
-        if (a is int ia2 && b is double db2) return ia2 * db2;
-        if (a is double da2 && b is int ib2) return da2 * ib2;
-        if (a is long la3 && b is double db3) return la3 * db3;
-        if (a is double da3 && b is long lb3) return da3 * lb3;
         throw new InvalidOperationError(new SourcePosition(), $"无法对类型 {DescribeValueType(a)} 和 {DescribeValueType(b)} 执行乘法");
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private VmValue Div(VmValue a, VmValue b)
+    {
+        if (a.Kind == VmValueKind.Int && b.Kind == VmValueKind.Int)
+            return VmValue.FromInt(a.AsInt / b.AsInt);
 
-    private object? Div(object? a, object? b)
+        if (a.Kind == VmValueKind.Double && b.Kind == VmValueKind.Double)
+            return VmValue.FromDouble(a.AsDouble / b.AsDouble);
+
+        if (a.Kind == VmValueKind.Int && b.Kind == VmValueKind.Double)
+            return VmValue.FromDouble(a.AsInt / b.AsDouble);
+
+        if (a.Kind == VmValueKind.Double && b.Kind == VmValueKind.Int)
+            return VmValue.FromDouble(a.AsDouble / b.AsInt);
+
+        if (a.Kind == VmValueKind.Long && b.Kind == VmValueKind.Long)
+            return VmValue.FromLong(a.AsLong / b.AsLong);
+
+        if (a.Kind == VmValueKind.Int && b.Kind == VmValueKind.Long)
+            return VmValue.FromLong((long)a.AsInt / b.AsLong);
+
+        if (a.Kind == VmValueKind.Long && b.Kind == VmValueKind.Int)
+            return VmValue.FromLong(a.AsLong / (long)b.AsInt);
+
+        if (a.Kind == VmValueKind.Long && b.Kind == VmValueKind.Double)
+            return VmValue.FromDouble(a.AsLong / b.AsDouble);
+
+        if (a.Kind == VmValueKind.Double && b.Kind == VmValueKind.Long)
+            return VmValue.FromDouble(a.AsDouble / b.AsLong);
+
+        return VmValue.FromObject(DivSlow(a.ToObject(), b.ToObject()));
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private object? DivSlow(object? a, object? b)
     {
         // 检查是否是 BytecodeObjectInstance（运算符重载）
         if (a is BytecodeObjectInstance objA)
@@ -284,20 +374,23 @@ public partial class VirtualMachine
             }
         }
 
-        if (a is int ia && b is int ib) return ia / ib;
-        if (a is long la && b is long lb) return la / lb;
-        if (a is int ia3 && b is long lb2) return (long)ia3 / lb2;
-        if (a is long la2 && b is int ib3) return la2 / (long)ib3;
-        if (a is double da && b is double db) return da / db;
-        if (a is int ia2 && b is double db2) return ia2 / db2;
-        if (a is double da2 && b is int ib2) return da2 / ib2;
-        if (a is long la3 && b is double db3) return la3 / db3;
-        if (a is double da3 && b is long lb3) return da3 / lb3;
         throw new InvalidOperationError(new SourcePosition(), $"无法对类型 {DescribeValueType(a)} 和 {DescribeValueType(b)} 执行除法");
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private VmValue Mod(VmValue a, VmValue b)
+    {
+        if (a.Kind == VmValueKind.Int && b.Kind == VmValueKind.Int)
+            return VmValue.FromInt(a.AsInt % b.AsInt);
 
-    private object? Mod(object? a, object? b)
+        if (a.Kind == VmValueKind.Double && b.Kind == VmValueKind.Double)
+            return VmValue.FromDouble(a.AsDouble % b.AsDouble);
+
+        return VmValue.FromObject(ModSlow(a.ToObject(), b.ToObject()));
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private object? ModSlow(object? a, object? b)
     {
         // 检查是否是 BytecodeObjectInstance（运算符重载）
         if (a is BytecodeObjectInstance objA)
@@ -336,13 +429,23 @@ public partial class VirtualMachine
             }
         }
 
-        if (a is int ia && b is int ib) return ia % ib;
-        if (a is double da && b is double db) return da % db;
         throw new InvalidOperationError(new SourcePosition(), $"无法对类型 {DescribeValueType(a)} 和 {DescribeValueType(b)} 执行取模");
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private VmValue Pow(VmValue a, VmValue b)
+    {
+        if (a.Kind is VmValueKind.Int or VmValueKind.Double or VmValueKind.Long &&
+            b.Kind is VmValueKind.Int or VmValueKind.Double or VmValueKind.Long)
+        {
+            return VmValue.FromDouble(Math.Pow(a.ToDoubleValue(), b.ToDoubleValue()));
+        }
 
-    private object Pow(object? a, object? b)
+        return VmValue.FromObject(PowSlow(a.ToObject(), b.ToObject()));
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private object PowSlow(object? a, object? b)
     {
         // 检查是否是 BytecodeObjectInstance（运算符重载）
         if (a is BytecodeObjectInstance objA)
@@ -386,13 +489,12 @@ public partial class VirtualMachine
         return Math.Pow(da, db);
     }
 
-
-    private object? Neg(object? a)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private VmValue Neg(VmValue a)
     {
-        if (a is int ia) return -ia;
-        if (a is double da) return -da;
-        throw new InvalidOperationError(new SourcePosition(), $"无法对类型 {DescribeValueType(a)} 执行取反");
+        if (a.Kind == VmValueKind.Int) return VmValue.FromInt(-a.AsInt);
+        if (a.Kind == VmValueKind.Double) return VmValue.FromDouble(-a.AsDouble);
+        if (a.Kind == VmValueKind.Long) return VmValue.FromLong(-a.AsLong);
+        throw new InvalidOperationError(new SourcePosition(), $"无法对类型 {DescribeValueType(a.ToObject())} 执行取反");
     }
-
-
 }

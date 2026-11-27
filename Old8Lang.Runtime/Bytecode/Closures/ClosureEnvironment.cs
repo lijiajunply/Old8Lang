@@ -1,5 +1,6 @@
 using System.Collections.Frozen;
 using System.Runtime.CompilerServices;
+using Old8Lang.Bytecode.Core;
 
 namespace Old8Lang.Bytecode.Closures;
 
@@ -110,6 +111,15 @@ public sealed class ClosureEnvironment
     /// </summary>
     public int LocalCount => _capturedNames.Length;
 
+    /// <summary>
+    /// 当前环境及全部父级是否均未捕获任何变量（顶层无捕获 lambda 可据此直接走全局槽位缓存）。
+    /// </summary>
+    public bool IsEmpty
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => _capturedNames.Length == 0 && Parent == null;
+    }
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool TryGetLocalIndex(string variableName, out int index)
     {
@@ -161,12 +171,21 @@ public sealed class ClosureEnvironment
     }
 
     /// <summary>
-    /// 取本环境的变量值（不回溯父级）
+    /// 取本环境的类型化变量值（不回溯父级，热路径零装箱）
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public VmValue GetLocalVmValue(int index)
+    {
+        return _capturedCells[index].Value;
+    }
+
+    /// <summary>
+    /// 取本环境的变量值（不回溯父级，边界视图）
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public object? GetLocalValue(int index)
     {
-        return _capturedCells[index].Value;
+        return _capturedCells[index].ObjectValue;
     }
 
     /// <summary>
@@ -187,7 +206,10 @@ public sealed class ClosureEnvironment
         return false;
     }
 
-    public bool TryGetValue(string variableName, out object? value)
+    /// <summary>
+    /// 沿父级链读取被捕获变量的类型化值（热路径零装箱）
+    /// </summary>
+    public bool TryGetVmValue(string variableName, out VmValue value)
     {
         if (TryGetCell(variableName, out var cell))
         {
@@ -195,8 +217,35 @@ public sealed class ClosureEnvironment
             return true;
         }
 
+        value = VmValue.Null;
+        return false;
+    }
+
+    public bool TryGetValue(string variableName, out object? value)
+    {
+        if (TryGetCell(variableName, out var cell))
+        {
+            value = cell!.ObjectValue;
+            return true;
+        }
+
         value = null;
         return false;
+    }
+
+    /// <summary>
+    /// 沿父级链写入被捕获的类型化变量（经由共享单元，外层可见，零装箱）
+    /// </summary>
+    /// <returns>该名字是否是被本环境（或父级）捕获的变量</returns>
+    public bool TrySetVmValue(string variableName, VmValue value)
+    {
+        if (!TryGetCell(variableName, out var cell))
+        {
+            return false;
+        }
+
+        cell!.Value = value;
+        return true;
     }
 
     /// <summary>
@@ -210,7 +259,7 @@ public sealed class ClosureEnvironment
             return false;
         }
 
-        cell!.Value = value;
+        cell!.ObjectValue = value;
         return true;
     }
 
@@ -222,7 +271,7 @@ public sealed class ClosureEnvironment
         var merged = Parent?.SnapshotToDictionary() ?? new Dictionary<string, object?>();
         for (var i = 0; i < _capturedNames.Length; i++)
         {
-            merged[_capturedNames[i]] = _capturedCells[i].Value;
+            merged[_capturedNames[i]] = _capturedCells[i].ObjectValue;
         }
 
         return merged;

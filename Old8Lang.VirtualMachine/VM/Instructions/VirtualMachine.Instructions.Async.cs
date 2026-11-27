@@ -20,14 +20,14 @@ public partial class VirtualMachine
             case OpCode.NewTask:
             {
                 // 栈顶: func, argCount
-                var funcObj = _stack.Pop();
-                var argCount = Convert.ToInt32(_stack.Pop());
+                var funcObj = _stack.PopObject();
+                var argCount = _stack.PopInt32();
 
                 // 弹出参数
                 var args = new object?[argCount];
                 for (int i = argCount - 1; i >= 0; i--)
                 {
-                    args[i] = _stack.Pop();
+                    args[i] = _stack.PopObject();
                 }
 
                 FunctionMetadata function;
@@ -50,7 +50,8 @@ public partial class VirtualMachine
                         $"Invalid function for NewTask: {DescribeValueType(funcObj)}");
                 }
 
-                // 创建并启动任务
+                // 创建并启动任务前开启全局槽位并发模式，保证无撕裂
+                _globalsState.IsConcurrent = true;
                 var task = Task.Run(() =>
                 {
                     var asyncVm = CreateWorkerVirtualMachine();
@@ -58,7 +59,7 @@ public partial class VirtualMachine
                     return asyncVm.ConvertResultToLangValue(result);
                 });
 
-                _stack.Push(new TaskLangValue(task));
+                _stack.PushRef(new TaskLangValue(task));
             }
                 break;
 
@@ -85,13 +86,13 @@ public partial class VirtualMachine
                     var namedArgValues = new object?[namedCount];
                     for (int i = namedCount - 1; i >= 0; i--)
                     {
-                        namedArgValues[i] = _stack.Pop();
+                        namedArgValues[i] = _stack.PopObject();
                     }
 
                     var positionalArgs = new object?[positionalCount];
                     for (int i = positionalCount - 1; i >= 0; i--)
                     {
-                        positionalArgs[i] = _stack.Pop();
+                        positionalArgs[i] = _stack.PopObject();
                     }
 
                     FunctionMetadata? namedFunction = null;
@@ -125,7 +126,7 @@ public partial class VirtualMachine
                     args = new object?[argCount];
                     for (int i = argCount - 1; i >= 0; i--)
                     {
-                        args[i] = _stack.Pop();
+                        args[i] = _stack.PopObject();
                     }
                 }
 
@@ -151,7 +152,8 @@ public partial class VirtualMachine
                     ValidateParameterTypes(function, args, instruction);
                 }
 
-                // 创建并启动任务
+                // 创建并启动任务前开启全局槽位并发模式，保证无撕裂
+                _globalsState.IsConcurrent = true;
                 var task = Task.Run(() =>
                 {
                     var asyncVm = CreateWorkerVirtualMachine();
@@ -160,30 +162,30 @@ public partial class VirtualMachine
                 });
 
                 // 将 Task 包装并压入栈
-                _stack.Push(new TaskLangValue(task));
+                _stack.PushRef(new TaskLangValue(task));
             }
                 break;
 
             case OpCode.Await:
             {
                 // 栈顶: TaskLangValue 或 VMThreadLangValue
-                var value = _stack.Pop();
+                var value = _stack.PopObject();
                 if (value is TaskLangValue taskValue)
                 {
                     // 阻塞等待任务完成
                     var result = taskValue.Await();
-                    _stack.Push(UnwrapToVmValue(result));
+                    _stack.PushObject(UnwrapToVmValue(result));
                 }
                 else if (value is VMThreadLangValue vmThreadValue)
                 {
                     // 等待虚拟机线程完成
                     var result = vmThreadValue.Join();
-                    _stack.Push(UnwrapToVmValue(result));
+                    _stack.PushObject(UnwrapToVmValue(result));
                 }
                 else if (value is Task task)
                 {
                     task.GetAwaiter().GetResult();
-                    _stack.Push(UnwrapToVmValue(task is Task<object?> objectTask ? objectTask.Result : null));
+                    _stack.PushObject(UnwrapToVmValue(task is Task<object?> objectTask ? objectTask.Result : null));
                 }
                 else
                 {
@@ -221,7 +223,7 @@ public partial class VirtualMachine
 
                 // 创建异步生成器对象并压入栈
                 var asyncGeneratorValue = new BytecodeAsyncGeneratorLangValue(asyncGeneratorId, this);
-                _stack.Push(asyncGeneratorValue);
+                _stack.PushRef(asyncGeneratorValue);
             }
                 break;
 
@@ -238,7 +240,7 @@ public partial class VirtualMachine
                 var args = new object?[argCount];
                 for (int i = argCount - 1; i >= 0; i--)
                 {
-                    args[i] = _stack.Pop();
+                    args[i] = _stack.PopObject();
                 }
 
                 FunctionMetadata? function = null;
@@ -274,7 +276,7 @@ public partial class VirtualMachine
 
                 // 创建异步生成器对象并压入栈
                 var asyncGeneratorValue = new BytecodeAsyncGeneratorLangValue(asyncGeneratorId, this);
-                _stack.Push(asyncGeneratorValue);
+                _stack.PushRef(asyncGeneratorValue);
             }
                 break;
 
@@ -284,7 +286,8 @@ public partial class VirtualMachine
             {
                 // Yield操作：生成器返回一个值并暂停执行
                 // 1. 从栈中弹出要yield的值
-                var yieldValue = _stack.Pop();
+                var yieldVmValue = _stack.Pop();
+                var yieldValue = yieldVmValue.ToObject();
 
                 // 2. 检查是否是异步生成器
                 if (frame.AsyncGeneratorId.HasValue)
@@ -293,7 +296,7 @@ public partial class VirtualMachine
                     if (_asyncGenerators.TryGetValue(generatorId, out var generatorState))
                     {
                         // 保存状态
-                        var stackArray = _stack.ToArray();
+                        var stackArray = _stack.ToObjectArrayTopToBottom();
                         var stackCopy = new Stack<LangValueType>();
                         foreach (var item in stackArray.Reverse())
                         {
@@ -303,14 +306,14 @@ public partial class VirtualMachine
 
                         generatorState.SaveState(
                             frame.IP,
-                            frame.Locals,
+                            CopyLocalsToObjects(frame.Locals, frame.LocalCount),
                             stackCopy
                         );
 
                         generatorState.CurrentValue = ConvertResultToLangValue(yieldValue);
 
                         // 将值压回栈顶
-                        _stack.Push(yieldValue);
+                        _stack.Push(yieldVmValue);
 
                         // 暂停执行
                         frame.IP = frame.Function.Instructions.Count;
@@ -323,7 +326,7 @@ public partial class VirtualMachine
                     if (_generators.TryGetValue(generatorId, out var generatorState))
                     {
                         // 3. 保存当前执行状态
-                        var stackArray = _stack.ToArray();
+                        var stackArray = _stack.ToObjectArrayTopToBottom();
                         var stackCopy = new Stack<LangValueType>();
                         foreach (var item in stackArray.Reverse())
                         {
@@ -333,7 +336,7 @@ public partial class VirtualMachine
 
                         generatorState.SaveState(
                             frame.IP, // 保存下一条指令的位置
-                            frame.Locals,
+                            CopyLocalsToObjects(frame.Locals, frame.LocalCount),
                             stackCopy
                         );
 
@@ -341,7 +344,7 @@ public partial class VirtualMachine
                         generatorState.CurrentValue = ConvertResultToLangValue(yieldValue);
 
                         // 5. 将yield的值压回栈顶（作为MoveNext的返回值）
-                        _stack.Push(yieldValue);
+                        _stack.Push(yieldVmValue);
 
                         // 6. 通过返回来暂停执行（设置IP到函数末尾）
                         frame.IP = frame.Function.Instructions.Count;

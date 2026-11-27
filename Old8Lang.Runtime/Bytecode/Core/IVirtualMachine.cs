@@ -26,6 +26,11 @@ public interface IVirtualMachine
     /// <summary>在线程工作项中调用函数值对象。</summary>
     object? ExecuteFunctionObjectInWorker(object? funcObj, object?[] arguments);
 
+    /// <summary>
+    /// 在启动工作线程或并发任务前开启全局槽位并发保护（防止跨线程读写类型化值撕裂）。
+    /// </summary>
+    void EnableConcurrentGlobals() { }
+
     /// <summary>按函数元数据执行函数并返回结果。</summary>
     object? ExecuteFunctionAndGetResult(FunctionMetadata function, object?[] args);
 }

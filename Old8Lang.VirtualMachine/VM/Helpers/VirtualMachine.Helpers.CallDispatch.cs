@@ -23,7 +23,7 @@ public partial class VirtualMachine
         var args = new object?[argCount];
         for (int i = argCount - 1; i >= 0; i--)
         {
-            args[i] = _stack.Pop();
+            args[i] = _stack.PopObject();
         }
 
         return args;
@@ -148,7 +148,7 @@ public partial class VirtualMachine
             {
                 var externArgs = PopArguments(argCount);
                 var result = externFunc.Invoke(externArgs);
-                _stack.Push(result);
+                _stack.PushObject(result);
                 return;
             }
 
@@ -158,7 +158,7 @@ public partial class VirtualMachine
                 var expressions = nativeArgs.Select(value => (Old8Lang.AST.LangExpression)
                     (value as Old8Lang.AST.Expression.LangValueType ?? Old8Lang.AST.Expression.LangValueType.ObjToValue(value))).ToList();
                 var result = nativeFunction.Run(new Old8Lang.Interpreter.VariateManager(), expressions);
-                _stack.Push(UnwrapToVmValue(result));
+                _stack.PushObject(UnwrapToVmValue(result));
                 return;
             }
 
@@ -190,21 +190,21 @@ public partial class VirtualMachine
             if (TryResolveClassByName(funcName, out var classMetadata))
             {
                 var obj = CreateObjectInstance(classMetadata, fallbackArgs);
-                _stack.Push(obj);
+                _stack.PushRef(obj);
                 return;
             }
 
             // 虚拟机专属的静态类「构造函数」形式（CancellationTokenSource() / TaskCompletionSource()）
             if (TryInvokeVmConstructor(funcName, fallbackArgs, out var constructed))
             {
-                _stack.Push(constructed);
+                _stack.PushObject(constructed);
                 return;
             }
 
             var globalFunction = GlobalFunctionRegistry.Instance.TryGetFunction(funcName);
             if (globalFunction != null)
             {
-                _stack.Push(globalFunction.ExecuteInVM(fallbackArgs));
+                _stack.PushObject(globalFunction.ExecuteInVM(fallbackArgs));
                 return;
             }
 
@@ -235,14 +235,69 @@ public partial class VirtualMachine
 
     private void ExecuteCallDynamicInstruction(Instruction instruction, CallFrame frame)
     {
-        int argCount = (int)instruction.Operand!;
+        int argCount = instruction.IntOperand;
+
+        // 零分配快速路径：纯位置调用普通闭包/函数时，直接从类型化栈弹出 VmValue 写入池化 Locals，
+        // 避免每次调用分配 new object?[argCount] 并避免基础类型装箱。
+        if (_stack.Count > argCount)
+        {
+            var peekFunc = _stack.PeekAt(argCount);
+            if (peekFunc.Kind == VmValueKind.Object)
+            {
+                if (peekFunc.ObjectRef is ClosureValue fastClosure &&
+                    !fastClosure.Function.IsGenerator &&
+                    CanSkipNormalizeForPositionalCall(fastClosure.Function, argCount))
+                {
+                    var funcMeta = fastClosure.Function;
+                    var locals = RentLocalsBuffer(funcMeta.LocalCount);
+                    var fastFrame = RentCallFrame(funcMeta, locals, funcMeta.LocalCount, usesPooledLocals: funcMeta.LocalCount > 0);
+                    fastFrame.ClosureEnvironment = fastClosure.CapturedVariables;
+                    fastFrame.ConstantPool = fastClosure.ConstantPool;
+
+                    for (int i = argCount - 1; i >= 0; i--)
+                    {
+                        var argVal = _stack.Pop();
+                        if (i < funcMeta.LocalCount)
+                        {
+                            fastFrame.Locals[i] = argVal;
+                        }
+                    }
+
+                    _stack.PopDiscard(); // 弹出闭包对象
+                    ExecuteFrame(fastFrame);
+                    return;
+                }
+
+                if (peekFunc.ObjectRef is FunctionMetadata fastFunc &&
+                    !fastFunc.IsGenerator &&
+                    CanSkipNormalizeForPositionalCall(fastFunc, argCount))
+                {
+                    var locals = RentLocalsBuffer(fastFunc.LocalCount);
+                    var fastFrame = RentCallFrame(fastFunc, locals, fastFunc.LocalCount, usesPooledLocals: fastFunc.LocalCount > 0);
+
+                    for (int i = argCount - 1; i >= 0; i--)
+                    {
+                        var argVal = _stack.Pop();
+                        if (i < fastFunc.LocalCount)
+                        {
+                            fastFrame.Locals[i] = argVal;
+                        }
+                    }
+
+                    _stack.PopDiscard(); // 弹出函数对象
+                    ExecuteFrame(fastFrame);
+                    return;
+                }
+            }
+        }
+
         var args = PopArguments(argCount);
-        var funcObj = _stack.Pop();
+        var funcObj = _stack.PopObject();
 
         // 静态类方法被当作函数值保存后调用（f <- Task.Delay; await f(10)）
         if (funcObj is VmStaticMethodValue staticMethod)
         {
-            _stack.Push(CallNativeFunction(staticMethod.QualifiedName, args));
+            _stack.PushObject(CallNativeFunction(staticMethod.QualifiedName, args));
             return;
         }
 
@@ -252,19 +307,6 @@ public partial class VirtualMachine
             if (funcMeta.IsGenerator)
             {
                 PushGeneratorForFunction(funcMeta, args);
-                return;
-            }
-
-            if (CanSkipNormalizeForPositionalCall(funcMeta, args.Length))
-            {
-                var locals = RentLocalsBuffer(funcMeta.LocalCount);
-                var fastFrame = RentCallFrame(funcMeta, locals, funcMeta.LocalCount, usesPooledLocals: funcMeta.LocalCount > 0);
-                fastFrame.ClosureEnvironment = closure.CapturedVariables;
-                fastFrame.ConstantPool = closure.ConstantPool;
-                int copyLen = Math.Min(args.Length, funcMeta.LocalCount);
-                for (int i = 0; i < copyLen; i++)
-                    fastFrame.Locals[i] = args[i];
-                ExecuteFrame(fastFrame);
                 return;
             }
 
@@ -312,13 +354,13 @@ public partial class VirtualMachine
         {
             var asyncGeneratorId = _nextAsyncGeneratorId++;
             _asyncGenerators[asyncGeneratorId] = new AsyncGeneratorState(function, args);
-            _stack.Push(new BytecodeAsyncGeneratorLangValue(asyncGeneratorId, this));
+            _stack.PushRef(new BytecodeAsyncGeneratorLangValue(asyncGeneratorId, this));
             return;
         }
 
         var generatorId = _nextGeneratorId++;
         _generators[generatorId] = new GeneratorState(function, args);
-        _stack.Push(new BytecodeGeneratorLangValue(generatorId, this));
+        _stack.PushRef(new BytecodeGeneratorLangValue(generatorId, this));
     }
 
     private bool TryResolveCallableFunction(CallFrame frame, string funcName, int functionIndexHint,

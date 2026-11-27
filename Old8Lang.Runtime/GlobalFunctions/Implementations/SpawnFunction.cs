@@ -231,6 +231,9 @@ public sealed class SpawnFunction : BaseGlobalFunction
             throw new InvalidOperationException("无法获取当前虚拟机实例");
         }
 
+        // 启动工作线程前开启全局槽位并发无撕裂保护
+        vm.EnableConcurrentGlobals();
+
         // 使用一个包装器来存储 threadId，以便在 lambda 中使用
         int[] threadIdHolder = new int[1];
 

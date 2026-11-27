@@ -37,39 +37,39 @@ public partial class VirtualMachine
         {
             case OpCode.NewArray:
             {
-                int count = (int)instruction.Operand!;
+                int count = instruction.IntOperand;
                 var elements = new object?[count];
                 for (int i = count - 1; i >= 0; i--)
                 {
-                    elements[i] = _stack.Pop();
+                    elements[i] = _stack.PopObject();
                 }
 
-                _stack.Push(elements);
+                _stack.PushRef(elements);
             }
                 break;
 
             case OpCode.NewList:
             {
-                int count = (int)instruction.Operand!;
-                var list = new List<object?>();
+                int count = instruction.IntOperand;
+                var list = new List<object?>(count);
                 var elements = new object?[count];
                 for (int i = count - 1; i >= 0; i--)
                 {
-                    elements[i] = _stack.Pop();
+                    elements[i] = _stack.PopObject();
                 }
 
                 list.AddRange(elements);
-                _stack.Push(list);
+                _stack.PushRef(list);
             }
                 break;
 
             case OpCode.NewTuple:
             {
-                int count = (int)instruction.Operand!;
+                int count = instruction.IntOperand;
                 var elements = new object?[count];
                 for (int i = count - 1; i >= 0; i--)
                 {
-                    elements[i] = _stack.Pop();
+                    elements[i] = _stack.PopObject();
                 }
 
                 object tuple;
@@ -99,13 +99,13 @@ public partial class VirtualMachine
                     tuple = current;
                 }
                 TupleElements.Add(tuple, elements);
-                _stack.Push(tuple);
+                _stack.PushRef(tuple);
             }
                 break;
 
             case OpCode.NewDict:
             {
-                int pairCount = (int)instruction.Operand!;
+                int pairCount = instruction.IntOperand;
                 var dict = new Dictionary<object, object?>();
                 // 每个键值对作为一个元组在栈上，栈顶是最后一个键值对。
                 // 先按倒序收回数组再正序写入，否则 Dictionary 的插入顺序（也就是遍历顺序）
@@ -113,7 +113,7 @@ public partial class VirtualMachine
                 var pairs = new Tuple<object?, object?>[pairCount];
                 for (int i = pairCount - 1; i >= 0; i--)
                 {
-                    if (_stack.Pop() is Tuple<object?, object?> { Item1: not null } tuple)
+                    if (_stack.PopObject() is Tuple<object?, object?> { Item1: not null } tuple)
                     {
                         pairs[i] = tuple;
                     }
@@ -127,13 +127,13 @@ public partial class VirtualMachine
                     }
                 }
 
-                _stack.Push(dict);
+                _stack.PushRef(dict);
             }
                 break;
 
             case OpCode.ArrayLength:
             {
-                var collection = _stack.Pop();
+                var collection = _stack.PopObject();
                 int length = 0;
 
                 if (collection is Array array)
@@ -178,47 +178,46 @@ public partial class VirtualMachine
                     throw new TypeError(GetPosition(instruction), $"无法获取类型 {DescribeValueType(collection)} 的长度");
                 }
 
-                _stack.Push(length);
+                _stack.PushInt(length);
             }
                 break;
 
             case OpCode.GetIndex:
             {
                 // 栈顶: index, collection
-                var index = _stack.Pop();
-                var collection = _stack.Pop();
+                var indexVal = _stack.Pop();
+                var collection = _stack.PopObject();
 
                 if (collection is Array array)
                 {
-                    _stack.Push(array.GetValue(NormalizeIndex(Convert.ToInt32(index), array.Length,
+                    _stack.PushObject(array.GetValue(NormalizeIndex(indexVal.ToInt32(), array.Length,
                         GetPosition(instruction))));
                 }
                 else if (collection is IList list)
                 {
-                    _stack.Push(list[NormalizeIndex(Convert.ToInt32(index), list.Count, GetPosition(instruction))]);
+                    _stack.PushObject(list[NormalizeIndex(indexVal.ToInt32(), list.Count, GetPosition(instruction))]);
                 }
                 else if (collection is IDictionary dict)
                 {
-                    if (!dict.Contains(index!))
+                    var indexObj = indexVal.ToObject();
+                    if (!dict.Contains(indexObj!))
                     {
-                        throw new KeyError(GetPosition(instruction), index!);
+                        throw new KeyError(GetPosition(instruction), indexObj!);
                     }
 
-                    _stack.Push(dict[index!]);
+                    _stack.PushObject(dict[indexObj!]);
                 }
                 else if (collection is DictionaryLangValue dictLangValue)
                 {
-                    // 处理 DictionaryLangValue 类型
-                    // 将索引转换为 LangValueType
-                    var keyToFind = ConvertToLangValueType(index);
+                    var indexObj = indexVal.ToObject();
+                    var keyToFind = ConvertToLangValueType(indexObj);
 
-                    // 在字典中查找键
                     bool found = false;
                     foreach (var (key, value) in dictLangValue.Value)
                     {
                         if (key.Equal(keyToFind))
                         {
-                            _stack.Push(value);
+                            _stack.PushObject(value);
                             found = true;
                             break;
                         }
@@ -226,17 +225,13 @@ public partial class VirtualMachine
 
                     if (!found)
                     {
-                        throw new KeyError(GetPosition(instruction), index!);
+                        throw new KeyError(GetPosition(instruction), indexObj!);
                     }
                 }
                 else if (collection is ILangList langList)
                 {
-                    // ListLangValue 之类的 Old8Lang 列表：只实现 ILangList，既不是 IList 也不是
-                    // IEnumerable，必须单独处理，否则 await Task.WhenAll(...) 之类产出的列表值
-                    // 落到求值栈上就无法索引。
-                    // 本分支必须排在 DictionaryLangValue 之后：DictionaryLangValue 也实现 ILangList。
                     var items = langList.GetItems().ToList();
-                    int idx = Convert.ToInt32(index);
+                    int idx = indexVal.ToInt32();
                     if (idx < 0)
                     {
                         idx += items.Count;
@@ -247,15 +242,14 @@ public partial class VirtualMachine
                         throw new IndexError(GetPosition(instruction), idx, items.Count);
                     }
 
-                    _stack.Push(items[idx]);
+                    _stack.PushObject(items[idx]);
                 }
                 else if (collection is string str)
                 {
-                    _stack.Push(str[NormalizeIndex(Convert.ToInt32(index), str.Length, GetPosition(instruction))]);
+                    _stack.PushChar(str[NormalizeIndex(indexVal.ToInt32(), str.Length, GetPosition(instruction))]);
                 }
                 else if (collection is Tuple<object?, object?> tuple)
                 {
-                    // 先把嵌套元组展平成元素列表，再按统一口径取下标（支持负索引与越界报错）
                     var tupleItems = new List<object?>();
                     var traverseStack = new Stack<object?>();
                     traverseStack.Push(tuple);
@@ -265,18 +259,16 @@ public partial class VirtualMachine
                         var current = traverseStack.Pop();
                         if (current is Tuple<object?, object?> t)
                         {
-                            // 保持顺序：先处理 Item1，再处理 Item2
-                            // 栈是后进先出，所以先压入 Item2，再压入 Item1
                             traverseStack.Push(t.Item2);
                             traverseStack.Push(t.Item1);
                         }
-                        else if (current != null) // 跳过 null (与 TupleLangValue 行为一致)
+                        else if (current != null)
                         {
                             tupleItems.Add(current);
                         }
                     }
 
-                    _stack.Push(tupleItems[NormalizeIndex(Convert.ToInt32(index), tupleItems.Count,
+                    _stack.PushObject(tupleItems[NormalizeIndex(indexVal.ToInt32(), tupleItems.Count,
                         GetPosition(instruction))]);
                 }
                 else
@@ -289,31 +281,28 @@ public partial class VirtualMachine
             case OpCode.SetIndex:
             {
                 // 栈顶: value, index, collection
-                var value = _stack.Pop();
-                var index = _stack.Pop();
-                var collection = _stack.Pop();
+                var value = _stack.PopObject();
+                var indexVal = _stack.Pop();
+                var collection = _stack.PopObject();
 
                 if (collection is Array array)
                 {
-                    array.SetValue(value, NormalizeIndex(Convert.ToInt32(index), array.Length,
+                    array.SetValue(value, NormalizeIndex(indexVal.ToInt32(), array.Length,
                         GetPosition(instruction)));
                 }
                 else if (collection is IList list)
                 {
-                    list[NormalizeIndex(Convert.ToInt32(index), list.Count, GetPosition(instruction))] = value;
+                    list[NormalizeIndex(indexVal.ToInt32(), list.Count, GetPosition(instruction))] = value;
                 }
                 else if (collection is IDictionary dict)
                 {
-                    dict[index!] = value;
+                    dict[indexVal.ToObject()!] = value;
                 }
                 else if (collection is DictionaryLangValue dictLangValue)
                 {
-                    // 处理 DictionaryLangValue 类型
-                    // 将索引和值转换为 LangValueType
-                    var keyToSet = ConvertToLangValueType(index);
+                    var keyToSet = ConvertToLangValueType(indexVal.ToObject());
                     var valueToSet = ConvertToLangValueType(value);
 
-                    // 在字典中查找键并更新，如果不存在则添加
                     bool found = false;
                     for (int i = 0; i < dictLangValue.Value.Count; i++)
                     {
@@ -328,16 +317,12 @@ public partial class VirtualMachine
 
                     if (!found)
                     {
-                        // 键不存在，添加新的键值对
                         dictLangValue.Value.Add((keyToSet, valueToSet));
                     }
                 }
                 else if (collection is ILangList langList)
                 {
-                    // 见 GetIndex 的同类分支：Old8Lang 列表只实现 ILangList。
-                    // Set 内部自带负索引换算、越界报错与元素类型转换，与解释器一致。
-                    // 本分支必须排在 DictionaryLangValue 之后：DictionaryLangValue 也实现 ILangList。
-                    langList.Set(ConvertToLangValueType(index), ConvertToLangValueType(value));
+                    langList.Set(ConvertToLangValueType(indexVal.ToObject()), ConvertToLangValueType(value));
                 }
                 else
                 {
@@ -349,19 +334,13 @@ public partial class VirtualMachine
             case OpCode.NewRange:
             {
                 // 栈顶: includeEnd, includeStart, end, start
-                var includeEndObj = _stack.Pop();
-                var includeStartObj = _stack.Pop();
-                var endObj = _stack.Pop();
-                var startObj = _stack.Pop();
-
-                int start = Convert.ToInt32(startObj);
-                int end = Convert.ToInt32(endObj);
-                bool includeStart = Convert.ToBoolean(includeStartObj);
-                bool includeEnd = Convert.ToBoolean(includeEndObj);
+                bool includeEnd = ToBool(_stack.Pop());
+                bool includeStart = ToBool(_stack.Pop());
+                int end = _stack.PopInt32();
+                int start = _stack.PopInt32();
 
                 var results = new List<int>();
 
-                // 根据包含规则调整起始值
                 var startNum = start;
                 var endNum = end;
 
@@ -370,11 +349,8 @@ public partial class VirtualMachine
                 if (!includeEnd)
                     endNum--;
 
-                // 检查范围是否有效
-                // 如果start原本就大于end,说明是反向范围
                 if (start > end)
                 {
-                    // 反向范围:从大到小
                     for (var i = startNum; i >= endNum; i--)
                     {
                         results.Add(i);
@@ -382,18 +358,15 @@ public partial class VirtualMachine
                 }
                 else if (startNum <= endNum)
                 {
-                    // 正向范围:从小到大
                     for (var i = startNum; i <= endNum; i++)
                     {
                         results.Add(i);
                     }
                 }
-                // 如果调整后startNum > endNum但原本start <= end,说明排除导致范围为空,返回空数组
 
-                _stack.Push(results.ToArray());
+                _stack.PushRef(results.ToArray());
             }
                 break;
-
         }
     }
 }

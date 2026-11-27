@@ -12,8 +12,8 @@ public class CallFrame
     /// <summary>当前执行的函数</summary>
     public FunctionMetadata Function { get; private set; }
 
-    /// <summary>局部变量数组</summary>
-    public object?[] Locals { get; private set; }
+    /// <summary>局部变量数组（类型化值存储，避免基础类型读写装箱）</summary>
+    public VmValue[] Locals { get; private set; }
 
     /// <summary>局部变量有效槽位数量</summary>
     public int LocalCount { get; private set; }
@@ -67,14 +67,14 @@ public class CallFrame
     /// 创建调用栈帧（默认分配新的局部变量数组）
     /// </summary>
     public CallFrame(FunctionMetadata function, int localCount)
-        : this(function, new object?[localCount], localCount, usesPooledLocals: false)
+        : this(function, new VmValue[localCount], localCount, usesPooledLocals: false)
     {
     }
 
     /// <summary>
     /// 创建调用栈帧（允许外部提供局部变量数组）
     /// </summary>
-    public CallFrame(FunctionMetadata function, object?[] locals, int localCount, bool usesPooledLocals)
+    public CallFrame(FunctionMetadata function, VmValue[] locals, int localCount, bool usesPooledLocals)
     {
         Function = function;
         Locals = locals;
@@ -85,7 +85,7 @@ public class CallFrame
     /// <summary>
     /// 从对象池取出后重新初始化（复用帧实例，避免分配）
     /// </summary>
-    internal void ReinitializeFromPool(FunctionMetadata function, object?[] locals, int localCount, bool usesPooledLocals)
+    internal void ReinitializeFromPool(FunctionMetadata function, VmValue[] locals, int localCount, bool usesPooledLocals)
     {
         Function = function;
         Locals = locals;

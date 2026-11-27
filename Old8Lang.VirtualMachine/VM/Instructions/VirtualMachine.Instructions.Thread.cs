@@ -17,14 +17,14 @@ public partial class VirtualMachine
             case OpCode.ThreadCreate:
             {
                 // 栈顶: func (int/string/Metadata), argCount (int)
-                var funcObj = _stack.Pop();
-                var argCount = Convert.ToInt32(_stack.Pop());
+                var funcObj = _stack.PopObject();
+                var argCount = _stack.PopInt32();
 
                 // 弹出参数
                 var args = new object?[argCount];
                 for (int i = argCount - 1; i >= 0; i--)
                 {
-                    args[i] = _stack.Pop();
+                    args[i] = _stack.PopObject();
                 }
 
                 FunctionMetadata function;
@@ -47,7 +47,8 @@ public partial class VirtualMachine
                         $"Invalid function for ThreadCreate: {DescribeValueType(funcObj)}");
                 }
 
-                // 创建线程
+                // 创建线程前开启全局槽位并发模式，保证主线程与子线程之间无撕裂
+                _globalsState.IsConcurrent = true;
                 var threadIdHolder = new int[1];
                 var threadId = Concurrency.ResourceManager.CreateThread(() =>
                 {
@@ -57,40 +58,39 @@ public partial class VirtualMachine
                 });
                 threadIdHolder[0] = threadId;
 
-                _stack.Push(threadId);
+                _stack.PushInt(threadId);
             }
                 break;
 
             case OpCode.ThreadStart:
             {
-                var threadId = Convert.ToInt32(_stack.Pop());
+                var threadId = _stack.PopInt32();
                 Concurrency.ResourceManager.StartThread(threadId);
             }
                 break;
 
             case OpCode.ThreadJoin:
             {
-                var threadId = Convert.ToInt32(_stack.Pop());
+                var threadId = _stack.PopInt32();
                 var result = Concurrency.ResourceManager.JoinThread(threadId);
-                _stack.Push(result);
+                _stack.PushObject(result);
             }
                 break;
 
             case OpCode.ThreadIsAlive:
             {
-                var threadId = Convert.ToInt32(_stack.Pop());
+                var threadId = _stack.PopInt32();
                 var isAlive = Concurrency.ResourceManager.IsThreadAlive(threadId);
-                _stack.Push(isAlive);
+                _stack.PushBool(isAlive);
             }
                 break;
 
             case OpCode.ThreadDispose:
             {
-                var threadId = Convert.ToInt32(_stack.Pop());
+                var threadId = _stack.PopInt32();
                 Concurrency.ResourceManager.DisposeThread(threadId);
             }
                 break;
-
         }
     }
 }

@@ -887,6 +887,7 @@
   - `TestFiles/VirtualMachine/DestructuringAssignmentTest.old8`：解析阶段报错（`StatementParser.Main.cs:444`）。
   - `TestFiles/VirtualMachine/vm_gap_6_error_position.old8`：VM 执行阶段抛异常（错误定位用例，末行没有 `error` 标记）。
   - `TestFiles/VirtualMachine/legacy/vm_operator_overload.old8`：VM 执行阶段抛异常（原 `VMTests/`）。
+  - `TestFiles/VirtualMachine/array_sort_vm_test.old8`（2026-11-27 回归顺带发现）：期望旧的字符串长度排序结果，与 2026-11-18 改为字典序（`CompareOrdinal`）后的 `a,bb,ccc,dd` 冲突。
   另有 `legacy/control_flow.old8`、`legacy/vm_decorator.old8` 为原 `VMTests/` README 已记录的已知失败。
 
 - [ ] **语法测试 5 个既有失败用例**（`run_syntax_tests.sh` 89 例中 5 失败，均与目录合并无关）：
@@ -919,11 +920,18 @@
 
 ## VM 性能
 
-- [ ] **VM 值表示仍以 `object` 装箱**：`Stack<object?>` / `CallFrame.Locals` / `GlobalSlot` / `UpValueCell` 里的整数
-  每次运算都要重新装箱。2026-10-24 P4 实测：`sum <- sum + 1` 型循环 1M 次仍分配 **45.78 B/次**
-  （两次整数装箱；比较结果的布尔装箱已在 P4 用 `VmBoxed` 消除），`Bytecode/` 下共 417 处 `object?`。
-  要再降一个数量级需要类型化值表示（`struct` 标记联合 + 类型化栈 / 类型化局部变量 / 类型化闭包单元），
-  属跨模块改造；P4 报告 §4 给出分阶段方案（先栈与局部变量、保留 `object?` 边界、再逐步收紧）。
+- [x] **VM 值表示仍以 `object` 装箱**：2026-11-27 已按 P4 §4.3 三阶段方案完成类型化值表示改造：
+  在 `Old8Lang.Runtime` 引入 24 字节标记联合 `readonly struct VmValue`（含边界共享布尔与 `-128..4095`
+  小整数缓存），升级 `ConstantPool.GetConstantValue`、`Instruction.IntOperand`、`CallFrame.Locals`（池化
+  `VmValue[]`）、`GlobalSlot`（单线程零锁 + 并发无锁 SeqLock 防撕裂）、`UpValueCell` 与 `ClosureEnvironment`
+  （含 `IsEmpty` 全局槽位直通）；在 `Old8Lang.VirtualMachine` 引入 `VmStack` 替代 `Stack<object?>`，
+  算术/比较/逻辑/类型校验与 `Call`/`CallDynamic` 位置快速路径全面零装箱，移除 `VmBoxed`。
+  Release 实测：`1M sum <- sum + 1` 循环由 **45.78 MB（45.78 B/次）** 降至 **944~1,184 B（~0 B/次）**，
+  `HighArgCount` 由 7.2 MB 降至 **1.6 KB**，`HighThrowRate` 由 5.0 MB 降至 **1.3 KB**，
+  `LargeClosureCapture_HighFreq` 由 14.8 MB（诊断 13.6 MB）降至 **1.9 KB（诊断 5.4 KB，耗时 -21%，GC 6 → 0）**，
+  `LargeFile_10k/50k` 执行分配降 **37%~39%**。已新增 `VMValueRepresentationTests`（8 项）并收紧
+  `VMPerformanceSmokeTests` 分配上限至 1 MB；VM 单测 1,149/1,149、架构边界 22/22、Benchmarks 31/31 全通过。
+  见 change（`2026-11-27-VM类型化值表示/test.md`）。
 
 ## 解释器测试覆盖待复核
 
