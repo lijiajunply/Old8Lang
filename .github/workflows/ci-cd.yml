@@ -19,20 +19,24 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
       - name: Restore dependencies
         run: dotnet restore Old8Lang.sln
       - name: Build solution
         run: dotnet build Old8Lang.sln --configuration Release --no-restore
       - name: Configure Python runtime for tests
         run: |
-          PYDLL=$(python3 -c "import os, sysconfig; libdir = sysconfig.get_config_var('LIBDIR') or ''; name = sysconfig.get_config_var('INSTSONAME') or sysconfig.get_config_var('LDLIBRARY') or ''; p = os.path.join(libdir, name); print(p if os.path.exists(p) else '')")
+          PYDLL=$(python3 -c "import os, sys, sysconfig; assert sys.version_info < (3, 14); libdir = sysconfig.get_config_var('LIBDIR') or ''; multiarch = sysconfig.get_config_var('MULTIARCH') or ''; names = [sysconfig.get_config_var('INSTSONAME'), sysconfig.get_config_var('LDLIBRARY'), f'libpython{sys.version_info.major}.{sys.version_info.minor}.so.1.0', f'libpython{sys.version_info.major}.{sys.version_info.minor}.so.1', f'libpython{sys.version_info.major}.{sys.version_info.minor}.so']; dirs = [libdir, os.path.join(libdir, multiarch) if multiarch else '', sys.base_prefix + '/lib']; found = [os.path.join(d, n) for d in dirs if d for n in names if n and os.path.exists(os.path.join(d, n))]; print(found[0] if found else '')")
           if [ -z "$PYDLL" ]; then
-            PYDLL=$(find /usr/lib /usr/local/lib /lib -maxdepth 3 -name 'libpython3.*.so*' 2>/dev/null | head -n 1)
+            for ver in 3.12 3.13 3.11 3.10; do
+              PYDLL=$(find /opt/hostedtoolcache/Python /usr/lib /usr/local/lib /lib -maxdepth 4 -name "libpython${ver}.so*" 2>/dev/null | head -n 1)
+              [ -n "$PYDLL" ] && break
+            done
           fi
-          if [ -n "$PYDLL" ]; then
-            echo "PYTHONNET_PYDLL=$PYDLL" >> "$GITHUB_ENV"
-            echo "Detected PYTHONNET_PYDLL=$PYDLL"
-          fi
+          echo "PYTHONNET_PYDLL=$PYDLL" >> "$GITHUB_ENV"
+          echo "Detected PYTHONNET_PYDLL=$PYDLL"
       - name: Run unit tests
         id: unit
         run: dotnet test Old8Lang.Tests/Old8Lang.Tests.csproj --configuration Release --no-build --logger "trx;LogFileName=test_results.trx"

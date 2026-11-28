@@ -454,6 +454,7 @@ public class PythonProvider : IExternProvider
             {
                 FileName = "python3",
                 Arguments = "-c \"import os, sys, sysconfig; " +
+                            "sys.exit(1) if sys.version_info >= (3, 14) else None; " +
                             "libdir = sysconfig.get_config_var('LIBDIR') or (sys.base_prefix + '/lib'); " +
                             "multiarch = sysconfig.get_config_var('MULTIARCH') or ''; " +
                             "names = [sysconfig.get_config_var('INSTSONAME'), sysconfig.get_config_var('LDLIBRARY'), " +
