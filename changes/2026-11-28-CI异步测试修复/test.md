@@ -34,7 +34,11 @@ docker run --rm -e DOTNET_PROCESSOR_COUNT=1 ... \
 | VM 套件 | `bash run_vm_tests.sh` | 退出码 0 |
 | 打包预检 | `dotnet publish Old8Lang.App -c Release -r linux-x64 --self-contained -o /tmp/dist-linux` | 成功 |
 
-## 待验证（GitHub Actions）
+## GitHub Actions 实测
 
-推送 `v1.0.0` tag 后确认：unit/syntax/interpreter/IL/VM 全绿、4 个 RID 打包成功、
-GitHub Release 创建并带上 4 个 `old8lang-*.tar.gz`。
+Run [46123780646](https://github.com/lijiajunply/Old8Lang/actions/runs/46123780646)，提交 `9dfecabf`：
+
+- `test` 作业 20m13s 通过：unit / syntax / interpreter / IL / VM 全部 ✓
+- `package` 四个 RID（linux-x64、win-x64、osx-x64、osx-arm64）全部 ✓
+- `release` 作业 ✓，已发布 <https://github.com/lijiajunply/Old8Lang/releases/tag/v1.0.0>，
+  产物 `old8lang-{linux-x64,win-x64,osx-x64,osx-arm64}.tar.gz` 齐全
