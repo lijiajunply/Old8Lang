@@ -184,11 +184,25 @@ internal static class GenericInstanceExpressionRuntimeExtensions
         // 如果使用了调用语法（带括号），调用 init 方法（包括无参 init）
         if (node.IsFunctionCall)
         {
+            var argCount = node.CallArguments?.Count ?? 0;
+
+            // 先检查是否存在 init 方法；无参调用且类未定义 init 时直接使用无参构造结果
+            if (argCount == 0)
+            {
+                var zeroArgInit = specializedType is TypeBuilder
+                    ? local.GenericClassInitializers.GetValueOrDefault(specializedType)
+                    : specializedType.GetMethod("init", Type.EmptyTypes) ?? specializedType.GetMethod("init");
+
+                if (zeroArgInit is null)
+                {
+                    return;
+                }
+            }
+
             // 复制实例引用，用于调用 init 方法
             ilGenerator.Emit(OpCodes.Dup);
 
             // 加载参数
-            var argCount = node.CallArguments?.Count ?? 0;
             var argTypes = new Type[argCount];
             for (int i = 0; i < argCount; i++)
             {

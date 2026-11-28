@@ -42,7 +42,7 @@ func bool_operation(a:bool, b:bool) -> bool {
 
 // 测试8：正确的列表类型
 func list_operation() -> void {
-    my_list:list <- [1, 2, 3, 4, 5]  // 正确：列表初始化
+    my_list:list <- {1, 2, 3, 4, 5}  // 正确：列表初始化
 }
 
 // 主函数

@@ -17,8 +17,8 @@ for char in str {
 // 测试3：字典迭代
 dict <- {"a": 1, "b": 2, "c": 3}
 PrintLine("\n测试3：字典迭代")
-for key in dict {
-    PrintLine(key.ToStr() + ": " + dict[key].ToStr())
+for key, val in dict {
+    PrintLine(key.ToStr() + ": " + val.ToStr())
 }
 
 // 测试4：生成器迭代

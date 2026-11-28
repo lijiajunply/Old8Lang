@@ -59,7 +59,7 @@ func wrong_default_param(a:int, b:string) -> string {
 
 // 测试12：正确的数组类型
 func correct_array() -> void {
-    arr:list <- [1, 2, 3, 4, 5]  // 正确：数组元素类型匹配
+    arr:list <- {1, 2, 3, 4, 5}  // 正确：列表元素类型匹配
 }
 
 // 测试13：变量赋值类型不匹配（简化版本）

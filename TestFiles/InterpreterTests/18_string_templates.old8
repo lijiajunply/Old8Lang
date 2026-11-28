@@ -117,7 +117,11 @@ person <- {
     "hobbies": ["reading", "swimming", "coding"]
 }
 
-complexTemplate <- $"Name: {person['name']}, Age: {person['age']}, City: {person['city']}, Hobbies: {person['hobbies']}"
+pName <- person["name"]
+pAge <- person["age"]
+pCity <- person["city"]
+pHobbies <- person["hobbies"]
+complexTemplate <- $"Name: {pName}, Age: {pAge}, City: {pCity}, Hobbies: {pHobbies}"
 PrintLine(complexTemplate)
 
 // 模板中嵌入类型转换

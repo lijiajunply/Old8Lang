@@ -1134,8 +1134,8 @@ return typeof(object);
         // 获取 Id 的类型
         var idType = node.Id.Accept(this);
 
-        // 如果类型为 null，返回 object 类型
-        if (idType is null)
+        // 如果类型为 null 或值类型（如 ValueTuple，运行期切片返回 object/object[]），返回 object 类型
+        if (idType is null || idType.IsValueType)
         {
             return typeof(object);
         }

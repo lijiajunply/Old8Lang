@@ -290,7 +290,10 @@ public partial class InterpreterVisitor
                         }
 
                         // Retry 需要重新执行原始函数，而不是重试同一个 Task 对象
-                        if (node.Left is not Instance funcCall)
+                        var funcCall = node.Left is CallExpression leftCall
+                            ? leftCall.ToInstance()
+                            : node.Left as Instance;
+                        if (funcCall is null)
                         {
                             throw new InvalidOperationError(instance, "Retry 只能用于异步函数调用（如 func().Retry(...)）");
                         }
@@ -346,7 +349,10 @@ public partial class InterpreterVisitor
                         }
 
                         // Retry 需要重新执行原始函数，而不是重试同一个 Thread 对象
-                        if (node.Left is not Instance funcCall)
+                        var funcCall = node.Left is CallExpression leftCall
+                            ? leftCall.ToInstance()
+                            : node.Left as Instance;
+                        if (funcCall is null)
                         {
                             throw new InvalidOperationError(instance, "Retry 只能用于函数调用（如 func().Retry(...)）");
                         }

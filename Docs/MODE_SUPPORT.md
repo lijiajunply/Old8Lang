@@ -471,12 +471,14 @@
 
 | 套件 | 2026-11-28 实测结果 | 说明 |
 |------|--------------------|------|
-| `Old8Lang.Tests` 全量默认档 | **7,264 通过 / 0 失败 / 24 跳过**（总计 7,288，耗时 48 s） | 覆盖解释器、IL、VM、Parser、LSP 与 Architecture，无挂起 |
+| `Old8Lang.Tests` 全量默认档 | **7,297 通过 / 0 失败 / 3 跳过**（总计 7,300，耗时 45 s） | 覆盖解释器、IL、VM、Parser、LSP 与 Architecture，无挂起 |
 | `Old8Lang.Tests.Architecture` | **73 通过 / 0 失败 / 0 跳过** | 程序集边界、宿主模块隔离与语法节点规范 |
 | `IlAsyncGeneratorStreamTests`（`performance.runsettings` 性能档） | **1 通过 / 0 失败 / 0 跳过**（248 ms） | 1,000 挂起流 + 300 并发编译期异步生成器无线程池阻塞 |
 | `SpawnTests`（`performance.runsettings` 性能档） | **13 通过 / 0 失败 / 0 跳过** | 含线程 `Sleep` 的并发用例分档隔离 |
-| `TestFiles/run_syntax_tests.sh` | **89 通过 / 0 失败** | 全部语法正反例 |
-| `TestFiles/run_vm_tests.sh` | **79 通过 / 0 失败** | 全部 VM 与字节码脚本用例 |
+| `TestFiles/run_syntax_tests.sh` | **90 通过 / 0 失败** | 全部语法正反例 |
+| `TestFiles/run_interpreter_tests.sh` | **188 通过 / 0 失败** | 全部解释器脚本用例 |
+| `TestFiles/run_compiler_tests.sh` | **154 通过 / 0 失败** | 全部 IL 编译器脚本用例 |
+| `TestFiles/run_vm_tests.sh` | **80 通过 / 0 失败** | 全部 VM 与字节码脚本用例 |
 
 测试覆盖待复核事项见 [统一待办清单](../changes/Todo.md)。
 

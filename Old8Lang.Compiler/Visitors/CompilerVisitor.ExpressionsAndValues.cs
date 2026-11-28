@@ -1050,6 +1050,58 @@ public partial class CompilerVisitor
                 return typeof(object);
             }
 
+            // 异步状态机内部定义的局部函数值（如嵌套 async lambda）存储在状态机字段中
+            if (local.AsyncStateMachineGenerator is not null &&
+                local.AsyncStateMachineGenerator.TryLoadVariable(ilGenerator, node.Id.IdName))
+            {
+                ilGenerator.Emit(OpCodes.Ldc_I4, node.Ids.Count);
+                ilGenerator.Emit(OpCodes.Newarr, typeof(object));
+                for (var index = 0; index < node.Ids.Count; index++)
+                {
+                    ilGenerator.Emit(OpCodes.Dup);
+                    ilGenerator.Emit(OpCodes.Ldc_I4, index);
+                    var argument = node.Ids[index];
+                    argument.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+                    var argumentType = argument.Accept(new TypeInferenceVisitor(local));
+                    if (argumentType is { IsValueType: true })
+                    {
+                        ilGenerator.Emit(OpCodes.Box, argumentType);
+                    }
+
+                    ilGenerator.Emit(OpCodes.Stelem_Ref);
+                }
+
+                ilGenerator.Emit(OpCodes.Call,
+                    typeof(IlValueBridge).GetMethod(nameof(IlValueBridge.InvokeFunctionValue))!);
+                return typeof(object);
+            }
+
+            // 顶层全局槽位保存的函数值（如顶层 lambda 在具名函数内被调用）
+            if (local.Globals is { } globalSlots && globalSlots.IsSlot(node.Id.IdName))
+            {
+                RuntimeGlobals.EmitLoad(ilGenerator, node.Id.IdName, globalSlots.GetType(node.Id.IdName));
+                ilGenerator.Emit(OpCodes.Ldc_I4, node.Ids.Count);
+                ilGenerator.Emit(OpCodes.Newarr, typeof(object));
+                for (var index = 0; index < node.Ids.Count; index++)
+                {
+                    ilGenerator.Emit(OpCodes.Dup);
+                    ilGenerator.Emit(OpCodes.Ldc_I4, index);
+                    var argument = node.Ids[index];
+                    argument.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+                    var argumentType = argument.Accept(new TypeInferenceVisitor(local));
+                    if (argumentType is { IsValueType: true })
+                    {
+                        ilGenerator.Emit(OpCodes.Box, argumentType);
+                    }
+
+                    ilGenerator.Emit(OpCodes.Stelem_Ref);
+                }
+
+                ilGenerator.Emit(OpCodes.Call,
+                    typeof(IlValueBridge).GetMethod(nameof(IlValueBridge.InvokeFunctionValue))!);
+                return typeof(object);
+            }
+
             var classType = local.ClassVar.GetValueOrDefault(node.Id.IdName);
             if (classType is null)
             {
@@ -1979,6 +2031,13 @@ public partial class CompilerVisitor
 
         // 加载集合（id）
         node.Id.Accept(this);
+
+        // 值类型集合（如 ValueTuple）传给 CollectionHelper.Slice(object, ...) 前必须装箱
+        var targetType = node.Id.Accept(new TypeInferenceVisitor(local));
+        if (targetType is { IsValueType: true })
+        {
+            ilGenerator.Emit(OpCodes.Box, targetType);
+        }
 
         // 加载起始索引
         if (node.Start is not null)

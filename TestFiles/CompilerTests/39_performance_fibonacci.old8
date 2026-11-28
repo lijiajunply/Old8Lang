@@ -11,7 +11,7 @@ func fib(n) {
 PrintLine("计算斐波那契数列...")
 
 // 计算前20个斐波那契数
-for i <- 0; i < 20; i <- i + 1 {
+for i <- 0, i < 20, i <- i + 1 {
     result <- fib(i)
     PrintLine("fib(" + i.ToStr() + ") = " + result.ToStr())
 }

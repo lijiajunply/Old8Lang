@@ -244,7 +244,11 @@ PrintLine("(0,0)到(3,4)的距离平方: " + distance)
 PrintLine("\n=== 带默认参数的方法 ===")
 
 class DefaultParamClass {
-    func greet(name, greeting: "greet") {
+    func greet(name:string) -> string {
+        return "Hello, " + name + "!"
+    }
+
+    func greet(name:string, greeting:string) -> string {
         return greeting + ", " + name + "!"
     }
 }

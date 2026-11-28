@@ -3,13 +3,13 @@
 // 测试1: 基本的 into 延续
 numbers <- {1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
 
-result1 <- from x in numbers where x > 5 into filtered select filtered
+result1 <- from x in numbers where x > 5 select x into filtered select filtered
 
 PrintLine("测试1 - 基本 into 延续:")
 PrintLine(result1.ToStr())
 
 // 测试2: into 后继续过滤
-result2 <- from x in numbers where x > 3 into filtered where filtered < 8 select filtered
+result2 <- from x in numbers where x > 3 select x into filtered where filtered < 8 select filtered
 
 PrintLine("测试2 - into 后继续过滤:")
 PrintLine(result2.ToStr())

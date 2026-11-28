@@ -31,7 +31,7 @@ arg_list <- {1, 2, 3, 4, 5}
 PrintLine("列表: " + arg_list)
 
 // 访问单个元素
-listElement1 <- arg_list{1}
+listElement1 <- arg_list[1]
 PrintLine("[1] = " + listElement1)
 
 // 修改列表元素

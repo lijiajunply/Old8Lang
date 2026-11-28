@@ -485,6 +485,11 @@ public partial class InterpreterVisitor
                     var args = node.Ids.Select(id => id.Accept(this)).ToList();
                     result = threadMethodWrapper.Invoke(args, node.Position);
                 }
+                // 如果idResult是GeneratorLangValue，则作为可调用对象推进下一步
+                else if (idResult is GeneratorLangValue generatorValue)
+                {
+                    result = generatorValue.Run(manager, node.Ids);
+                }
                 else if (idResult is not NativeAnyLangValue)
                 {
                     throw new InvalidOperationError(node, $"对象 '{node.Id.IdName}' (类型: {idResult.TypeToString()}) 不可调用");
@@ -575,6 +580,11 @@ public partial class InterpreterVisitor
                 // 执行静态方法
                 var args = node.Ids.Select(id => id.Accept(this)).ToList();
                 result = threadMethodWrapper.Invoke(args, node.Position);
+            }
+            // 如果idResult是GeneratorLangValue，则作为可调用对象推进下一步
+            else if (idResult is GeneratorLangValue generatorValue)
+            {
+                result = generatorValue.Run(manager, node.Ids);
             }
             else if (idResult is not NativeAnyLangValue)
             {

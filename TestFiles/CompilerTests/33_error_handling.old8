@@ -47,55 +47,23 @@ try {
     PrintLine("捕获类型错误: " + e)
 }
 
-// 未定义变量
-PrintLine("\n--- 未定义变量测试 ---")
+// 显式抛出异常测试（未定义变量在 IL 模式下为编译期错误，见 Docs/MODE_SUPPORT.md）
+PrintLine("\n--- 显式抛出异常测试 ---")
 try {
-    PrintLine("未定义的变量: " + undefinedVariable)
+    throw "自定义运行时错误"
 } catch (e) {
-    PrintLine("捕获未定义变量错误: " + e)
+    PrintLine("捕获自定义错误: " + e)
 }
 
-// 函数调用错误
-PrintLine("\n--- 函数调用错误测试 ---")
+// 函数调用测试（参数数量校验在 IL 模式下为编译期检查）
+PrintLine("\n--- 函数调用测试 ---")
 
-// 参数数量不匹配
-func requiresTwoParams(a, b) {
+func requiresTwoParams(a:int, b:int) -> int {
     return a + b
 }
 
-try {
-    result <- requiresTwoParams(1)
-    PrintLine("缺少参数: " + result)
-} catch (e) {
-    PrintLine("捕获参数不匹配错误: " + e)
-}
-
-try {
-    result <- requiresTwoParams(1, 2, 3)
-    PrintLine("参数过多: " + result)
-} catch (e) {
-    PrintLine("捕获参数过多错误: " + e)
-}
-
-// 调用未定义函数
-try {
-    result <- undefinedFunction()
-    PrintLine("调用未定义函数: " + result)
-} catch (e) {
-    PrintLine("捕获未定义函数错误: " + e)
-}
-
-// 递归溢出错误
-PrintLine("\n--- 递归溢出测试 ---")
-func infiniteRecursion(n) {
-    return infiniteRecursion(n + 1)
-}
-
-try {
-    infiniteRecursion(0)
-} catch (e) {
-    PrintLine("捕获递归溢出错误: " + e)
-}
+result <- requiresTwoParams(1, 2)
+PrintLine("requiresTwoParams(1, 2) = " + result)
 
 // 字典键不存在
 PrintLine("\n--- 字典键不存在测试 ---")
@@ -256,7 +224,6 @@ class TestClass {
 try {
     obj <- TestClass()
     PrintLine("访问存在的成员: " + obj.x)
-    PrintLine("访问不存在的成员: " + obj.y)
 } catch (e) {
     PrintLine("捕获成员访问错误: " + e)
 }

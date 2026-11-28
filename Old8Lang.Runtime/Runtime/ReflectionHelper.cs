@@ -64,6 +64,40 @@ public static class ReflectionHelper
 
             return new DictionaryLangValue(tuples);
         }
+
+        if (obj is not null and not LangValueType)
+        {
+            var type = obj.GetType();
+            const BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly;
+            var methods = type.GetMethods(flags)
+                .Where(m => !m.IsSpecialName)
+                .Select(m => (LangValueType)new StringLangValue(m.Name))
+                .Distinct()
+                .ToList();
+            var fields = type.GetFields(flags)
+                .Select(f => (LangValueType)new StringLangValue(f.Name))
+                .ToList();
+            var interfaces = type.GetInterfaces()
+                .Select(i => (LangValueType)new StringLangValue(i.Name))
+                .ToList();
+            var baseClass = type.BaseType is not null && type.BaseType != typeof(object)
+                ? (LangValueType)new StringLangValue(type.BaseType.Name)
+                : new NullLangValue();
+
+            var tuples = new List<TupleLangValue>
+            {
+                new TupleLangValue([new StringLangValue("className"), new StringLangValue(type.Name)]),
+                new TupleLangValue([new StringLangValue("methods"), new ListLangValue(methods)]),
+                new TupleLangValue([new StringLangValue("fields"), new ListLangValue(fields)]),
+                new TupleLangValue([new StringLangValue("isInterface"), new BoolLangValue(type.IsInterface)]),
+                new TupleLangValue([new StringLangValue("isAbstract"), new BoolLangValue(type.IsAbstract)]),
+                new TupleLangValue([new StringLangValue("isMixin"), new BoolLangValue(false)]),
+                new TupleLangValue([new StringLangValue("baseClass"), baseClass]),
+                new TupleLangValue([new StringLangValue("interfaces"), new ListLangValue(interfaces)])
+            };
+
+            return new DictionaryLangValue(tuples);
+        }
         throw new InvalidOperationException("对象不是类实例");
     }
 

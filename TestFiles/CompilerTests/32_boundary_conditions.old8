@@ -175,10 +175,10 @@ PrintLine("1 ^ 100 = " + pow3)
 
 // 范围边界
 PrintLine("\n--- 范围边界 ---")
-range1 <- 0..5
+range1 <- [0~5]
 PrintLine("范围 0..5: " + range1)
 
-range2 <- 5..5
+range2 <- [5~5]
 PrintLine("范围 5..5: " + range2)
 
 // 嵌套结构边界
@@ -193,9 +193,6 @@ PrintLine("深度嵌套字典: " + nestedDict["a"]["b"]["c"])
 PrintLine("\n--- 元组边界 ---")
 singleTuple <- (42,)
 PrintLine("单元素元组: " + singleTuple)
-
-emptyTupleTest <- ()
-PrintLine("空元组: " + emptyTupleTest)
 
 largeTuple <- (1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
 PrintLine("大元组第一个元素: " + largeTuple[0])

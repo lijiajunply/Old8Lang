@@ -161,6 +161,11 @@ internal static class FuncLangValueIlCompilerExtensions
                     ilGenerator.Emit(OpCodes.Ldarg_0);
                 }
             }
+            else if (local.AsyncStateMachineGenerator is not null &&
+                     local.AsyncStateMachineGenerator.TryLoadVariable(ilGenerator, captured.Name))
+            {
+                // 当前位于异步状态机 MoveNext 内，变量已提升为状态机字段并由 TryLoadVariable 压栈
+            }
             else if (captured.Local is not null)
             {
                 ilGenerator.Emit(OpCodes.Ldloc, captured.Local);

@@ -48,7 +48,7 @@ PrintLine("nestedArray[25][25] = " + nestedArray[25][25])
 PrintLine("\n--- 大列表操作 ---")
 bigList <- {}
 for i <- 0, i < 500, i++ {
-    bigList <- bigList + [i * 2]
+    bigList.Add(i * 2)
 }
 PrintLine("创建 500 元素列表完成")
 PrintLine("列表长度: " + Len(bigList))
@@ -56,7 +56,7 @@ PrintLine("列表第 250 个元素: " + bigList[250])
 
 // 大字典创建和访问
 PrintLine("\n--- 大字典创建和访问 ---")
-bigDict <- {}
+bigDict:dict <- {}
 for i <- 0, i < 200, i++ {
     key <- "key" + i
     bigDict[key] <- i * 3
@@ -69,8 +69,8 @@ PrintLine("bigDict['key150'] = " + bigDict["key150"])
 PrintLine("\n--- 字典遍历 ---")
 dictSum <- 0
 count <- 0
-for key in bigDict {
-    dictSum <- dictSum + bigDict[key]
+for key, val in bigDict {
+    dictSum <- dictSum + val
     count <- count + 1
 }
 PrintLine("遍历字典，键值对数量: " + count)
@@ -78,9 +78,10 @@ PrintLine("所有值的总和: " + dictSum)
 
 // 复杂嵌套结构
 PrintLine("\n--- 复杂嵌套结构 ---")
+scoresDict:dict <- {}
 complexData <- {
     "users": [],
-    "scores": {},
+    "scores": scoresDict,
     "metadata": {
         "count": 0,
         "version": "1.0"

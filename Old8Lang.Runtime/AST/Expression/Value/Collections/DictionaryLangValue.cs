@@ -42,6 +42,20 @@ public partial class DictionaryLangValue : LangValueType, ILangList
         Tuples = tuples;
         KeyType = keyType;
         ValueType = valueType;
+
+        foreach (var tuple in tuples)
+        {
+            if (tuple.ItemValues.Count == 2)
+            {
+                Value.Add((tuple.ItemValues[0], tuple.ItemValues[1]));
+            }
+            else if (tuple.Elements.Count == 2 &&
+                     tuple.Elements[0] is LangValueType keyVal &&
+                     tuple.Elements[1] is LangValueType valueVal)
+            {
+                Value.Add((keyVal, valueVal));
+            }
+        }
     }
 
     public DictionaryLangValue(string? keyType = null, string? valueType = null, SourcePosition position = default) :

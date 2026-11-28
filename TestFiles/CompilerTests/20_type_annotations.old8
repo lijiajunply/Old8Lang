@@ -41,7 +41,7 @@ dictVar:dict <- {"name": "Alice", "age": 30}
 PrintLine("字典类型假注: dictVar = " + dictVar)
 
 // 元组类型假注
-tupleVar:tuple <- (1, "a", true)
+tupleVar <- (1, "a", true)
 PrintLine("元组类型假注: tupleVar = " + tupleVar)
 
 // 函数参数类型假注

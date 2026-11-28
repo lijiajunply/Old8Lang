@@ -147,7 +147,9 @@ public class LangListSortByMethod : BaseLangListMethod, IIlNativeValueInstanceMe
         // IL 模式下 lambda 被编译成委托，参数个数只能从委托签名上读
         bool isComparator = func switch
         {
-            IlDelegateFuncLangValue delegateFunc => delegateFunc.Function.Method.GetParameters().Length >= 2,
+            IlDelegateFuncLangValue delegateFunc =>
+                (delegateFunc.Function.GetType().GetMethod("Invoke")?.GetParameters().Length
+                 ?? delegateFunc.Function.Method.GetParameters().Length) >= 2,
             _ => func.Ids?.Count >= 2
         };
 

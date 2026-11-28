@@ -129,6 +129,21 @@ public static class CollectionHelper
         {
             return SliceList(list, start, end, step);
         }
+        else if (collection is string str)
+        {
+            var chars = str.ToCharArray().Cast<object>().ToArray();
+            var sliced = SliceArray(chars, start, end, step);
+            return new string(sliced.Select(c => (char)c).ToArray());
+        }
+        else if (collection is System.Runtime.CompilerServices.ITuple tuple)
+        {
+            var items = new object[tuple.Length];
+            for (int i = 0; i < tuple.Length; i++)
+            {
+                items[i] = tuple[i]!;
+            }
+            return SliceArray(items, start, end, step);
+        }
         else
         {
             throw new InvalidOperationException($"不支持的切片类型: {collection.GetType().Name}");

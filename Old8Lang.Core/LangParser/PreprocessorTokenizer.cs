@@ -167,8 +167,9 @@ public class PreprocessorTokenizer
                 inComment = false;
             }
 
-            // 检查是否是预编译指令（以 # 开头，且不在字符串/注释中）
-            if (ch == '#' && !inString && !inChar && !inComment && !inMultiLineComment && IsAtLineStart())
+            // 检查是否是预编译指令（以 # 开头，且不在字符串/注释中，跳过 #! 文件头指令）
+            if (ch == '#' && !inString && !inChar && !inComment && !inMultiLineComment && IsAtLineStart() &&
+                !(_currentIndex + 1 < _input.Length && _input[_currentIndex + 1] == '!'))
             {
                 ProcessDirective(result, conditionStack);
             }

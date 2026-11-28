@@ -167,7 +167,7 @@ PrintLine("字典中的列表: " + complexDict["list"])
 
 // 动态构建复杂结构
 PrintLine("\n--- 动态构建复杂结构 ---")
-graph <- {}
+graph:dict <- {}
 for i <- 0, i < 5, i++ {
     node <- "node" + i
     graph[node] <- []
@@ -179,8 +179,8 @@ for i <- 0, i < 5, i++ {
 }
 
 PrintLine("图结构（邻接表）:")
-for node in graph {
-    PrintLine(node + " -> " + graph[node])
+for node, edges in graph {
+    PrintLine(node + " -> " + edges)
 }
 
 // 树形结构
@@ -211,7 +211,7 @@ PrintLine("第一个孙节点: " + tree["children"][0]["children"][0]["value"])
 
 // 稀疏矩阵
 PrintLine("\n--- 稀疏矩阵 ---")
-sparseMatrix <- {}
+sparseMatrix:dict <- {}
 sparseMatrix["0,0"] <- 1
 sparseMatrix["1,2"] <- 5
 sparseMatrix["2,1"] <- 3
@@ -251,7 +251,7 @@ dataset <- [
     {"category": "B", "value": 25}
 ]
 
-aggregated <- {}
+aggregated:dict <- {}
 for item in dataset {
     cat <- item["category"]
     val <- item["value"]
@@ -264,8 +264,8 @@ for item in dataset {
 }
 
 PrintLine("聚合结果:")
-for category in aggregated {
-    PrintLine(category + ": " + aggregated[category])
+for category, total in aggregated {
+    PrintLine(category + ": " + total)
 }
 
 // 数组去重
@@ -273,13 +273,13 @@ PrintLine("\n--- 数组去重 ---")
 duplicates <- [1, 2, 3, 2, 4, 3, 5, 1, 6, 4]
 PrintLine("原数组: " + duplicates)
 
-unique <- {}
+unique:dict <- {}
 for num in duplicates {
     unique[num] <- true
 }
 
 uniqueArray <- []
-for key in unique {
+for key, _ in unique {
     uniqueArray <- uniqueArray + [key]
 }
 PrintLine("去重后: " + uniqueArray)

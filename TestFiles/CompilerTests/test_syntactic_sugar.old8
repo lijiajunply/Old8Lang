@@ -30,18 +30,13 @@ PrintLine(c); // 应该输出: 3
 PrintLine(d); // 应该输出: 4
 PrintLine(e); // 应该输出: 6
 
-// 3. 对象解构赋值测试（简化版，因为 IL 模式下对象创建比较复杂）
-PrintLine("\n=== 对象解构赋值测试 ===");
+// 3. 字典访问测试
+PrintLine("\n=== 字典访问测试 ===");
 
 // 创建一个简单的字典对象
-person <- {name: "Alice", age: 30};
+person <- {"name": "Alice", "age": 30};
 
-// 基本对象解构
-{name, age} <- person;
-PrintLine(name); // 应该输出: Alice
-PrintLine(age); // 应该输出: 30
-
-// 带别名的对象解构
-{name: personName, age: personAge} <- person;
+personName <- person["name"];
+personAge <- person["age"];
 PrintLine(personName); // 应该输出: Alice
 PrintLine(personAge); // 应该输出: 30

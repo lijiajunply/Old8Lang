@@ -1,4 +1,4 @@
-#verify-il false
+#!verify-il false
 
 // IL 模式：测试泛型类方法调用（禁用IL验证）
 

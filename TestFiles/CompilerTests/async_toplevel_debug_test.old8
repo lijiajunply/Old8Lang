@@ -1,7 +1,4 @@
-// 测试顶层 await - 启用调试
-Compiler.DebugOutputEnabled <- true
-Compiler.CurrentLogLevel <- Compiler.LogLevel.Debug
-
+// 测试顶层 await
 async func simpleAsync() -> string {
     return "Hello"
 }

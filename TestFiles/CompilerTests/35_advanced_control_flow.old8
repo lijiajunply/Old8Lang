@@ -87,16 +87,21 @@ for value <- 0, value < 5, value++ {
 PrintLine("\n--- 复杂 Switch-Case ---")
 func evaluateGrade(score) {
     switch true {
-        case score >= 90
+        case score >= 90 {
             return "优秀"
-        case score >= 80
+        }
+        case score >= 80 {
             return "良好"
-        case score >= 70
+        }
+        case score >= 70 {
             return "中等"
-        case score >= 60
+        }
+        case score >= 60 {
             return "及格"
-        default:
+        }
+        default {
             return "不及格"
+        }
     }
 }
 
@@ -178,7 +183,7 @@ func level1() {
 
 try {
     level1()
-} catch e {
+} catch (e) {
     PrintLine("在顶层捕获异常: " + e)
 }
 
@@ -191,7 +196,7 @@ func innerFunc() {
 func middleFunc() {
     try {
         innerFunc()
-    } catch e {
+    } catch (e) {
         PrintLine("中间层捕获: " + e)
         throw "重新抛出: " + e
     }
@@ -200,7 +205,7 @@ func middleFunc() {
 func outerFunc() {
     try {
         middleFunc()
-    } catch e {
+    } catch (e) {
         PrintLine("外层捕获: " + e)
     }
 }
@@ -224,7 +229,7 @@ for val in testValues {
     try {
         result <- checkValue(val)
         PrintLine(result)
-    } catch e {
+    } catch (e) {
         PrintLine("验证失败: " + e)
     }
 }
@@ -238,7 +243,7 @@ func resourceOperation(shouldFail) {
             throw "操作失败"
         }
         PrintLine("操作成功")
-    } catch e {
+    } catch (e) {
         PrintLine("捕获错误: " + e)
     } finally {
         PrintLine("清理资源（总是执行）")
@@ -264,7 +269,7 @@ for i <- 1, i <= 5, i++ {
         result <- processItem(i)
         processedItems <- processedItems + [result]
         PrintLine("处理 item " + i + ": " + result)
-    } catch e {
+    } catch (e) {
         PrintLine("错误: " + e)
     }
 }
@@ -277,7 +282,7 @@ for outer <- 1, outer <= 3, outer++ {
     PrintLine("\n外层循环: " + outer)
 
     switch outer {
-        case 1:
+        case 1 {
             PrintLine("  执行 Case 1")
             for inner <- 1, inner <= 3, inner++ {
                 if inner == 2 {
@@ -285,20 +290,23 @@ for outer <- 1, outer <= 3, outer++ {
                 }
                 PrintLine("    内层: " + inner)
             }
-        case 2:
+        }
+        case 2 {
             PrintLine("  执行 Case 2")
             try {
                 throw "测试异常"
-            } catch e {
+            } catch (e) {
                 PrintLine("    捕获: " + e)
             }
-        case 3:
+        }
+        case 3 {
             PrintLine("  执行 Case 3")
             count <- 0
             while count < 3 {
                 count <- count + 1
                 PrintLine("    While: " + count)
             }
+        }
     }
 }
 

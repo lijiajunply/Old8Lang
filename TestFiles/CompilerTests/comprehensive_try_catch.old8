@@ -35,14 +35,18 @@ try {
     PrintLine("finally块被执行")
 }
 
-// 4. 只有try-finally语句
+// 4. 只有try-finally语句（配合外层 catch 验证 finally 执行后异常继续传播）
 PrintLine("\n4. 只有try-finally语句")
 try {
-    PrintLine("尝试执行可能抛出异常的代码")
-    result <- 10 / 0
-    PrintLine("这行不应该被执行")
-} finally {
-    PrintLine("finally块被执行")
+    try {
+        PrintLine("尝试执行可能抛出异常的代码")
+        result <- 10 / 0
+        PrintLine("这行不应该被执行")
+    } finally {
+        PrintLine("finally块被执行")
+    }
+} catch (e) {
+    PrintLine("外层捕获到 finally 传播的异常: " + e)
 }
 
 PrintLine("\n✅ 测试完成")
