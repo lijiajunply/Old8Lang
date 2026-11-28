@@ -30,7 +30,7 @@ public class VMClosureTests
 
         try
         {
-            new VM(new Old8Lang.Bytecode.BytecodeCompiler().Compile(ast)).Execute();
+            new VM(new Bytecode.BytecodeCompiler().Compile(ast)).Execute();
             return writer.ToString().Trim();
         }
         finally

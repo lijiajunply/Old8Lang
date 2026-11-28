@@ -41,10 +41,10 @@ public partial class VirtualMachine
                 var elements = new object?[count];
                 for (int i = count - 1; i >= 0; i--)
                 {
-                    elements[i] = _stack.PopObject();
+                    elements[i] = Stack.PopObject();
                 }
 
-                _stack.PushRef(elements);
+                Stack.PushRef(elements);
             }
                 break;
 
@@ -55,11 +55,11 @@ public partial class VirtualMachine
                 var elements = new object?[count];
                 for (int i = count - 1; i >= 0; i--)
                 {
-                    elements[i] = _stack.PopObject();
+                    elements[i] = Stack.PopObject();
                 }
 
                 list.AddRange(elements);
-                _stack.PushRef(list);
+                Stack.PushRef(list);
             }
                 break;
 
@@ -69,7 +69,7 @@ public partial class VirtualMachine
                 var elements = new object?[count];
                 for (int i = count - 1; i >= 0; i--)
                 {
-                    elements[i] = _stack.PopObject();
+                    elements[i] = Stack.PopObject();
                 }
 
                 object tuple;
@@ -99,7 +99,7 @@ public partial class VirtualMachine
                     tuple = current;
                 }
                 TupleElements.Add(tuple, elements);
-                _stack.PushRef(tuple);
+                Stack.PushRef(tuple);
             }
                 break;
 
@@ -113,7 +113,7 @@ public partial class VirtualMachine
                 var pairs = new Tuple<object?, object?>[pairCount];
                 for (int i = pairCount - 1; i >= 0; i--)
                 {
-                    if (_stack.PopObject() is Tuple<object?, object?> { Item1: not null } tuple)
+                    if (Stack.PopObject() is Tuple<object?, object?> { Item1: not null } tuple)
                     {
                         pairs[i] = tuple;
                     }
@@ -127,13 +127,13 @@ public partial class VirtualMachine
                     }
                 }
 
-                _stack.PushRef(dict);
+                Stack.PushRef(dict);
             }
                 break;
 
             case OpCode.ArrayLength:
             {
-                var collection = _stack.PopObject();
+                var collection = Stack.PopObject();
                 int length = 0;
 
                 if (collection is Array array)
@@ -178,24 +178,24 @@ public partial class VirtualMachine
                     throw new TypeError(GetPosition(instruction), $"无法获取类型 {DescribeValueType(collection)} 的长度");
                 }
 
-                _stack.PushInt(length);
+                Stack.PushInt(length);
             }
                 break;
 
             case OpCode.GetIndex:
             {
                 // 栈顶: index, collection
-                var indexVal = _stack.Pop();
-                var collection = _stack.PopObject();
+                var indexVal = Stack.Pop();
+                var collection = Stack.PopObject();
 
                 if (collection is Array array)
                 {
-                    _stack.PushObject(array.GetValue(NormalizeIndex(indexVal.ToInt32(), array.Length,
+                    Stack.PushObject(array.GetValue(NormalizeIndex(indexVal.ToInt32(), array.Length,
                         GetPosition(instruction))));
                 }
                 else if (collection is IList list)
                 {
-                    _stack.PushObject(list[NormalizeIndex(indexVal.ToInt32(), list.Count, GetPosition(instruction))]);
+                    Stack.PushObject(list[NormalizeIndex(indexVal.ToInt32(), list.Count, GetPosition(instruction))]);
                 }
                 else if (collection is IDictionary dict)
                 {
@@ -205,7 +205,7 @@ public partial class VirtualMachine
                         throw new KeyError(GetPosition(instruction), indexObj!);
                     }
 
-                    _stack.PushObject(dict[indexObj!]);
+                    Stack.PushObject(dict[indexObj!]);
                 }
                 else if (collection is DictionaryLangValue dictLangValue)
                 {
@@ -217,7 +217,7 @@ public partial class VirtualMachine
                     {
                         if (key.Equal(keyToFind))
                         {
-                            _stack.PushObject(value);
+                            Stack.PushObject(value);
                             found = true;
                             break;
                         }
@@ -242,11 +242,11 @@ public partial class VirtualMachine
                         throw new IndexError(GetPosition(instruction), idx, items.Count);
                     }
 
-                    _stack.PushObject(items[idx]);
+                    Stack.PushObject(items[idx]);
                 }
                 else if (collection is string str)
                 {
-                    _stack.PushChar(str[NormalizeIndex(indexVal.ToInt32(), str.Length, GetPosition(instruction))]);
+                    Stack.PushChar(str[NormalizeIndex(indexVal.ToInt32(), str.Length, GetPosition(instruction))]);
                 }
                 else if (collection is Tuple<object?, object?> tuple)
                 {
@@ -268,7 +268,7 @@ public partial class VirtualMachine
                         }
                     }
 
-                    _stack.PushObject(tupleItems[NormalizeIndex(indexVal.ToInt32(), tupleItems.Count,
+                    Stack.PushObject(tupleItems[NormalizeIndex(indexVal.ToInt32(), tupleItems.Count,
                         GetPosition(instruction))]);
                 }
                 else
@@ -281,9 +281,9 @@ public partial class VirtualMachine
             case OpCode.SetIndex:
             {
                 // 栈顶: value, index, collection
-                var value = _stack.PopObject();
-                var indexVal = _stack.Pop();
-                var collection = _stack.PopObject();
+                var value = Stack.PopObject();
+                var indexVal = Stack.Pop();
+                var collection = Stack.PopObject();
 
                 if (collection is Array array)
                 {
@@ -334,10 +334,10 @@ public partial class VirtualMachine
             case OpCode.NewRange:
             {
                 // 栈顶: includeEnd, includeStart, end, start
-                bool includeEnd = ToBool(_stack.Pop());
-                bool includeStart = ToBool(_stack.Pop());
-                int end = _stack.PopInt32();
-                int start = _stack.PopInt32();
+                bool includeEnd = ToBool(Stack.Pop());
+                bool includeStart = ToBool(Stack.Pop());
+                int end = Stack.PopInt32();
+                int start = Stack.PopInt32();
 
                 var results = new List<int>();
 
@@ -364,7 +364,7 @@ public partial class VirtualMachine
                     }
                 }
 
-                _stack.PushRef(results.ToArray());
+                Stack.PushRef(results.ToArray());
             }
                 break;
         }

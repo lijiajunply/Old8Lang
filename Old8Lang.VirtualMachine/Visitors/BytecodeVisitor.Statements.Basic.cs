@@ -221,7 +221,7 @@ public partial class BytecodeVisitor
 
                 _compiler.FreeLocal(tempLocalIndex);
             }
-            else if (Old8Lang.Runtime.LiteralCollectionRuntimeFactory.TryCreateIndex(leftExpr, out var listItem))
+            else if (Runtime.LiteralCollectionRuntimeFactory.TryCreateIndex(leftExpr, out var listItem))
             {
                 // 简单索引赋值: array[index] <- value
                 // SetIndex期望栈布局(从栈顶到栈底): value, index, collection
@@ -239,7 +239,7 @@ public partial class BytecodeVisitor
                 // 发出SetIndex指令
                 Emit(OpCode.SetIndex);
             }
-            else if (Old8Lang.Runtime.LiteralCollectionRuntimeFactory.TryCreateNestedIndex(leftExpr, out var nestedIndexAccess))
+            else if (Runtime.LiteralCollectionRuntimeFactory.TryCreateNestedIndex(leftExpr, out var nestedIndexAccess))
             {
                 // 嵌套索引赋值: array[i][j] <- value
                 // 需要分解为两步：
@@ -272,7 +272,7 @@ public partial class BytecodeVisitor
                 {
                     fieldName = rightClassMemberId.IdName;
                 }
-                else if (Old8Lang.Runtime.LiteralCollectionRuntimeFactory.TryCreateIndex(operation.Right, out var nestedListItem))
+                else if (Runtime.LiteralCollectionRuntimeFactory.TryCreateIndex(operation.Right, out var nestedListItem))
                 {
                     // 这是索引赋值：obj.field[index] <- value
                     // 例如：this.groups[key] <- newGroup

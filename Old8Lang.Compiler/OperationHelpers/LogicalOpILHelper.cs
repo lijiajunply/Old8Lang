@@ -61,10 +61,10 @@ public static class LogicalOpILHelper
             }
 
             ilGenerator.Emit(OpCodes.Ldstr,
-                Old8Lang.InstanceMethods.Core.IlTypeErrors.TypeName(operandType));
+                InstanceMethods.Core.IlTypeErrors.TypeName(operandType));
             ilGenerator.Emit(OpCodes.Call,
-                typeof(Old8Lang.InstanceMethods.Core.IlTypeErrors).GetMethod(
-                    nameof(Old8Lang.InstanceMethods.Core.IlTypeErrors.ThrowLogicOperandMismatch))!);
+                typeof(InstanceMethods.Core.IlTypeErrors).GetMethod(
+                    nameof(InstanceMethods.Core.IlTypeErrors.ThrowLogicOperandMismatch))!);
             ilGenerator.Emit(OpCodes.Pop);
             ilGenerator.Emit(OpCodes.Ldc_I4_0);
             return typeof(bool);
@@ -131,10 +131,10 @@ public static class LogicalOpILHelper
             }
 
             ilGenerator.Emit(OpCodes.Ldstr,
-                Old8Lang.InstanceMethods.Core.IlTypeErrors.TypeName(operandType));
+                InstanceMethods.Core.IlTypeErrors.TypeName(operandType));
             ilGenerator.Emit(OpCodes.Call,
-                typeof(Old8Lang.InstanceMethods.Core.IlTypeErrors).GetMethod(
-                    nameof(Old8Lang.InstanceMethods.Core.IlTypeErrors.ThrowLogicOperandMismatch))!);
+                typeof(InstanceMethods.Core.IlTypeErrors).GetMethod(
+                    nameof(InstanceMethods.Core.IlTypeErrors.ThrowLogicOperandMismatch))!);
             ilGenerator.Emit(OpCodes.Pop);
             ilGenerator.Emit(OpCodes.Ldc_I4_0);
             return typeof(bool);

@@ -124,7 +124,7 @@ protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpres
         if (arguments.Length >= 2)
         {
             var zipper = arguments[1];
-            var vm = Old8Lang.Bytecode.Core.VMContext.CurrentVM;
+            var vm = Bytecode.Core.VMContext.CurrentVM;
             if (vm == null)
             {
                 throw new InvalidOperationException("VM 上下文未初始化");

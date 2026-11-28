@@ -501,7 +501,7 @@ result <- len(items)
 
         // Act & Assert
         var ast = interpreter.Build(code);
-        Assert.Throws<Old8Lang.Error.TypeError>(() => ast.Run(interpreter.Manager));
+        Assert.Throws<TypeError>(() => ast.Run(interpreter.Manager));
     }
 
     /// <summary>

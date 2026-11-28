@@ -324,16 +324,16 @@ internal static partial class LinqExpressionRuntimeExtensions
         groupByClause.KeyExpression.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
         var keyType = groupByClause.KeyExpression.Accept(new TypeInferenceVisitor(local)) ?? typeof(object);
         if (keyType.IsValueType) ilGenerator.Emit(OpCodes.Box, keyType);
-        ilGenerator.Emit(OpCodes.Call, typeof(Old8Lang.InstanceMethods.Core.IlValueBridge)
-            .GetMethod(nameof(Old8Lang.InstanceMethods.Core.IlValueBridge.UnwrapDynamic))!);
+        ilGenerator.Emit(OpCodes.Call, typeof(InstanceMethods.Core.IlValueBridge)
+            .GetMethod(nameof(InstanceMethods.Core.IlValueBridge.UnwrapDynamic))!);
         ilGenerator.Emit(OpCodes.Stloc, keyLocal);
 
         // 计算分组元素
         groupByClause.ElementExpression.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
         var elementType = groupByClause.ElementExpression.Accept(new TypeInferenceVisitor(local)) ?? typeof(object);
         if (elementType.IsValueType) ilGenerator.Emit(OpCodes.Box, elementType);
-        ilGenerator.Emit(OpCodes.Call, typeof(Old8Lang.InstanceMethods.Core.IlValueBridge)
-            .GetMethod(nameof(Old8Lang.InstanceMethods.Core.IlValueBridge.UnwrapDynamic))!);
+        ilGenerator.Emit(OpCodes.Call, typeof(InstanceMethods.Core.IlValueBridge)
+            .GetMethod(nameof(InstanceMethods.Core.IlValueBridge.UnwrapDynamic))!);
         ilGenerator.Emit(OpCodes.Stloc, elementLocal);
 
         // 调用辅助方法添加到分组
@@ -638,8 +638,8 @@ internal static partial class LinqExpressionRuntimeExtensions
     {
         var type = expression.Accept(new TypeInferenceVisitor(local)) ?? typeof(object);
         if (type.IsValueType) il.Emit(OpCodes.Box, type);
-        il.Emit(OpCodes.Call, typeof(Old8Lang.InstanceMethods.Core.IlValueBridge)
-            .GetMethod(nameof(Old8Lang.InstanceMethods.Core.IlValueBridge.UnwrapDynamic))!);
+        il.Emit(OpCodes.Call, typeof(InstanceMethods.Core.IlValueBridge)
+            .GetMethod(nameof(InstanceMethods.Core.IlValueBridge.UnwrapDynamic))!);
     }
 
     private static void EmitBindRow(this LinqExpression node, ILGenerator ilGenerator, LocalManager local,
@@ -805,7 +805,7 @@ public static class LinqCompilerHelper
             string strVal => new StringLangValue(strVal),
             bool boolVal => new BoolLangValue(boolVal),
             char charVal => new CharLangValue(charVal),
-            _ => Old8Lang.InstanceMethods.Core.IlValueBridge.Wrap(obj)
+            _ => InstanceMethods.Core.IlValueBridge.Wrap(obj)
         };
     }
 

@@ -42,7 +42,7 @@ public class VMNamedArgumentsTests
         try
         {
             bytecode.SaveToFile(path);
-            vm = new VM(Old8Lang.Bytecode.BytecodeFile.LoadFromFile(path));
+            vm = new VM(Bytecode.BytecodeFile.LoadFromFile(path));
             vm.Execute();
             Assert.IsType<int>(vm.GetGlobalVariable("sem"));
         }
@@ -63,7 +63,7 @@ public class VMNamedArgumentsTests
         try
         {
             bytecode.SaveToFile(path);
-            var vm = new VM(Old8Lang.Bytecode.BytecodeFile.LoadFromFile(path));
+            var vm = new VM(Bytecode.BytecodeFile.LoadFromFile(path));
             vm.Execute();
             Assert.Equal(7, vm.GetGlobalVariable("result"));
         }

@@ -15,57 +15,57 @@ public partial class VirtualMachine
         {
             case OpCode.Equal:
             {
-                var b = _stack.Pop();
-                var a = _stack.Pop();
-                _stack.PushBool(Equals(a, b));
+                var b = Stack.Pop();
+                var a = Stack.Pop();
+                Stack.PushBool(Equals(a, b));
             }
                 break;
 
             case OpCode.NotEqual:
             {
-                var b = _stack.Pop();
-                var a = _stack.Pop();
-                _stack.PushBool(!Equals(a, b));
+                var b = Stack.Pop();
+                var a = Stack.Pop();
+                Stack.PushBool(!Equals(a, b));
             }
                 break;
 
             case OpCode.Greater:
             {
-                var b = _stack.Pop();
-                var a = _stack.Pop();
-                _stack.PushBool(Greater(a, b));
+                var b = Stack.Pop();
+                var a = Stack.Pop();
+                Stack.PushBool(Greater(a, b));
             }
                 break;
 
             case OpCode.Less:
             {
-                var b = _stack.Pop();
-                var a = _stack.Pop();
-                _stack.PushBool(Less(a, b));
+                var b = Stack.Pop();
+                var a = Stack.Pop();
+                Stack.PushBool(Less(a, b));
             }
                 break;
 
             case OpCode.GreaterEqual:
             {
-                var b = _stack.Pop();
-                var a = _stack.Pop();
-                _stack.PushBool(GreaterEqual(a, b));
+                var b = Stack.Pop();
+                var a = Stack.Pop();
+                Stack.PushBool(GreaterEqual(a, b));
             }
                 break;
 
             case OpCode.LessEqual:
             {
-                var b = _stack.Pop();
-                var a = _stack.Pop();
-                _stack.PushBool(LessEqual(a, b));
+                var b = Stack.Pop();
+                var a = Stack.Pop();
+                Stack.PushBool(LessEqual(a, b));
             }
                 break;
 
             case OpCode.In:
             {
-                var collection = _stack.PopObject();
-                var value = _stack.PopObject();
-                _stack.PushBool(ContainsIn(value, collection));
+                var collection = Stack.PopObject();
+                var value = Stack.PopObject();
+                Stack.PushBool(ContainsIn(value, collection));
             }
                 break;
         }

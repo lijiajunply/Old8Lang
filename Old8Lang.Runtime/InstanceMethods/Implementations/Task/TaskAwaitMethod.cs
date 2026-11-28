@@ -37,7 +37,7 @@ public class TaskAwaitMethod : BaseInstanceMethod
         ilGenerator.Emit(OpCodes.Call, helperMethod!);
     }
 
-    public static object? AwaitHelper(System.Threading.Tasks.Task<object> task)
+    public static object? AwaitHelper(Task<object> task)
     {
         try
         {
@@ -64,7 +64,7 @@ public class TaskAwaitMethod : BaseInstanceMethod
             return taskLangValue.Await();
         }
 
-        if (instance is System.Threading.Tasks.Task<object> task)
+        if (instance is Task<object> task)
         {
             try
             {

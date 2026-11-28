@@ -81,7 +81,7 @@ public class BackendAssemblyBoundaryTests
     public void InterpreterDebugger_LivesInInterpreterAssembly()
     {
         Assert.Equal("Old8Lang.Interpreter",
-            typeof(Old8Lang.Debugger.DebuggableInterpreter).Assembly.GetName().Name);
+            typeof(Debugger.DebuggableInterpreter).Assembly.GetName().Name);
         Assert.Equal("Old8Lang.Interpreter",
             typeof(Old8Lang.Debugger.Debugger).Assembly.GetName().Name);
     }
@@ -100,9 +100,9 @@ public class BackendAssemblyBoundaryTests
     public void AsyncStateMachineGenerator_LivesInCompilerAssembly_AndRuntimeOnlySeesContract()
     {
         Assert.Equal("Old8Lang.Compiler",
-            typeof(Old8Lang.AsyncGeneration.AsyncStateMachineGenerator).Assembly.GetName().Name);
+            typeof(AsyncGeneration.AsyncStateMachineGenerator).Assembly.GetName().Name);
         Assert.Equal("Old8Lang.Runtime",
-            typeof(Old8Lang.AsyncGeneration.IAsyncStateMachineGenerator).Assembly.GetName().Name);
+            typeof(AsyncGeneration.IAsyncStateMachineGenerator).Assembly.GetName().Name);
     }
 
     [Fact]
@@ -110,7 +110,7 @@ public class BackendAssemblyBoundaryTests
     {
         Assert.Equal("Old8Lang.Compiler", typeof(Old8Lang.Compiler.Compiler).Assembly.GetName().Name);
         Assert.Equal("Old8Lang.Runtime",
-            typeof(Old8Lang.Compiler.IlCompilerOptions).Assembly.GetName().Name);
+            typeof(IlCompilerOptions).Assembly.GetName().Name);
     }
 
     [Fact]

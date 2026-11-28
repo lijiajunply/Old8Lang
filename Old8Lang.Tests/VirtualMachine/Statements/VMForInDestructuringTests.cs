@@ -17,7 +17,7 @@ public class VMForInDestructuringTests
     {
         var interpreter = new LangInterpreter();
         var ast = interpreter.Build(code);
-        var bytecodeFile = new Old8Lang.Bytecode.BytecodeCompiler().Compile(ast);
+        var bytecodeFile = new Bytecode.BytecodeCompiler().Compile(ast);
 
         var originalOut = Console.Out;
         using var writer = new StringWriter();

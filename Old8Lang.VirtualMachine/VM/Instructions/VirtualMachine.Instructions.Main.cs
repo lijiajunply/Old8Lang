@@ -681,12 +681,12 @@ public partial class VirtualMachine
     {
         return val switch
         {
-            Old8Lang.AST.Expression.Value.IntLangValue i => i.Value,
-            Old8Lang.AST.Expression.Value.DoubleLangValue d => d.Value,
-            Old8Lang.AST.Expression.Value.StringLangValue s => s.Value,
-            Old8Lang.AST.Expression.Value.BoolLangValue b => b.Value,
-            Old8Lang.AST.Expression.Value.CharLangValue c => c.Value,
-            Old8Lang.AST.Expression.Value.NullLangValue => null,
+            AST.Expression.Value.IntLangValue i => i.Value,
+            AST.Expression.Value.DoubleLangValue d => d.Value,
+            AST.Expression.Value.StringLangValue s => s.Value,
+            AST.Expression.Value.BoolLangValue b => b.Value,
+            AST.Expression.Value.CharLangValue c => c.Value,
+            AST.Expression.Value.NullLangValue => null,
             _ => val
         };
     }

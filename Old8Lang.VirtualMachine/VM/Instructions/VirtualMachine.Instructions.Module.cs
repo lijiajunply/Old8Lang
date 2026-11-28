@@ -86,7 +86,7 @@ public partial class VirtualMachine
                         $"模块 '{moduleName}' 中未找到符号 '{symbolName}'");
                 }
 
-                _stack.PushObject(symbol);
+                Stack.PushObject(symbol);
             }
                 break;
 
@@ -95,8 +95,8 @@ public partial class VirtualMachine
                 int messageIndex = instruction.IntOperand;
                 var message = _bytecodeFile.ConstantPool.GetConstant(messageIndex);
                 var stackContents = string.Join(", ",
-                    _stack.ToObjectArrayTopToBottom().Select(x => x is null ? "null" : DescribeValueType(x)));
-                Console.WriteLine($"{message} - 栈深度:{_stack.Count}, 内容:[{stackContents}]");
+                    Stack.ToObjectArrayTopToBottom().Select(x => x is null ? "null" : DescribeValueType(x)));
+                Console.WriteLine($"{message} - 栈深度:{Stack.Count}, 内容:[{stackContents}]");
             }
                 break;
 

@@ -40,7 +40,7 @@ internal static class NumericBinaryOpHelper
             il.Emit(OpCodes.Box, rightType);
         }
 
-        var helper = typeof(Old8Lang.InstanceMethods.Core.IlDynamicArithmetic)
+        var helper = typeof(InstanceMethods.Core.IlDynamicArithmetic)
             .GetMethod(methodName, [typeof(object), typeof(object)])!;
         il.Emit(OpCodes.Call, helper);
         return true;
@@ -58,8 +58,8 @@ internal static class NumericBinaryOpHelper
             expression!.Accept(RuntimeVisitors.CreateCompiler(il, local));
             if (type != null && typeof(LangValueType).IsAssignableFrom(type)) return;
             if (type is { IsValueType: true }) il.Emit(OpCodes.Box, type);
-            il.Emit(OpCodes.Call, typeof(Old8Lang.InstanceMethods.Core.IlValueBridge)
-                .GetMethod(nameof(Old8Lang.InstanceMethods.Core.IlValueBridge.Wrap))!);
+            il.Emit(OpCodes.Call, typeof(InstanceMethods.Core.IlValueBridge)
+                .GetMethod(nameof(InstanceMethods.Core.IlValueBridge.Wrap))!);
         }
         EmitWrapped(left, leftType);
         EmitWrapped(right, rightType);
@@ -202,7 +202,7 @@ internal static class NumericBinaryOpHelper
         }
 
         if (TryEmitDynamicObjectBinary(left, right, ilGenerator, local, leftType, rightType,
-                nameof(Old8Lang.InstanceMethods.Core.IlDynamicArithmetic.Add)))
+                nameof(InstanceMethods.Core.IlDynamicArithmetic.Add)))
             return typeof(object);
 
         LoadAndConvertOperands(left, right, ilGenerator, local, ref leftType, ref rightType);
@@ -272,7 +272,7 @@ internal static class NumericBinaryOpHelper
         }
 
         if (TryEmitDynamicObjectBinary(left, right, ilGenerator, local, leftType, rightType,
-                nameof(Old8Lang.InstanceMethods.Core.IlDynamicArithmetic.Subtract)))
+                nameof(InstanceMethods.Core.IlDynamicArithmetic.Subtract)))
             return typeof(object);
 
         LoadAndConvertOperands(left, right, ilGenerator, local, ref leftType, ref rightType);
@@ -353,8 +353,8 @@ internal static class NumericBinaryOpHelper
             }
 
             ilGenerator.Emit(OpCodes.Call,
-                typeof(Old8Lang.InstanceMethods.Core.IlValueBridge).GetMethod(
-                    nameof(Old8Lang.InstanceMethods.Core.IlValueBridge.RepeatString))!);
+                typeof(InstanceMethods.Core.IlValueBridge).GetMethod(
+                    nameof(InstanceMethods.Core.IlValueBridge.RepeatString))!);
             return typeof(string);
         }
 
@@ -364,14 +364,14 @@ internal static class NumericBinaryOpHelper
             ilGenerator.Emit(OpCodes.Ldstr,
                 $"无法对类型 {DisplayName(leftType)} 和 {DisplayName(rightType)} 执行乘法");
             ilGenerator.Emit(OpCodes.Call,
-                typeof(Old8Lang.InstanceMethods.Core.IlTypeErrors).GetMethod(
-                    nameof(Old8Lang.InstanceMethods.Core.IlTypeErrors.ThrowInvalidOperation))!);
+                typeof(InstanceMethods.Core.IlTypeErrors).GetMethod(
+                    nameof(InstanceMethods.Core.IlTypeErrors.ThrowInvalidOperation))!);
             ilGenerator.Emit(OpCodes.Unbox_Any, typeof(int));
             return typeof(int);
         }
 
         if (TryEmitDynamicObjectBinary(left, right, ilGenerator, local, leftType, rightType,
-                nameof(Old8Lang.InstanceMethods.Core.IlDynamicArithmetic.Multiply)))
+                nameof(InstanceMethods.Core.IlDynamicArithmetic.Multiply)))
             return typeof(object);
 
         // 加载操作数，并把 object（未注解的函数参数）按 int 拆箱
@@ -457,7 +457,7 @@ internal static class NumericBinaryOpHelper
         }
 
         if (TryEmitDynamicObjectBinary(left, right, ilGenerator, local, leftType, rightType,
-                nameof(Old8Lang.InstanceMethods.Core.IlDynamicArithmetic.Divide)))
+                nameof(InstanceMethods.Core.IlDynamicArithmetic.Divide)))
             return typeof(object);
 
         // 加载操作数，并把 object（未注解的函数参数）按 int 拆箱
@@ -527,7 +527,7 @@ internal static class NumericBinaryOpHelper
         }
 
         if (TryEmitDynamicObjectBinary(left, right, ilGenerator, local, leftType, rightType,
-                nameof(Old8Lang.InstanceMethods.Core.IlDynamicArithmetic.Modulo)))
+                nameof(InstanceMethods.Core.IlDynamicArithmetic.Modulo)))
             return typeof(object);
 
         // 加载操作数，并把 object（未注解的函数参数）按 int 拆箱
@@ -597,7 +597,7 @@ internal static class NumericBinaryOpHelper
         }
 
         if (TryEmitDynamicObjectBinary(left, right, ilGenerator, local, leftType, rightType,
-                nameof(Old8Lang.InstanceMethods.Core.IlDynamicArithmetic.Power)))
+                nameof(InstanceMethods.Core.IlDynamicArithmetic.Power)))
             return typeof(object);
 
         left?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));

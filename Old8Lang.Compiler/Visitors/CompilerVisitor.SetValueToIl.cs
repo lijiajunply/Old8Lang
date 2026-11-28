@@ -434,7 +434,7 @@ public partial class CompilerVisitor
                 ? func.BlockStatement[^1]
                 : null;
 
-            if (lastStatement is not Old8Lang.AST.Statement.ReturnStatement)
+            if (lastStatement is not Statement.ReturnStatement)
             {
                 if (returnType == typeof(void))
                 {

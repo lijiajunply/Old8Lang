@@ -269,7 +269,7 @@ public partial class VirtualMachine
         _globalsState.IsConcurrent = true;
         // worker 虚拟机的创建与执行都必须发生在 Task.Run 的委托内部：求值栈、调用栈与帧池都按线程存放，
         // 在调用方线程上执行 worker 会让栈语义错位（与 OpCode.CallAsync 的既有写法保持一致）。
-        var task = System.Threading.Tasks.Task.Run(() =>
+        var task = Task.Run(() =>
         {
             var workerVm = CreateWorkerVirtualMachine();
             return workerVm.ConvertResultToLangValue(workerVm.CallCallableAndGetResult(callable, []));
@@ -603,7 +603,7 @@ public partial class VirtualMachine
     /// </remarks>
     private void CallCallableSafely(object callable, object?[] args, SourcePosition position)
     {
-        var snapshot = _stack.Count;
+        var snapshot = Stack.Count;
         try
         {
             InvokeCallable(callable, args, position);
@@ -611,9 +611,9 @@ public partial class VirtualMachine
         finally
         {
             // 无论正常返回还是抛异常，都把这次调用在求值栈上留下的值（返回值与中途的中间值）清掉
-            while (_stack.Count > snapshot)
+            while (Stack.Count > snapshot)
             {
-                _stack.PopDiscard();
+                Stack.PopDiscard();
             }
         }
     }
@@ -625,7 +625,7 @@ public partial class VirtualMachine
     private object? CallCallableAndGetResult(object? callable, object?[] args)
     {
         InvokeCallable(callable, args, new SourcePosition());
-        return _stack.Count > 0 ? _stack.PopObject() : null;
+        return Stack.Count > 0 ? Stack.PopObject() : null;
     }
 
     /// <summary>
@@ -637,7 +637,7 @@ public partial class VirtualMachine
         {
             case VmStaticMethodValue staticMethod:
                 // 静态类方法值：复用同一套限定名分发，结果压回求值栈供调用方读取
-                _stack.PushObject(CallNativeFunction(staticMethod.QualifiedName, args));
+                Stack.PushObject(CallNativeFunction(staticMethod.QualifiedName, args));
                 break;
             case ClosureValue closure:
                 // 带上 ConstantPool：与 ExecuteCallDynamicInstruction 的动态调用路径一致

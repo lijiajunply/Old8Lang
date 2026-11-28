@@ -89,17 +89,17 @@ public partial class VirtualMachine
         RestoreLocalsFromObjects(locals, frame.Locals);
 
         // 保存调用者的栈状态和调用栈
-        var callerStack = _stack.SnapshotBottomToTop();
-        var callerCallStackCount = _callStack.Count;
+        var callerStack = Stack.SnapshotBottomToTop();
+        var callerCallStackCount = CallStack.Count;
 
         // 恢复生成器的栈
-        _stack.Clear();
+        Stack.Clear();
         foreach (var item in stack.Reverse())
         {
-            _stack.PushObject(item);
+            Stack.PushObject(item);
         }
 
-        _callStack.Push(frame);
+        CallStack.Push(frame);
 
         try
         {
@@ -138,10 +138,10 @@ public partial class VirtualMachine
         finally
         {
             ExecuteDefers(frame);
-            _callStack.Pop();
+            CallStack.Pop();
 
             // 恢复调用者的栈状态
-            _stack.RestoreFromBottom(callerStack);
+            Stack.RestoreFromBottom(callerStack);
         }
     }
 }

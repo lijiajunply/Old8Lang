@@ -233,7 +233,7 @@ public class ClosureCaptureAnalyzer
         }
 
         // 处理 FuncLangValue（运行时可调用值，作为函数声明/原生函数的载体）
-        if (node is AST.Expression.Value.FuncLangValue funcValue)
+        if (node is FuncLangValue funcValue)
         {
             AnalyzeNestedFunction(
                 funcValue.Ids?.Select(id => id.IdName).ToList() ?? new List<string>(),
@@ -242,7 +242,7 @@ public class ClosureCaptureAnalyzer
         }
 
         // 处理 AsyncFuncLangValue（异步函数值 / async lambda）
-        if (node is AST.Expression.Value.AsyncFuncLangValue asyncFuncValue)
+        if (node is AsyncFuncLangValue asyncFuncValue)
         {
             AnalyzeNestedFunction(
                 asyncFuncValue.Ids?.Select(id => id.IdName).ToList() ?? new List<string>(),

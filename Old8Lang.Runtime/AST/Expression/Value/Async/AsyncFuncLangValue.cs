@@ -248,6 +248,6 @@ public partial class AsyncFuncLangValue : ImportInfo
 
     public override TResult Accept<TResult>(IVisitor<TResult> visitor)
     {
-        return ((Old8Lang.AST.Visitor.IRuntimeVisitor<TResult>)visitor).VisitAsyncFuncLangValue(this);
+        return ((IRuntimeVisitor<TResult>)visitor).VisitAsyncFuncLangValue(this);
     }
 }

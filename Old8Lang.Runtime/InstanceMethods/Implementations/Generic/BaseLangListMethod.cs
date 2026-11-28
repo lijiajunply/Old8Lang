@@ -76,7 +76,7 @@ public abstract class BaseLangListMethod : BaseInstanceMethod
             return FlattenTuple(instance);
         }
         throw new ArgumentException(
-            $"实例必须实现 ILangList 接口或是数组/列表/元组类型，当前类型：{Old8Lang.Runtime.VMReflectionHelper.DescribeValueType(instance)}");
+            $"实例必须实现 ILangList 接口或是数组/列表/元组类型，当前类型：{Runtime.VMReflectionHelper.DescribeValueType(instance)}");
     }
 
     /// <summary>按语言值的相等语义比较 VM 集合元素。</summary>
@@ -111,7 +111,7 @@ public abstract class BaseLangListMethod : BaseInstanceMethod
             return FlattenTuple(instance).Count;
         }
         throw new ArgumentException(
-            $"实例必须实现 ILangList 接口或是数组/列表/元组类型，当前类型：{Old8Lang.Runtime.VMReflectionHelper.DescribeValueType(instance)}");
+            $"实例必须实现 ILangList 接口或是数组/列表/元组类型，当前类型：{Runtime.VMReflectionHelper.DescribeValueType(instance)}");
     }
 
     /// <summary>

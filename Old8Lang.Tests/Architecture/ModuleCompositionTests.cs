@@ -23,15 +23,15 @@ public class ModuleCompositionTests
         Assert.Equal("Old8Lang.Core", typeof(Old8Lang.Error.SourceContextWindow).Assembly.GetName().Name);
         Assert.Equal("Old8Lang.Core", typeof(Old8Lang.Error.Old8Exception).Assembly.GetName().Name);
         Assert.Equal("Old8Lang.Core", typeof(Old8Lang.Error.SyntaxError).Assembly.GetName().Name);
-        Assert.Equal("Old8Lang.Core", typeof(global::Old8Lang.LangParser.LangTokenType).Assembly.GetName().Name);
-        Assert.Equal("Old8Lang.Core", typeof(global::Old8Lang.LangParser.PreprocessorSymbols).Assembly.GetName().Name);
-        Assert.Equal("Old8Lang.Core", typeof(global::Old8Lang.LangParser.PreprocessorTokenizer).Assembly.GetName().Name);
-        Assert.Equal("Old8Lang.Core", typeof(global::Old8Lang.LangParser.LangTokenizer).Assembly.GetName().Name);
-        Assert.Equal("Old8Lang.Core", typeof(global::Old8Lang.LangParser.Core.TokenIndexCache).Assembly.GetName().Name);
-        Assert.Equal("Old8Lang.Core", typeof(global::Old8Lang.LangParser.ParserHelpers.ExpectHelper).Assembly.GetName().Name);
-        Assert.Equal("Old8Lang.Core", typeof(global::Old8Lang.LangParser.DocCommentParser).Assembly.GetName().Name);
-        Assert.Equal("Old8Lang.Core", typeof(global::Old8Lang.AST.DocCommentInfo).Assembly.GetName().Name);
-        Assert.Equal("Old8Lang.Core", typeof(global::Old8Lang.LangParser.Core.ParserContext).Assembly.GetName().Name);
+        Assert.Equal("Old8Lang.Core", typeof(LangParser.LangTokenType).Assembly.GetName().Name);
+        Assert.Equal("Old8Lang.Core", typeof(LangParser.PreprocessorSymbols).Assembly.GetName().Name);
+        Assert.Equal("Old8Lang.Core", typeof(LangParser.PreprocessorTokenizer).Assembly.GetName().Name);
+        Assert.Equal("Old8Lang.Core", typeof(LangParser.LangTokenizer).Assembly.GetName().Name);
+        Assert.Equal("Old8Lang.Core", typeof(LangParser.Core.TokenIndexCache).Assembly.GetName().Name);
+        Assert.Equal("Old8Lang.Core", typeof(LangParser.ParserHelpers.ExpectHelper).Assembly.GetName().Name);
+        Assert.Equal("Old8Lang.Core", typeof(LangParser.DocCommentParser).Assembly.GetName().Name);
+        Assert.Equal("Old8Lang.Core", typeof(AST.DocCommentInfo).Assembly.GetName().Name);
+        Assert.Equal("Old8Lang.Core", typeof(LangParser.Core.ParserContext).Assembly.GetName().Name);
         Assert.Equal("Old8Lang.Core", typeof(FileHeaderDirectives).Assembly.GetName().Name);
     }
 

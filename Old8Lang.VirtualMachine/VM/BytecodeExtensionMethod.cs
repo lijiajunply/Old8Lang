@@ -11,41 +11,26 @@ namespace Old8Lang.Bytecode.VM;
 /// <summary>
 /// 字节码扩展方法包装器 - 在VM中执行扩展方法
 /// </summary>
-public class BytecodeExtensionMethod : IInstanceMethod
+public class BytecodeExtensionMethod(
+    Type targetType,
+    FunctionMetadata function,
+    VirtualMachine vm,
+    List<GenericParameter>? targetGenericParameters = null)
+    : IInstanceMethod
 {
-    private readonly Type _targetType;
-    private readonly FunctionMetadata _function;
-    private readonly VirtualMachine _vm;
-    private readonly IReadOnlyList<GenericParameter> _targetGenericParameters;
+    public readonly IReadOnlyList<GenericParameter> _targetGenericParameters = targetGenericParameters ?? [];
 
-    public BytecodeExtensionMethod(
-        Type targetType,
-        FunctionMetadata function,
-        VirtualMachine vm,
-        List<GenericParameter>? targetGenericParameters = null)
-    {
-        _targetType = targetType;
-        _function = function;
-        _vm = vm;
-        _targetGenericParameters = targetGenericParameters ?? [];
-    }
+    public string[] Names => [function.Name.Split('$').Last()]; // 从 "TargetType$MethodName" 提取方法名
 
-    public string[] Names => [_function.Name.Split('$').Last()]; // 从 "TargetType$MethodName" 提取方法名
+    public Type TargetType => targetType;
 
-    public Type TargetType => _targetType;
+    public string[]? ParameterNames =>
+        // 跳过第一个参数（this），返回其余参数
+        [.. function.Parameters.Skip(1)];
 
-    public string[]? ParameterNames
-    {
-        get
-        {
-            // 跳过第一个参数（this），返回其余参数
-            return _function.Parameters.Skip(1).ToArray();
-        }
-    }
+    public int MinParameterCount => function.Parameters.Count - 1; // 减去 this 参数
 
-    public int MinParameterCount => _function.Parameters.Count - 1; // 减去 this 参数
-
-    public int MaxParameterCount => _function.Parameters.Count - 1; // 减去 this 参数
+    public int MaxParameterCount => function.Parameters.Count - 1; // 减去 this 参数
 
     public Type?[]? ParameterTypes => null; // 接受任意类型
 
@@ -56,7 +41,7 @@ public class BytecodeExtensionMethod : IInstanceMethod
     public bool CanAccept(List<LangExpression> parameters, LocalManager? local)
     {
         // 检查参数数量（不包括隐式的 this 参数）
-        var expectedParamCount = _function.Parameters.Count - 1;
+        var expectedParamCount = function.Parameters.Count - 1;
         return parameters.Count == expectedParamCount;
     }
 
@@ -112,7 +97,7 @@ public class BytecodeExtensionMethod : IInstanceMethod
         Array.Copy(arguments, 0, methodArgs, 1, arguments.Length);
 
         // 调用 VM 的公共方法来执行函数
-        return _vm.ExecuteFunction(_function, methodArgs);
+        return vm.ExecuteFunction(function, methodArgs);
     }
 
     private void ValidateTargetGenericConstraintsInVm(object instance)

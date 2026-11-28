@@ -35,8 +35,8 @@ public partial class VirtualMachine
     /// <summary>
     /// 辅助方法：调用实例方法
     /// </summary>
-    private static InstanceMethods.Core.IInstanceMethod? ResolveVmInstanceMethod(
-        InstanceMethods.Core.InstanceMethodRegistry registry,
+    private static IInstanceMethod? ResolveVmInstanceMethod(
+        InstanceMethodRegistry registry,
         Type objectType,
         string methodName,
         int argCount)
@@ -92,27 +92,27 @@ public partial class VirtualMachine
                 .Select(item => (LangExpression)IlValueBridge.Wrap(item))
                 .ToList();
             var tupleValue = new TupleLangValue(tupleItems);
-            tupleValue.Accept(Old8Lang.AST.Visitor.RuntimeVisitors.CreateInterpreter(
-                new Old8Lang.Interpreter.VariateManager()));
+            tupleValue.Accept(AST.Visitor.RuntimeVisitors.CreateInterpreter(
+                new Interpreter.VariateManager()));
             return InvokeTypeMethod(tupleValue, methodName, args);
         }
 
-        if (obj is Old8Lang.AST.Expression.ModuleObjects.UnifiedModule module)
+        if (obj is AST.Expression.ModuleObjects.UnifiedModule module)
         {
-            var manager = new Old8Lang.Interpreter.VariateManager();
-            var arguments = args.Select(value => (Old8Lang.AST.LangExpression)
-                (value as Old8Lang.AST.Expression.LangValueType ?? Old8Lang.AST.Expression.LangValueType.ObjToValue(value))).ToList();
-            var named = new List<Old8Lang.AST.Expression.NamedArgument>();
+            var manager = new Interpreter.VariateManager();
+            var arguments = args.Select(value => (LangExpression)
+                (value as LangValueType ?? LangValueType.ObjToValue(value))).ToList();
+            var named = new List<NamedArgument>();
             for (var i = 0; namedArgNames is not null && namedArgValues is not null && i < namedArgNames.Length; i++)
             {
                 var namedValue = namedArgValues[i];
-                named.Add(new Old8Lang.AST.Expression.NamedArgument(namedArgNames[i],
-                    (Old8Lang.AST.LangExpression)(namedValue as Old8Lang.AST.Expression.LangValueType ??
-                                                  Old8Lang.AST.Expression.LangValueType.ObjToValue(namedValue))));
+                named.Add(new NamedArgument(namedArgNames[i],
+                    (LangExpression)(namedValue as LangValueType ??
+                                                  LangValueType.ObjToValue(namedValue))));
             }
 
-            var call = new Old8Lang.AST.Expression.Value.Instance(
-                new Old8Lang.AST.Expression.LangId(methodName), arguments, named);
+            var call = new Instance(
+                new LangId(methodName), arguments, named);
             return UnwrapToVmValue(module.Dot(call, manager));
         }
 
@@ -135,7 +135,7 @@ public partial class VirtualMachine
         }
 
         // 首先尝试使用实例方法系统（支持类型等价和按参数个数匹配重载）
-        var registry = InstanceMethods.Core.InstanceMethodRegistry.Instance;
+        var registry = InstanceMethodRegistry.Instance;
 
         var instanceMethod = ResolveVmInstanceMethod(registry, obj.GetType(), methodName, args.Length);
 

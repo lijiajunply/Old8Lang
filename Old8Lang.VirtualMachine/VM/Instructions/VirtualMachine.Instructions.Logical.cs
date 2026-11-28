@@ -14,32 +14,32 @@ public partial class VirtualMachine
         {
             case OpCode.And:
             {
-                var b = _stack.Pop();
-                var a = _stack.Pop();
+                var b = Stack.Pop();
+                var a = Stack.Pop();
                 // 检查操作数是否为布尔类型
                 ValidateLogicalOperand(a, "&&", instruction);
                 ValidateLogicalOperand(b, "&&", instruction);
-                _stack.PushBool(ToBool(a) && ToBool(b));
+                Stack.PushBool(ToBool(a) && ToBool(b));
             }
                 break;
 
             case OpCode.Or:
             {
-                var b = _stack.Pop();
-                var a = _stack.Pop();
+                var b = Stack.Pop();
+                var a = Stack.Pop();
                 // 检查操作数是否为布尔类型
                 ValidateLogicalOperand(a, "||", instruction);
                 ValidateLogicalOperand(b, "||", instruction);
-                _stack.PushBool(ToBool(a) || ToBool(b));
+                Stack.PushBool(ToBool(a) || ToBool(b));
             }
                 break;
 
             case OpCode.Not:
             {
-                var a = _stack.Pop();
+                var a = Stack.Pop();
                 // 检查操作数是否为布尔类型
                 ValidateLogicalOperand(a, "!", instruction);
-                _stack.PushBool(!ToBool(a));
+                Stack.PushBool(!ToBool(a));
             }
                 break;
         }

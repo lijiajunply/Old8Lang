@@ -560,7 +560,7 @@ public class VMDecoratorTests
         try
         {
             bytecodeFile.SaveToFile(path);
-            var reloaded = Old8Lang.Bytecode.BytecodeFile.LoadFromFile(path);
+            var reloaded = Bytecode.BytecodeFile.LoadFromFile(path);
 
             var vm = new VM(reloaded);
             vm.Execute();

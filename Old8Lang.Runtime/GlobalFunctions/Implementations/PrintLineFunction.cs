@@ -72,6 +72,6 @@ public sealed class PrintLineFunction : BaseGlobalFunction
     private static string ToString(object? value)
     {
         // 与 ToStr() 同一套格式化：集合/字典/元组不再打印 .NET 类型名
-        return Old8Lang.Runtime.VMValueFormatter.ToDisplayString(value);
+        return Runtime.VMValueFormatter.ToDisplayString(value);
     }
 }

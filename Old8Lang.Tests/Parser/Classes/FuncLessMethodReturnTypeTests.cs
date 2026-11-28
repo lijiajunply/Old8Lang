@@ -80,13 +80,13 @@ public class FuncLessMethodReturnTypeTests
         Assert.Equal("int", func.GetFuncValue().Id.AssumptionType);
     }
 
-    private static Old8Lang.AST.Statement.FuncInit FindFunction(
-        Old8Lang.AST.Statement.BlockStatement program, string name)
+    private static FuncInit FindFunction(
+        BlockStatement program, string name)
     {
         // 函数声明会被 BlockStatement 归入 ImportStatements
         return program.ImportStatements
             .Concat(program.OtherStatements)
-            .OfType<Old8Lang.AST.Statement.FuncInit>()
+            .OfType<FuncInit>()
             .Single(func => func.GetFuncValue().Id.IdName == name);
     }
 }

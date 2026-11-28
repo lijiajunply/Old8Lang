@@ -59,7 +59,7 @@ Assert.Equal(42, value)
         }
     }
 
-    private static System.Exception CompileAndRunExpectingError(string code)
+    private static Exception CompileAndRunExpectingError(string code)
     {
         var interpreter = new LangInterpreter();
         var ast = interpreter.Build(code);
@@ -68,7 +68,7 @@ Assert.Equal(42, value)
         try
         {
             var action = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
-            return Assert.ThrowsAny<System.Exception>(() => action());
+            return Assert.ThrowsAny<Exception>(() => action());
         }
         finally
         {

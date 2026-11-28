@@ -15,8 +15,8 @@ public static class IlConversionHelper
     public static object? ConvertTo(object? value, string typeName)
     {
         var wrapped = IlValueBridge.Wrap(value);
-        var target = new Old8Lang.AST.Expression.Value.TypeLangValue(typeName);
-        var result = wrapped.Converse(target, new Old8Lang.Interpreter.VariateManager());
+        var target = new AST.Expression.Value.TypeLangValue(typeName);
+        var result = wrapped.Converse(target, new Interpreter.VariateManager());
         return IlValueBridge.Unwrap(result);
     }
 }

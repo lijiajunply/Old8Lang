@@ -1,12 +1,16 @@
 using System.Runtime.CompilerServices;
+using Old8Lang.Compiler.CodeGeneration;
 
 namespace Old8Lang.AST.Expression;
 
-/// <summary>编译过程的运算类型缓存，随节点回收。</summary>
+/// <summary>编译过程的运算类型缓存，按 LocalManager 作用域隔离并随其回收。</summary>
 internal static class OperationTypeCache
 {
-    private sealed class Entry { public Type? Type; }
-    private static readonly ConditionalWeakTable<Operation, Entry> Entries = new();
-    internal static Type? Get(Operation node) => Entries.TryGetValue(node, out var entry) ? entry.Type : null;
-    internal static void Set(Operation node, Type? type) => Entries.GetValue(node, static _ => new Entry()).Type = type;
+    private static readonly ConditionalWeakTable<LocalManager, Dictionary<Operation, Type?>> Scopes = new();
+
+    internal static Type? Get(LocalManager local, Operation node) =>
+        Scopes.TryGetValue(local, out var map) && map.TryGetValue(node, out var type) ? type : null;
+
+    internal static void Set(LocalManager local, Operation node, Type? type) =>
+        Scopes.GetValue(local, static _ => new Dictionary<Operation, Type?>())[node] = type;
 }

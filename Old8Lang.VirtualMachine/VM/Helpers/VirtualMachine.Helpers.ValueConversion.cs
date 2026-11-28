@@ -42,14 +42,14 @@ public partial class VirtualMachine
     {
         // 静态类方法值（Task.Delay 这类裸引用）对外表现为函数
         VmStaticMethodValue => "Function",
-        _ => Old8Lang.Runtime.VMReflectionHelper.DescribeValueType(value)
+        _ => Runtime.VMReflectionHelper.DescribeValueType(value)
     };
 
     /// <summary>
     /// 用语言口径描述一个 CLR 类型（只有 <see cref="Type"/> 可用时的报错场景）。
     /// </summary>
     private static string DescribeTypeName(Type type) =>
-        Old8Lang.Runtime.VMReflectionHelper.DescribeTypeName(type);
+        Runtime.VMReflectionHelper.DescribeTypeName(type);
 
     /// <summary>
     /// 把 <see cref="ConvertResultToLangValue"/> 包出来的值还原成虚拟机栈上的原生表示（逆操作）。

@@ -57,12 +57,12 @@ public class ArchitectureProjectDependencyTests
     [Fact]
     public void SyntaxModelEnums_AreDefinedInSyntaxAssembly()
     {
-        var syntaxAssembly = typeof(Old8Lang.Syntax.LiteralSyntax).Assembly;
-        Assert.Same(syntaxAssembly, typeof(Old8Lang.AST.Expression.Intermediates.PatternType).Assembly);
-        Assert.Same(syntaxAssembly, typeof(Old8Lang.AST.Expression.AccessModifierType).Assembly);
-        Assert.Same(syntaxAssembly, typeof(Old8Lang.AST.Statement.ExternType).Assembly);
-        Assert.Same(syntaxAssembly, typeof(Old8Lang.AST.Statement.CallingConventionType).Assembly);
-        Assert.Same(syntaxAssembly, typeof(Old8Lang.AST.Statement.CSharpImportMode).Assembly);
+        var syntaxAssembly = typeof(Syntax.LiteralSyntax).Assembly;
+        Assert.Same(syntaxAssembly, typeof(AST.Expression.Intermediates.PatternType).Assembly);
+        Assert.Same(syntaxAssembly, typeof(AST.Expression.AccessModifierType).Assembly);
+        Assert.Same(syntaxAssembly, typeof(AST.Statement.ExternType).Assembly);
+        Assert.Same(syntaxAssembly, typeof(AST.Statement.CallingConventionType).Assembly);
+        Assert.Same(syntaxAssembly, typeof(AST.Statement.CSharpImportMode).Assembly);
     }
 
     [Fact]

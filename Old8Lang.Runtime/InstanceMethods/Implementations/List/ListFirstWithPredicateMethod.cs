@@ -45,7 +45,7 @@ public class ListFirstWithPredicateMethod : BaseInstanceMethod
 
         if (predicateParam is not FuncLangValue predicate)
         {
-            throw new Error.TypeError(position, $"FirstWith 方法的参数必须是函数类型，但实际是 {predicateParam.GetType().Name}");
+            throw new TypeError(position, $"FirstWith 方法的参数必须是函数类型，但实际是 {predicateParam.GetType().Name}");
         }
 
         if (list.Values.Count == 0)

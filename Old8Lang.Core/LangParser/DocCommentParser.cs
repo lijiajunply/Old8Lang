@@ -134,17 +134,19 @@ public static class DocCommentParser
                 currentSection = SectionType.Parameters;
                 continue;
             }
-            else if (lowerLine.StartsWith("returns:") || lowerLine.StartsWith("return:"))
+
+            if (lowerLine.StartsWith("returns:") || lowerLine.StartsWith("return:"))
             {
                 currentSection = SectionType.Returns;
                 continue;
             }
-            else if (lowerLine.StartsWith("raises:") || lowerLine.StartsWith("throws:"))
+
+            if (lowerLine.StartsWith("raises:") || lowerLine.StartsWith("throws:"))
             {
                 currentSection = SectionType.Throws;
                 continue;
             }
-            else if (lowerLine.StartsWith("example:") || lowerLine.StartsWith("examples:"))
+            if (lowerLine.StartsWith("example:") || lowerLine.StartsWith("examples:"))
             {
                 currentSection = SectionType.Examples;
                 continue;

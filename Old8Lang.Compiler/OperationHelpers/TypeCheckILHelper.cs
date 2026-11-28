@@ -90,9 +90,9 @@ public static class TypeCheckILHelper
             // 静态类型为 object：运行期可能是字符串/数字，走解释器 Converse 语义，
             // 不能直接 unbox.any（`"1" as int` 会 InvalidCastException）。
             if (leftType == typeof(object) || leftType == typeof(string) ||
-                leftType == typeof(Old8Lang.AST.Expression.LangValueType))
+                leftType == typeof(LangValueType))
             {
-                if (leftType == typeof(Old8Lang.AST.Expression.LangValueType))
+                if (leftType == typeof(LangValueType))
                 {
                     ilGenerator.Emit(OpCodes.Call,
                         typeof(IlValueBridge).GetMethod(nameof(IlValueBridge.Unwrap))!);

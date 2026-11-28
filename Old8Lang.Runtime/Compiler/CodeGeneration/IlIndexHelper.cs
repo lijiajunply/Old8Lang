@@ -134,7 +134,7 @@ public static class IlIndexHelper
             return dictionary[actualKey];
         }
 
-        throw new KeyError(new Old8Lang.SourcePosition(), actualKey);
+        throw new KeyError(new SourcePosition(), actualKey);
     }
 
     public static object? GetDynamicObjectItem(object? collection, object? key)

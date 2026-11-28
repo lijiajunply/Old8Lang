@@ -467,8 +467,8 @@ public static class DotOperatorILHelper
                     }
 
                     ilGenerator.Emit(OpCodes.Call,
-                        typeof(Old8Lang.Runtime.VMValueFormatter).GetMethod(
-                            nameof(Old8Lang.Runtime.VMValueFormatter.ToDisplayString))!);
+                        typeof(Runtime.VMValueFormatter).GetMethod(
+                            nameof(Runtime.VMValueFormatter.ToDisplayString))!);
                 }
             }
 
@@ -792,7 +792,7 @@ public static class DotOperatorILHelper
         }
         catch (AggregateException ex) when (ex.InnerExceptions.Count == 1)
         {
-            System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(ex.InnerExceptions[0]).Throw();
+            ExceptionDispatchInfo.Capture(ex.InnerExceptions[0]).Throw();
         }
     }
 
@@ -1739,7 +1739,7 @@ public static class DotOperatorILHelper
 
         if (methodName == "ToStr" && arguments.Length == 0)
         {
-            return Old8Lang.Runtime.VMValueFormatter.ToDisplayString(receiver);
+            return Runtime.VMValueFormatter.ToDisplayString(receiver);
         }
 
         if (receiver is IDictionary dictionary &&
@@ -1775,13 +1775,13 @@ public static class DotOperatorILHelper
             var second = IlValueBridge.Wrap(arguments[1]);
             if (first is FuncLangValue)
             {
-                return Old8Lang.InstanceMethods.Implementations.Generic.LangListReduceMethod
+                return InstanceMethods.Implementations.Generic.LangListReduceMethod
                     .ReduceWithInitialHelper(collection, first, second);
             }
 
             if (second is FuncLangValue)
             {
-                return Old8Lang.InstanceMethods.Implementations.Generic.LangListReduceMethod
+                return InstanceMethods.Implementations.Generic.LangListReduceMethod
                     .ReduceWithInitialHelper(collection, second, first);
             }
         }
@@ -1791,15 +1791,15 @@ public static class DotOperatorILHelper
         if (receiver is LangValueType languageReceiver)
         {
             var wrappedArguments = arguments
-                .Select(argument => (Old8Lang.AST.LangExpression)IlValueBridge.Wrap(argument))
+                .Select(argument => (LangExpression)IlValueBridge.Wrap(argument))
                 .ToList();
-            var instanceMethod = Old8Lang.InstanceMethods.Core.InstanceMethodRegistry.Instance
+            var instanceMethod = InstanceMethodRegistry.Instance
                 .ResolveMethod(languageReceiver.GetType(), methodName, wrappedArguments, local: null);
 
             if (instanceMethod is not null)
             {
-                var manager = Old8Lang.Compiler.RuntimeGlobalWriter.CurrentManager ??
-                              new Old8Lang.Interpreter.VariateManager();
+                var manager = Compiler.RuntimeGlobalWriter.CurrentManager ??
+                              new Interpreter.VariateManager();
                 var result = instanceMethod.Execute(languageReceiver, wrappedArguments, manager, new SourcePosition());
                 return IlValueBridge.Unwrap(result);
             }
@@ -2146,7 +2146,7 @@ public static class DotOperatorILHelper
             return typeof(object);
         }
 
-        if (leftType != null && typeof(System.Collections.IList).IsAssignableFrom(leftType) &&
+        if (leftType != null && typeof(IList).IsAssignableFrom(leftType) &&
             !leftType.IsArray && leftType != typeof(string))
         {
             // 列表索引访问：走非泛型 IList 接口。

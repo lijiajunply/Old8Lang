@@ -19,7 +19,7 @@ public class VMListComprehensionTests
     {
         var interpreter = new LangInterpreter();
         var ast = interpreter.Build(code);
-        var bytecodeFile = new Old8Lang.Bytecode.BytecodeCompiler().Compile(ast);
+        var bytecodeFile = new Bytecode.BytecodeCompiler().Compile(ast);
         var vm = new VM(bytecodeFile);
         vm.Execute();
         return vm.GetGlobalVariable(variableName);
@@ -30,7 +30,7 @@ public class VMListComprehensionTests
         var interpreter = new LangInterpreter();
         var ast = interpreter.Build(code);
         ast.Run(interpreter.Manager);
-        return interpreter.Manager.GetValue(new Old8Lang.AST.Expression.LangId(variableName))?.GetValue();
+        return interpreter.Manager.GetValue(new AST.Expression.LangId(variableName))?.GetValue();
     }
 
     private static List<object?> AsList(object? value)

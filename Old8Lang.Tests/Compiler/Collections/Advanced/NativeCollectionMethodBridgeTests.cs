@@ -497,8 +497,8 @@ public class NativeCollectionMethodBridgeTests
         // Interpreter
         var interp = new LangInterpreter();
         interp.Build(code).Run(interp.Manager);
-        Assert.Equal(1, ((Old8Lang.AST.Expression.Value.IntLangValue)interp.Manager.GetValue(new Old8Lang.AST.Expression.LangId("cnt"))!).Value);
-        Assert.Equal(99, ((Old8Lang.AST.Expression.Value.IntLangValue)interp.Manager.GetValue(new Old8Lang.AST.Expression.LangId("val"))!).Value);
+        Assert.Equal(1, ((AST.Expression.Value.IntLangValue)interp.Manager.GetValue(new AST.Expression.LangId("cnt"))!).Value);
+        Assert.Equal(99, ((AST.Expression.Value.IntLangValue)interp.Manager.GetValue(new AST.Expression.LangId("val"))!).Value);
 
         // IL
         RunInIlMode(code + "\nAssert.Equal(1, cnt)\nAssert.Equal(99, val)");

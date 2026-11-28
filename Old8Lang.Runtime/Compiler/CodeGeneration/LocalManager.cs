@@ -100,7 +100,7 @@ public class LocalManager
     /// 泛型函数特化方法缓存
     /// 键为 "函数名$类型参数1_类型参数2"，值为特化后的MethodInfo
     /// </summary>
-    public readonly Dictionary<string, MethodInfo> GenericSpecializations = [];
+    public Dictionary<string, MethodInfo> GenericSpecializations { get; init; } = [];
 
     /// <summary>
     /// 泛型函数定义缓存，键为函数名，值为FuncLangValue

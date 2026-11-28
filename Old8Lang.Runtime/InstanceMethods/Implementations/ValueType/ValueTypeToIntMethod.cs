@@ -81,7 +81,7 @@ public class ValueTypeToIntMethod : BaseValueTypeMethod
             if (instanceType is null || !typeof(LangValueType).IsAssignableFrom(instanceType))
             {
                 ilGenerator.Emit(OpCodes.Call,
-                    typeof(InstanceMethods.Core.IlValueBridge).GetMethod(nameof(InstanceMethods.Core.IlValueBridge.Wrap))!);
+                    typeof(Core.IlValueBridge).GetMethod(nameof(Core.IlValueBridge.Wrap))!);
             }
 
             // LangValueType -> IntLangValue

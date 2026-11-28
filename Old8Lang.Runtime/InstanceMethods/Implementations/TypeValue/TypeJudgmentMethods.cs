@@ -50,11 +50,11 @@ public class TypeIsInterfaceMethod : BaseInstanceMethod
 
     protected override object ExecuteInVMInternal(object? instance, object?[] arguments)
     {
-        var typeName = Old8Lang.Runtime.VMReflectionHelper.ResolveTypeName(instance);
+        var typeName = Runtime.VMReflectionHelper.ResolveTypeName(instance);
         if (string.IsNullOrEmpty(typeName)) return false;
-        var vm = Old8Lang.Bytecode.Core.VMContext.CurrentVM;
+        var vm = Bytecode.Core.VMContext.CurrentVM;
         if (vm == null) return false;
-        var classMetadata = Old8Lang.Runtime.VMReflectionHelper.GetClassMetadata(vm, typeName);
+        var classMetadata = Runtime.VMReflectionHelper.GetClassMetadata(vm, typeName);
         return classMetadata?.IsInterface ?? false;
     }
 }
@@ -97,8 +97,8 @@ public class TypeIsPrimitiveMethod : BaseInstanceMethod
 
     protected override object ExecuteInVMInternal(object? instance, object?[] arguments)
     {
-        return Old8Lang.Runtime.VMReflectionHelper.IsPrimitiveTypeName(
-            Old8Lang.Runtime.VMReflectionHelper.ResolveTypeName(instance));
+        return Runtime.VMReflectionHelper.IsPrimitiveTypeName(
+            Runtime.VMReflectionHelper.ResolveTypeName(instance));
     }
 }
 
@@ -141,12 +141,12 @@ public class TypeIsGenericMethod : BaseInstanceMethod
 
     protected override object ExecuteInVMInternal(object? instance, object?[] arguments)
     {
-        var vm = Old8Lang.Bytecode.Core.VMContext.CurrentVM;
+        var vm = Bytecode.Core.VMContext.CurrentVM;
         if (vm == null) return false;
 
         // 虚拟机只编译泛型类的特化版本（如 Box$int），类元数据上留有类型参数映射
-        var classMetadata = Old8Lang.Runtime.VMReflectionHelper.GetClassMetadataFromTypeValue(vm, instance);
-        return Old8Lang.Runtime.VMReflectionHelper.IsGenericType(classMetadata);
+        var classMetadata = Runtime.VMReflectionHelper.GetClassMetadataFromTypeValue(vm, instance);
+        return Runtime.VMReflectionHelper.IsGenericType(classMetadata);
     }
 }
 
@@ -197,11 +197,11 @@ public class TypeIsAssignableFromMethod : BaseInstanceMethod
 
     protected override object ExecuteInVMInternal(object? instance, object?[] arguments)
     {
-        var vm = Old8Lang.Bytecode.Core.VMContext.CurrentVM;
+        var vm = Bytecode.Core.VMContext.CurrentVM;
         if (vm == null) return false;
 
-        var targetTypeName = Old8Lang.Runtime.VMReflectionHelper.ResolveTypeName(instance);
-        var sourceTypeName = Old8Lang.Runtime.VMReflectionHelper.ResolveTypeName(
+        var targetTypeName = Runtime.VMReflectionHelper.ResolveTypeName(instance);
+        var sourceTypeName = Runtime.VMReflectionHelper.ResolveTypeName(
             arguments.Length > 0 ? arguments[0] : null);
 
         if (string.IsNullOrEmpty(targetTypeName) || string.IsNullOrEmpty(sourceTypeName))
@@ -209,6 +209,6 @@ public class TypeIsAssignableFromMethod : BaseInstanceMethod
             return false;
         }
 
-        return Old8Lang.Runtime.VMReflectionHelper.IsAssignableFrom(vm, targetTypeName, sourceTypeName);
+        return Runtime.VMReflectionHelper.IsAssignableFrom(vm, targetTypeName, sourceTypeName);
     }
 }

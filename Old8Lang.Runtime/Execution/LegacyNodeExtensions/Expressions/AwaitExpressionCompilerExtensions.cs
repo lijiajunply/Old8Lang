@@ -28,8 +28,8 @@ internal static class AwaitExpressionCompilerExtensions
             }
 
             il.Emit(OpCodes.Call,
-                typeof(Old8Lang.InstanceMethods.Core.IlRuntimeFunctions)
-                    .GetMethod(nameof(Old8Lang.InstanceMethods.Core.IlRuntimeFunctions.ToAwaitableTask))!);
+                typeof(InstanceMethods.Core.IlRuntimeFunctions)
+                    .GetMethod(nameof(InstanceMethods.Core.IlRuntimeFunctions.ToAwaitableTask))!);
             exprType = typeof(Task<object>);
         }
 

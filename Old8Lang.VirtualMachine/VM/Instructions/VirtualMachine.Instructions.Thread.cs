@@ -17,14 +17,14 @@ public partial class VirtualMachine
             case OpCode.ThreadCreate:
             {
                 // 栈顶: func (int/string/Metadata), argCount (int)
-                var funcObj = _stack.PopObject();
-                var argCount = _stack.PopInt32();
+                var funcObj = Stack.PopObject();
+                var argCount = Stack.PopInt32();
 
                 // 弹出参数
                 var args = new object?[argCount];
                 for (int i = argCount - 1; i >= 0; i--)
                 {
-                    args[i] = _stack.PopObject();
+                    args[i] = Stack.PopObject();
                 }
 
                 FunctionMetadata function;
@@ -58,36 +58,36 @@ public partial class VirtualMachine
                 });
                 threadIdHolder[0] = threadId;
 
-                _stack.PushInt(threadId);
+                Stack.PushInt(threadId);
             }
                 break;
 
             case OpCode.ThreadStart:
             {
-                var threadId = _stack.PopInt32();
+                var threadId = Stack.PopInt32();
                 Concurrency.ResourceManager.StartThread(threadId);
             }
                 break;
 
             case OpCode.ThreadJoin:
             {
-                var threadId = _stack.PopInt32();
+                var threadId = Stack.PopInt32();
                 var result = Concurrency.ResourceManager.JoinThread(threadId);
-                _stack.PushObject(result);
+                Stack.PushObject(result);
             }
                 break;
 
             case OpCode.ThreadIsAlive:
             {
-                var threadId = _stack.PopInt32();
+                var threadId = Stack.PopInt32();
                 var isAlive = Concurrency.ResourceManager.IsThreadAlive(threadId);
-                _stack.PushBool(isAlive);
+                Stack.PushBool(isAlive);
             }
                 break;
 
             case OpCode.ThreadDispose:
             {
-                var threadId = _stack.PopInt32();
+                var threadId = Stack.PopInt32();
                 Concurrency.ResourceManager.DisposeThread(threadId);
             }
                 break;

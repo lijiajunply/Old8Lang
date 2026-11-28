@@ -45,7 +45,7 @@ public class ListLastWithPredicateMethod : BaseInstanceMethod
 
         if (predicateParam is not FuncLangValue predicate)
         {
-            throw new Error.TypeError(position, $"LastWith 方法的参数必须是函数类型，但实际是 {predicateParam.GetType().Name}");
+            throw new TypeError(position, $"LastWith 方法的参数必须是函数类型，但实际是 {predicateParam.GetType().Name}");
         }
 
         if (list.Values.Count == 0)

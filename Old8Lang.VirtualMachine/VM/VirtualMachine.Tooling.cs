@@ -166,7 +166,7 @@ public partial class VirtualMachine
     /// <summary>获取当前执行线程的实时调用栈帧（栈顶在前）</summary>
     public IReadOnlyList<CallFrame> GetLiveCallStackFrames()
     {
-        return _callStack.ToArray();
+        return CallStack.ToArray();
     }
 
     /// <summary>获取当前虚拟机的用户全局变量快照（供 DAP Globals 作用域使用）</summary>

@@ -73,7 +73,7 @@ public class LangListCountMethod : BaseLangListMethod, IIlNativeValueInstanceMet
         catch (ArgumentException)
         {
             throw new ArgumentException(
-                $"Count 需要列表、数组或元组，当前类型：{Old8Lang.Runtime.VMReflectionHelper.DescribeValueType(instance)}");
+                $"Count 需要列表、数组或元组，当前类型：{Runtime.VMReflectionHelper.DescribeValueType(instance)}");
         }
     }
 }

@@ -246,7 +246,7 @@ public partial class CompilerVisitor
     {
 
         // 调用带有ILGenerator参数的OutputType方法，该方法会生成实际的IL指令
-        OperationTypeCache.Set(node, EmitOperationOutputType(node));
+        OperationTypeCache.Set(local, node, EmitOperationOutputType(node));
 
         return null;
     

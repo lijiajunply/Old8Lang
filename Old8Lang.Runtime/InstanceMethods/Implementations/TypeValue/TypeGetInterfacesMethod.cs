@@ -61,20 +61,20 @@ public class TypeGetInterfacesMethod : BaseInstanceMethod
 
     protected override object ExecuteInVMInternal(object? instance, object?[] arguments)
     {
-        var typeName = Old8Lang.Runtime.VMReflectionHelper.ResolveTypeName(instance);
+        var typeName = Runtime.VMReflectionHelper.ResolveTypeName(instance);
         if (string.IsNullOrEmpty(typeName))
         {
             throw new InvalidOperationException(
                 $"GetInterfaces 需要类型值，实际得到 {(instance is null ? "null" : instance.GetType().Name)}");
         }
 
-        var vm = Old8Lang.Bytecode.Core.VMContext.CurrentVM;
+        var vm = Bytecode.Core.VMContext.CurrentVM;
         if (vm == null)
         {
             return new List<object?>();
         }
 
-        var classMetadata = Old8Lang.Runtime.VMReflectionHelper.GetClassMetadata(vm, typeName);
+        var classMetadata = Runtime.VMReflectionHelper.GetClassMetadata(vm, typeName);
         if (classMetadata == null)
         {
             return new List<object?>();
@@ -82,7 +82,7 @@ public class TypeGetInterfacesMethod : BaseInstanceMethod
 
         // 与解释器一致：返回类型值列表而不是裸类型名
         return classMetadata.InterfaceNames
-            .Select(name => (object?)new Old8Lang.AST.Expression.Value.TypeLangValue(name))
+            .Select(name => (object?)new TypeLangValue(name))
             .ToList();
     }
 }

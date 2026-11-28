@@ -130,7 +130,7 @@ public sealed class GetTypeInfoFunction : BaseGlobalFunction
         }
 
         // 在 VM 模式下，使用 VMReflectionHelper
-        var vm = Old8Lang.Bytecode.Core.VMContext.CurrentVM;
+        var vm = Bytecode.Core.VMContext.CurrentVM;
         if (vm == null)
         {
             return new Dictionary<string, object?>();

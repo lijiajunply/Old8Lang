@@ -751,15 +751,17 @@ public class VMExecutionPerformanceTests
 
     #region 选择语句性能测试
 
-    [Fact(Skip = "用例本身存在死锁：仅向 ch1/ch2 各发 1 条消息但循环 select 10 次且无 default 分支")]
+    [Fact]
     public void Performance_Select_ChannelSelect()
     {
         var code = @"
             ch1 <- ChannelCreate()
             ch2 <- ChannelCreate()
 
-            ChannelSend(ch1, 1)
-            ChannelSend(ch2, 2)
+            for i <- 0, i < 5, i++ {
+                ChannelSend(ch1, 1)
+                ChannelSend(ch2, 2)
+            }
 
             result <- 0
             for i <- 0, i < 10, i++ {
@@ -772,6 +774,9 @@ public class VMExecutionPerformanceTests
                     }
                 }
             }
+
+            ChannelClose(ch1)
+            ChannelClose(ch2)
         ";
 
         var (elapsed, _) = ExecuteVMCodeWithTiming(code);

@@ -293,22 +293,22 @@ public class PositionBasisTests(ITestOutputHelper o)
         var ast = new LangParser.LangParser(tokens, code, Uri).ParseProgram();
         var lines = Lines(code);
 
-        var funcInit = ast.ImportStatements.OfType<Old8Lang.AST.Statement.FuncInit>().Single();
+        var funcInit = ast.ImportStatements.OfType<AST.Statement.FuncInit>().Single();
         Assert.Equal(1, funcInit.Body.Position.Line);
         Assert.Equal(9, funcInit.Body.EndPosition.Line);
 
-        var forIn = funcInit.Body.OtherStatements.OfType<Old8Lang.AST.Statement.ForInStatement>().Single();
+        var forIn = funcInit.Body.OtherStatements.OfType<AST.Statement.ForInStatement>().Single();
         Assert.Equal(2, forIn.Id.Position.Line);
         Assert.Equal(lines[1].IndexOf("item", StringComparison.Ordinal), forIn.Id.Position.Column);
 
-        var tryStmt = ((Old8Lang.AST.Statement.BlockStatement)forIn.Body).OtherStatements
-            .OfType<Old8Lang.AST.Statement.TryStatement>().Single();
+        var tryStmt = ((AST.Statement.BlockStatement)forIn.Body).OtherStatements
+            .OfType<AST.Statement.TryStatement>().Single();
         Assert.Equal(3, tryStmt.Position.Line);
         var catchVar = tryStmt.CatchBlocks.Single().exceptionVar!;
         Assert.Equal(5, catchVar.Position.Line);
         Assert.Equal(lines[4].IndexOf("err", StringComparison.Ordinal), catchVar.Position.Column);
 
-        var enumInit = ast.OtherStatements.OfType<Old8Lang.AST.Statement.EnumInit>().Single();
+        var enumInit = ast.OtherStatements.OfType<AST.Statement.EnumInit>().Single();
         Assert.Equal(10, enumInit.NamePosition.Line);
         Assert.Equal(lines[9].IndexOf("Color", StringComparison.Ordinal), enumInit.NamePosition.Column);
     }

@@ -76,24 +76,24 @@ public static class VMValueFormatter
         }
 
         // 对于 Task 类型（System.Threading.Tasks.Task）
-        if (value is System.Threading.Tasks.Task task)
+        if (value is Task task)
         {
             return task.Status switch
             {
-                System.Threading.Tasks.TaskStatus.Created => "Task(Status: Created)",
-                System.Threading.Tasks.TaskStatus.WaitingForActivation => "Task(Status: WaitingForActivation)",
-                System.Threading.Tasks.TaskStatus.WaitingToRun => "Task(Status: WaitingToRun)",
-                System.Threading.Tasks.TaskStatus.Running => "Task(Status: Running)",
-                System.Threading.Tasks.TaskStatus.RanToCompletion => "Task(Status: Completed)",
-                System.Threading.Tasks.TaskStatus.Canceled => "Task(Status: Canceled)",
-                System.Threading.Tasks.TaskStatus.Faulted =>
+                TaskStatus.Created => "Task(Status: Created)",
+                TaskStatus.WaitingForActivation => "Task(Status: WaitingForActivation)",
+                TaskStatus.WaitingToRun => "Task(Status: WaitingToRun)",
+                TaskStatus.Running => "Task(Status: Running)",
+                TaskStatus.RanToCompletion => "Task(Status: Completed)",
+                TaskStatus.Canceled => "Task(Status: Canceled)",
+                TaskStatus.Faulted =>
                     $"Task(Status: Faulted, Exception: {task.Exception?.GetBaseException().Message ?? "Unknown"})",
                 _ => "Task(Status: Unknown)"
             };
         }
 
         // 对于 Thread 类型（System.Threading.Thread）
-        if (value is System.Threading.Thread thread)
+        if (value is Thread thread)
         {
             var status = thread.IsAlive ? "Alive" : "Stopped";
             return $"Thread(Id: {thread.ManagedThreadId}, Status: {status})";

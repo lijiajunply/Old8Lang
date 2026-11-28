@@ -30,8 +30,8 @@ public class ValueTypeEqualMethod : BaseValueTypeMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        InstanceMethods.Core.IlValueBridge.EmitLoadWrapped(instance, ilGenerator, local);
-        InstanceMethods.Core.IlValueBridge.EmitLoadWrapped(parameters[0], ilGenerator, local);
+        Core.IlValueBridge.EmitLoadWrapped(instance, ilGenerator, local);
+        Core.IlValueBridge.EmitLoadWrapped(parameters[0], ilGenerator, local);
 
         var helperMethod = typeof(ValueTypeEqualMethod).GetMethod(nameof(EqualHelper),
             System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);

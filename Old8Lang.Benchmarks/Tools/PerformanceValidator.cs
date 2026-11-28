@@ -164,7 +164,7 @@ func test3() {
 }
 ";
 
-        var cache = new Old8Lang.LangParser.Optimization.StringCache();
+        var cache = new LangParser.Optimization.StringCache();
 
         try
         {

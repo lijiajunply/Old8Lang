@@ -143,6 +143,6 @@ public class PerformanceReporter : IPerformanceReporter
             Directory.CreateDirectory(directory);
         }
 
-        File.WriteAllText(filePath, content, System.Text.Encoding.UTF8);
+        File.WriteAllText(filePath, content, Encoding.UTF8);
     }
 }

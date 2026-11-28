@@ -33,7 +33,7 @@ public class ObjectPool<T> where T : class, IPoolable
     /// <returns>对象实例</returns>
     public T Get()
     {
-        System.Threading.Interlocked.Increment(ref _totalAllocations);
+        Interlocked.Increment(ref _totalAllocations);
         return _objectPoolables.TryTake(out var item) ? item : _factory();
     }
 
@@ -47,7 +47,7 @@ public class ObjectPool<T> where T : class, IPoolable
         {
             item.Reset();
             _objectPoolables.Add(item);
-            System.Threading.Interlocked.Increment(ref _totalReturns);
+            Interlocked.Increment(ref _totalReturns);
         }
     }
 
@@ -57,7 +57,7 @@ public class ObjectPool<T> where T : class, IPoolable
     public ObjectPoolStats GetStats(string poolName, string objectType)
     {
         var available = _objectPoolables.Count;
-        var active = (int)System.Math.Max(0, _totalAllocations - _totalReturns);
+        var active = (int)Math.Max(0, _totalAllocations - _totalReturns);
         return new ObjectPoolStats
         {
             PoolName = poolName,

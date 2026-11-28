@@ -40,9 +40,9 @@ public partial class VirtualMachine : IVirtualMachine
     private readonly ConcurrentDictionary<(string ModuleName, string SymbolName), object> _moduleSymbolCache;
 
     // 便捷属性，获取当前线程的栈
-    private VmStack _stack => _threadStack.Value!;
-    private Stack<CallFrame> _callStack => _threadCallStack.Value!;
-    private Stack<ExceptionHandler> _exceptionHandlers => _threadExceptionHandlers.Value!;
+    private VmStack Stack => _threadStack.Value!;
+    private Stack<CallFrame> CallStack => _threadCallStack.Value!;
+    private Stack<ExceptionHandler> ExceptionHandlers => _threadExceptionHandlers.Value!;
 
     // Task 管理
     private readonly Dictionary<int, TaskLangValue> _tasks = new();
@@ -446,7 +446,7 @@ public partial class VirtualMachine : IVirtualMachine
         // 求值栈是 ThreadLocal 属性，逐指令访问要走一次线程本地查找。
         // 同一次 ExecuteFrameLoop 内当前线程与常量池不会变化，把它们提到循环外，
         // 让下面内联的极热指令零额外开销、零装箱地读写栈与变量槽。
-        var stack = _stack;
+        var stack = Stack;
         var locals = frame.Locals;
         var constantPool = frame.ConstantPool ?? _bytecodeFile.ConstantPool;
         var closureEnv = frame.ClosureEnvironment is { IsEmpty: false } env ? env : null;
@@ -762,7 +762,7 @@ public partial class VirtualMachine : IVirtualMachine
 
     private void ExecuteFrame(CallFrame frame)
     {
-        _callStack.Push(frame);
+        CallStack.Push(frame);
         OnFrameEnter(frame);
         try
         {
@@ -776,7 +776,7 @@ public partial class VirtualMachine : IVirtualMachine
             // 注意必须放在 ExecuteFrameLoop 正常返回之后：若函数抛出异常则不补值。
             if (!frame.LeftReturnValue)
             {
-                _stack.PushRef(VoidLangValue.Instance);
+                Stack.PushRef(VoidLangValue.Instance);
             }
         }
         finally
@@ -793,7 +793,7 @@ public partial class VirtualMachine : IVirtualMachine
             finally
             {
                 OnFrameExit(frame);
-                _callStack.Pop();
+                CallStack.Pop();
                 ReturnLocalsBuffer(frame);
                 ReturnCallFrame(frame);
             }
@@ -827,7 +827,7 @@ public partial class VirtualMachine : IVirtualMachine
     public object? ExecuteFunction(FunctionMetadata function, object?[] arguments)
     {
         // 保存当前栈状态
-        var stackSnapshot = _stack.Count;
+        var stackSnapshot = Stack.Count;
 
         try
         {
@@ -835,9 +835,9 @@ public partial class VirtualMachine : IVirtualMachine
             CallFunction(function, arguments);
 
             // 如果栈上有返回值，弹出并返回
-            if (_stack.Count > stackSnapshot)
+            if (Stack.Count > stackSnapshot)
             {
-                return _stack.PopObject();
+                return Stack.PopObject();
             }
 
             return null;
@@ -845,9 +845,9 @@ public partial class VirtualMachine : IVirtualMachine
         catch
         {
             // 恢复栈状态
-            while (_stack.Count > stackSnapshot)
+            while (Stack.Count > stackSnapshot)
             {
-                _stack.PopDiscard();
+                Stack.PopDiscard();
             }
             throw;
         }
@@ -999,9 +999,9 @@ public partial class VirtualMachine : IVirtualMachine
             }
 
             // 返回栈顶的值（如果有）
-            if (_stack.Count > 0)
+            if (Stack.Count > 0)
             {
-                return _stack.PopObject();
+                return Stack.PopObject();
             }
             return null;
         }

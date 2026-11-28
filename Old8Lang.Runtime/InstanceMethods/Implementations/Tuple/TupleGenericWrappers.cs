@@ -52,7 +52,7 @@ public class TupleToStrMethod : LangListToStrMethod
     {
         // 虚拟机元组是嵌套的 Tuple<object?, object?>，交给共用格式化器展平并递归格式化，
         // 与 PrintLine / ToStr 的解释器口径一致。
-        return Old8Lang.Runtime.VMValueFormatter.ToDisplayString(instance);
+        return Runtime.VMValueFormatter.ToDisplayString(instance);
     }
 }
 

@@ -237,115 +237,124 @@ public static class GenericMethodSpecializer
             true
         );
 
-        // 创建方法的IL发射器
-        var methodIl = dynamicMethod.GetILGenerator();
+        // 先注册到缓存，避免递归泛型函数在生成方法体时无限递归特化自身
+        local.GenericSpecializations[specializationKey] = dynamicMethod;
 
-        // 创建专门的函数本地管理器
-        var funcLocal = new LocalManager()
+        try
         {
-            FilePath = local.FilePath,
-            Interpreter = local.Interpreter,
-            CurrentGenericTypeResolver = resolver,
-            Globals = local.Globals
-        };
+            // 创建方法的IL发射器
+            var methodIl = dynamicMethod.GetILGenerator();
 
-        // 复制全局信息
-        foreach (var (key, value) in local.DelegateVar)
-        {
-            funcLocal.DelegateVar[key] = value;
-        }
-        foreach (var (key, value) in local.ClassVar)
-        {
-            funcLocal.ClassVar[key] = value;
-        }
-        foreach (var (key, value) in local.GlobalStaticClasses)
-        {
-            funcLocal.GlobalStaticClasses[key] = value;
-        }
-        foreach (var (key, value) in local.FuncParameters)
-        {
-            funcLocal.FuncParameters[key] = value;
-        }
-        foreach (var (key, value) in local.GenericFunctions)
-        {
-            funcLocal.GenericFunctions[key] = value;
-        }
-        foreach (var (key, value) in local.GenericClasses)
-        {
-            funcLocal.GenericClasses[key] = value;
-        }
+            // 创建专门的函数本地管理器（共享 GenericSpecializations 以支持递归和相互递归泛型调用）
+            var funcLocal = new LocalManager()
+            {
+                FilePath = local.FilePath,
+                Interpreter = local.Interpreter,
+                CurrentGenericTypeResolver = resolver,
+                Globals = local.Globals,
+                GenericSpecializations = local.GenericSpecializations
+            };
 
-        // 处理参数：为特化版本创建具体的参数局部变量
-        for (var i = 0; i < funcValue.Ids!.Count; i++)
-        {
-            var id = funcValue.Ids[i];
-            var paramType = parameterTypes[i];
-            var localVar = methodIl.DeclareLocal(paramType);
-            funcLocal.AddLocalVar(id.IdName, localVar);
-            funcLocal.LocalVarTypes[id.IdName] = paramType;
-            
-            // 加载参数并存储到局部变量
-            methodIl.Emit(OpCodes.Ldarg, i);
-            methodIl.Emit(OpCodes.Stloc, localVar);
-        }
+            // 复制全局信息
+            foreach (var (key, value) in local.DelegateVar)
+            {
+                funcLocal.DelegateVar[key] = value;
+            }
+            foreach (var (key, value) in local.ClassVar)
+            {
+                funcLocal.ClassVar[key] = value;
+            }
+            foreach (var (key, value) in local.GlobalStaticClasses)
+            {
+                funcLocal.GlobalStaticClasses[key] = value;
+            }
+            foreach (var (key, value) in local.FuncParameters)
+            {
+                funcLocal.FuncParameters[key] = value;
+            }
+            foreach (var (key, value) in local.GenericFunctions)
+            {
+                funcLocal.GenericFunctions[key] = value;
+            }
+            foreach (var (key, value) in local.GenericClasses)
+            {
+                funcLocal.GenericClasses[key] = value;
+            }
 
-        // 创建函数结束标签
-        var endLabel = methodIl.DefineLabel();
-        funcLocal.ReturnLabel = endLabel;
+            // 处理参数：为特化版本创建具体的参数局部变量
+            for (var i = 0; i < funcValue.Ids!.Count; i++)
+            {
+                var id = funcValue.Ids[i];
+                var paramType = parameterTypes[i];
+                var localVar = methodIl.DeclareLocal(paramType);
+                funcLocal.AddLocalVar(id.IdName, localVar);
+                funcLocal.LocalVarTypes[id.IdName] = paramType;
+                
+                // 加载参数并存储到局部变量
+                methodIl.Emit(OpCodes.Ldarg, i);
+                methodIl.Emit(OpCodes.Stloc, localVar);
+            }
 
-        // 声明返回值局部变量（如果需要）
-        funcLocal.ReturnTypeAnnotation = resolver.ResolveReturnTypeAnnotation(funcValue.Id?.AssumptionType);
-        if (returnType != typeof(void))
-        {
-            funcLocal.ReturnValueLocal = methodIl.DeclareLocal(returnType);
-        }
+            // 创建函数结束标签
+            var endLabel = methodIl.DefineLabel();
+            funcLocal.ReturnLabel = endLabel;
 
-        // 开始 try-finally 块以支持 defer
-        methodIl.BeginExceptionBlock();
-
-        // 生成方法体的IL代码，使用特化的类型信息
-        GenerateSpecializedMethodBody(funcValue, methodIl, funcLocal, resolver);
-
-        // 检查是否需要默认返回值
-        var lastStatement = funcValue.BlockStatement.Count > 0
-            ? funcValue.BlockStatement[^1]
-            : null;
-
-        if (lastStatement is not AST.Statement.ReturnStatement)
-        {
+            // 声明返回值局部变量（如果需要）
+            funcLocal.ReturnTypeAnnotation = resolver.ResolveReturnTypeAnnotation(funcValue.Id?.AssumptionType);
             if (returnType != typeof(void))
             {
-                // 提供默认返回值
-                GenerateDefaultValue(methodIl, returnType);
-                methodIl.Emit(OpCodes.Stloc, funcLocal.ReturnValueLocal!);
+                funcLocal.ReturnValueLocal = methodIl.DeclareLocal(returnType);
             }
-            
-            // 显式离开 try 块，触发 finally 块执行
-            methodIl.Emit(OpCodes.Leave, endLabel);
+
+            // 开始 try-finally 块以支持 defer
+            methodIl.BeginExceptionBlock();
+
+            // 生成方法体的IL代码，使用特化的类型信息
+            GenerateSpecializedMethodBody(funcValue, methodIl, funcLocal, resolver);
+
+            // 检查是否需要默认返回值
+            var lastStatement = funcValue.BlockStatement.Count > 0
+                ? funcValue.BlockStatement[^1]
+                : null;
+
+            if (lastStatement is not AST.Statement.ReturnStatement)
+            {
+                if (returnType != typeof(void))
+                {
+                    // 提供默认返回值
+                    GenerateDefaultValue(methodIl, returnType);
+                    methodIl.Emit(OpCodes.Stloc, funcLocal.ReturnValueLocal!);
+                }
+                
+                // 显式离开 try 块，触发 finally 块执行
+                methodIl.Emit(OpCodes.Leave, endLabel);
+            }
+
+            // Finally 块：执行 defer 语句
+            methodIl.BeginFinallyBlock();
+            funcLocal.IsInFinallyBlock = true;
+            funcLocal.GenerateDeferIL(methodIl);
+            funcLocal.IsInFinallyBlock = false;
+            methodIl.EndExceptionBlock();
+
+            // 标记函数结束位置
+            methodIl.MarkLabel(endLabel);
+
+            // 加载返回值并返回
+            if (returnType != typeof(void))
+            {
+                methodIl.Emit(OpCodes.Ldloc, funcLocal.ReturnValueLocal!);
+            }
+
+            methodIl.Emit(OpCodes.Ret);
+
+            return dynamicMethod;
         }
-
-        // Finally 块：执行 defer 语句
-        methodIl.BeginFinallyBlock();
-        funcLocal.IsInFinallyBlock = true;
-        funcLocal.GenerateDeferIL(methodIl);
-        funcLocal.IsInFinallyBlock = false;
-        methodIl.EndExceptionBlock();
-
-        // 标记函数结束位置
-        methodIl.MarkLabel(endLabel);
-
-        // 加载返回值并返回
-        if (returnType != typeof(void))
+        catch
         {
-            methodIl.Emit(OpCodes.Ldloc, funcLocal.ReturnValueLocal!);
+            local.GenericSpecializations.Remove(specializationKey);
+            throw;
         }
-
-        methodIl.Emit(OpCodes.Ret);
-
-        // 缓存特化方法
-        local.GenericSpecializations[specializationKey] = dynamicMethod;
-        
-        return dynamicMethod;
     }
 
     /// <summary>

@@ -16,56 +16,56 @@ public partial class VirtualMachine
         {
             case OpCode.Add:
             {
-                var b = _stack.Pop();
-                var a = _stack.Pop();
-                _stack.Push(Add(a, b));
+                var b = Stack.Pop();
+                var a = Stack.Pop();
+                Stack.Push(Add(a, b));
             }
                 break;
 
             case OpCode.Sub:
             {
-                var b = _stack.Pop();
-                var a = _stack.Pop();
-                _stack.Push(Sub(a, b));
+                var b = Stack.Pop();
+                var a = Stack.Pop();
+                Stack.Push(Sub(a, b));
             }
                 break;
 
             case OpCode.Mul:
             {
-                var b = _stack.Pop();
-                var a = _stack.Pop();
-                _stack.Push(Mul(a, b));
+                var b = Stack.Pop();
+                var a = Stack.Pop();
+                Stack.Push(Mul(a, b));
             }
                 break;
 
             case OpCode.Div:
             {
-                var b = _stack.Pop();
-                var a = _stack.Pop();
-                _stack.Push(Div(a, b));
+                var b = Stack.Pop();
+                var a = Stack.Pop();
+                Stack.Push(Div(a, b));
             }
                 break;
 
             case OpCode.Mod:
             {
-                var b = _stack.Pop();
-                var a = _stack.Pop();
-                _stack.Push(Mod(a, b));
+                var b = Stack.Pop();
+                var a = Stack.Pop();
+                Stack.Push(Mod(a, b));
             }
                 break;
 
             case OpCode.Pow:
             {
-                var b = _stack.Pop();
-                var a = _stack.Pop();
-                _stack.Push(Pow(a, b));
+                var b = Stack.Pop();
+                var a = Stack.Pop();
+                Stack.Push(Pow(a, b));
             }
                 break;
 
             case OpCode.Neg:
             {
-                var a = _stack.Pop();
-                _stack.Push(Neg(a));
+                var a = Stack.Pop();
+                Stack.Push(Neg(a));
             }
                 break;
 

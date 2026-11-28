@@ -35,7 +35,7 @@ public static partial class ClassInitRuntimeExtensions
             if (memberExpr is TypeTemplate nestedTypeTemplate)
             {
                 // 递归注册嵌套类的嵌套类
-                var nestedClassInit = ClassInitRuntimeExtensions.CreateForTemplate(nestedTypeTemplate);
+                var nestedClassInit = CreateForTemplate(nestedTypeTemplate);
                 nestedClassInit.RegisterNestedClasses(manager);
 
                 // 注册嵌套类到管理器
@@ -49,7 +49,7 @@ public static partial class ClassInitRuntimeExtensions
             if (memberExpr is TypeTemplate nestedTypeTemplate)
             {
                 // 递归注册嵌套类的嵌套类
-                var nestedClassInit = ClassInitRuntimeExtensions.CreateForTemplate(nestedTypeTemplate);
+                var nestedClassInit = CreateForTemplate(nestedTypeTemplate);
                 nestedClassInit.RegisterNestedClasses(manager);
 
                 // 注册嵌套类到管理器

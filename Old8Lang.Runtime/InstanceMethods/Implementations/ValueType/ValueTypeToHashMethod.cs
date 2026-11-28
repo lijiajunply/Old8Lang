@@ -27,7 +27,7 @@ public class ValueTypeToHashMethod : BaseValueTypeMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        InstanceMethods.Core.IlValueBridge.EmitLoadWrapped(instance, ilGenerator, local);
+        Core.IlValueBridge.EmitLoadWrapped(instance, ilGenerator, local);
 
         var helperMethod = typeof(ValueTypeToHashMethod).GetMethod(nameof(GetHashCodeHelper),
             System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);

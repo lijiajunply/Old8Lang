@@ -93,7 +93,7 @@ public class TaskThenMethod : BaseInstanceMethod, IIlNativeValueInstanceMethod
     /// 也能作为接收者继续链式调用（<see cref="IlValueBridge.Wrap"/> 会把它转回
     /// <see cref="TaskLangValue"/>）。
     /// </remarks>
-    public static System.Threading.Tasks.Task<object> ThenHelper(LangValueType instance, LangValueType callback)
+    public static Task<object> ThenHelper(LangValueType instance, LangValueType callback)
     {
         if (instance is not TaskLangValue task)
         {
@@ -126,7 +126,7 @@ public class TaskThenMethod : BaseInstanceMethod, IIlNativeValueInstanceMethod
 
     protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)
     {
-        return typeof(System.Threading.Tasks.Task<object>);
+        return typeof(Task<object>);
     }
 
     /// <summary>

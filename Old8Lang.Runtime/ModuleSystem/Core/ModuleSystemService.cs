@@ -555,7 +555,7 @@ public class ModuleSystemService
             foreach (var (name, value) in currentScope)
             {
                 // 跳过模块对象
-                if (value is AST.Expression.ModuleObjects.IModuleObject)
+                if (value is IModuleObject)
                 {
                     continue;
                 }
@@ -575,7 +575,7 @@ public class ModuleSystemService
                 NativeAnyLangValue nativeAny => nativeAny.RegisterName,
                 NativeStaticAny staticAny => staticAny.ClassName,
                 ConstantLangValue constant => constant.Name,
-                AST.Expression.ModuleObjects.UnifiedModule module => module.ModuleName,
+                UnifiedModule module => module.ModuleName,
                 _ => null
             };
 

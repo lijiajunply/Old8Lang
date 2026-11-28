@@ -500,7 +500,7 @@ public partial class InterpreterVisitor
         }
 
         // 处理嵌套索引访问赋值：array[0][0] <- value
-        if (Old8Lang.Runtime.LiteralCollectionRuntimeFactory.TryCreateNestedIndex(node.LeftExpression, out var nestedIndexAccess))
+        if (Runtime.LiteralCollectionRuntimeFactory.TryCreateNestedIndex(node.LeftExpression, out var nestedIndexAccess))
         {
             // 运行基础表达式，获取容器对象
             var baseResult = nestedIndexAccess.BaseExpression.Accept(this);
@@ -639,7 +639,7 @@ public partial class InterpreterVisitor
             {
                 // 首先检查是否是嵌套索引赋值：matrix[0][1] <- value
                 // 左侧应该是LangListItem（第一层索引），右侧应该是索引表达式
-                if (operation.Right is { } finalIndex && Old8Lang.Runtime.LiteralCollectionRuntimeFactory.TryCreateIndex(operation.Left, out var outerListItem))
+                if (operation.Right is { } finalIndex && Runtime.LiteralCollectionRuntimeFactory.TryCreateIndex(operation.Left, out var outerListItem))
                 {
                     // 获取外层索引的值：matrix[0] 返回内层数组
                     var outerCollectionValue = manager.GetValue(outerListItem.ListId);
@@ -772,7 +772,7 @@ public partial class InterpreterVisitor
         else if (node.LeftExpression is SliceExpression or SliceLangValue)
         {
             var sliceValue = node.LeftExpression is SliceExpression syntax
-                ? Old8Lang.Runtime.LiteralCollectionRuntimeFactory.CreateSlice(syntax)
+                ? Runtime.LiteralCollectionRuntimeFactory.CreateSlice(syntax)
                 : (SliceLangValue)node.LeftExpression;
             // 获取集合对象
             var collectionValue = sliceValue.Id.Accept(this);
@@ -822,7 +822,7 @@ public partial class InterpreterVisitor
             return new VoidLangValue();
         }
         // 处理索引访问赋值：array[index] <- value, list[index] <- value, dict[key] <- value
-        else if (Old8Lang.Runtime.LiteralCollectionRuntimeFactory.TryCreateIndex(node.LeftExpression, out var listItem))
+        else if (Runtime.LiteralCollectionRuntimeFactory.TryCreateIndex(node.LeftExpression, out var listItem))
         {
             // 获取集合对象
             var collectionValue = manager.GetValue(listItem.ListId);

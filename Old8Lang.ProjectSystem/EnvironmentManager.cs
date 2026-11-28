@@ -122,7 +122,7 @@ public class EnvironmentManager
     /// </summary>
     public string? GetVariable(string key)
     {
-        return _environmentVariables.TryGetValue(key, out var value) ? value : null;
+        return _environmentVariables.GetValueOrDefault(key);
     }
 
     /// <summary>

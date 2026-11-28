@@ -95,7 +95,7 @@ public class LangListAllMethod : BaseLangListMethod, IIlNativeValueInstanceMetho
         }
 
         var predicate = arguments[0];
-        var vm = Old8Lang.Bytecode.Core.VMContext.CurrentVM;
+        var vm = Bytecode.Core.VMContext.CurrentVM;
         if (vm == null)
         {
             throw new InvalidOperationException("VM 上下文未初始化");

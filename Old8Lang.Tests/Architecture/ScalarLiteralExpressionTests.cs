@@ -14,7 +14,7 @@ public class ScalarLiteralExpressionTests
     {
         const string code = "result <- items[1:4:2]";
         var block = new LangParser.LangParser(LangInterpreter.Tokenize(code), code).ParseProgram();
-        var assignment = Assert.IsType<Old8Lang.AST.Statement.SetStatement>(block[0]);
+        var assignment = Assert.IsType<AST.Statement.SetStatement>(block[0]);
         var slice = Assert.IsType<SliceExpression>(assignment.Value);
         Assert.Equal("items", slice.Id.IdName);
         Assert.NotNull(slice.Start);
@@ -33,7 +33,7 @@ public class ScalarLiteralExpressionTests
         var first = new ScalarLiteralExpression(new LiteralSyntax(LiteralKind.Int, start, default));
         var last = new ScalarLiteralExpression(new LiteralSyntax(LiteralKind.Int, end, default));
         var syntax = new RangeLiteralExpression(first, last, includeStart: includeStart, includeEnd: includeEnd);
-        var legacy = new Old8Lang.AST.Expression.Intermediates.RangeLangValue(first, last,
+        var legacy = new AST.Expression.Intermediates.RangeLangValue(first, last,
             includeStart: includeStart, includeEnd: includeEnd);
         var visitor = new InterpreterVisitor(new VariateManager());
         var expected = Assert.IsType<ArrayLangValue>(legacy.Accept(visitor));
@@ -129,8 +129,8 @@ public class ScalarLiteralExpressionTests
         var dictionary = new DictionaryLiteralExpression([
             new KeyValuePair<LangExpression, LangExpression>(keyAwait, valueAwait)
         ]);
-        var block = new Old8Lang.AST.Statement.BlockStatement([
-            new Old8Lang.AST.Statement.SetStatement(new LangId("items"),
+        var block = new AST.Statement.BlockStatement([
+            new AST.Statement.SetStatement(new LangId("items"),
                 new ListLiteralExpression([listAwait, new ArrayLiteralExpression([arrayAwait]), dictionary,
                     new TupleLiteralExpression([tupleAwait]), new RangeLiteralExpression(rangeAwait, null),
                     new SliceExpression(new LangId("items"), step: sliceAwait),
@@ -139,7 +139,7 @@ public class ScalarLiteralExpressionTests
                         nestedSliceAwait)]))
         ]);
         var method = new System.Reflection.Emit.DynamicMethod("test", typeof(void), Type.EmptyTypes);
-        var generator = new Old8Lang.AsyncGeneration.AsyncStateMachineGenerator(
+        var generator = new AsyncGeneration.AsyncStateMachineGenerator(
             method.GetILGenerator(), new Old8Lang.Compiler.CodeGeneration.LocalManager(), block);
 
         Assert.Throws<Old8Lang.Error.CompilerException>(() =>
@@ -192,57 +192,57 @@ public class ScalarLiteralExpressionTests
         Assert.Same(assembly, typeof(Operation).Assembly);
         Assert.Same(assembly, typeof(FunctionCallExpression).Assembly);
         Assert.Same(assembly, typeof(AwaitExpression).Assembly);
-        Assert.Same(assembly, typeof(Old8Lang.AST.Statement.ThrowStatement).Assembly);
-        Assert.Same(assembly, typeof(Old8Lang.AST.Statement.ReturnStatement).Assembly);
-        Assert.Same(assembly, typeof(Old8Lang.AST.Statement.YieldStatement).Assembly);
-        Assert.Same(assembly, typeof(Old8Lang.AST.Statement.BreakStatement).Assembly);
-        Assert.Same(assembly, typeof(Old8Lang.AST.Statement.ContinueStatement).Assembly);
-        Assert.Same(assembly, typeof(Old8Lang.AST.Statement.BlockStatement).Assembly);
-        Assert.Same(assembly, typeof(Old8Lang.AST.Statement.IfChild).Assembly);
-        Assert.Same(assembly, typeof(Old8Lang.AST.Statement.IfStatement).Assembly);
-        Assert.Same(assembly, typeof(Old8Lang.AST.Statement.DeferStatement).Assembly);
-        Assert.Same(assembly, typeof(Old8Lang.AST.Statement.WhileStatement).Assembly);
-        Assert.Same(assembly, typeof(Old8Lang.AST.Statement.UsingStatement).Assembly);
-        Assert.Same(assembly, typeof(Old8Lang.AST.Statement.SetStatement).Assembly);
-        Assert.Same(assembly, typeof(Old8Lang.AST.Statement.ForStatement).Assembly);
-        Assert.Same(assembly, typeof(Old8Lang.AST.Statement.SelectCase).Assembly);
-        Assert.Same(assembly, typeof(Old8Lang.AST.Statement.ImportItem).Assembly);
-        Assert.Same(assembly, typeof(Old8Lang.AST.Statement.ClassFieldSetStatement).Assembly);
-        Assert.Same(assembly, typeof(Old8Lang.AST.Expression.Intermediates.MatchCase).Assembly);
-        Assert.Same(assembly, typeof(Old8Lang.AST.Expression.Intermediates.TuplePattern).Assembly);
-        Assert.Same(assembly, typeof(Old8Lang.AST.Expression.Intermediates.RangePattern).Assembly);
-        Assert.Same(assembly, typeof(Old8Lang.AST.Statement.FuncRunStatement).Assembly);
-        Assert.Same(assembly, typeof(Old8Lang.AST.Statement.SwitchStatement).Assembly);
-        Assert.Same(assembly, typeof(Old8Lang.AST.Statement.CaseStatement).Assembly);
-        Assert.Same(assembly, typeof(Old8Lang.AST.Statement.TryStatement).Assembly);
-        Assert.Same(assembly, typeof(Old8Lang.AST.Statement.EnumInit).Assembly);
-        Assert.Same(assembly, typeof(Old8Lang.AST.Statement.SelectStatement).Assembly);
-        Assert.Same(assembly, typeof(Old8Lang.AST.Statement.ForInStatement).Assembly);
-        Assert.Same(assembly, typeof(Old8Lang.AST.Statement.AsyncForInStatement).Assembly);
-        Assert.Same(assembly, typeof(Old8Lang.AST.Expression.Intermediates.ListComprehension).Assembly);
-        Assert.Same(assembly, typeof(Old8Lang.AST.Expression.Intermediates.MatchExpression).Assembly);
-        Assert.Same(assembly, typeof(Old8Lang.AST.Expression.GenericInstanceExpression).Assembly);
-        Assert.Same(assembly, typeof(Old8Lang.AST.Expression.Intermediates.StringTemplateValue).Assembly);
-        Assert.Same(assembly, typeof(Old8Lang.AST.Expression.LambdaExpression).Assembly);
-        Assert.Same(assembly, typeof(Old8Lang.AST.FunctionDecorator).Assembly);
-        Assert.Same(assembly, typeof(Old8Lang.AST.Expression.Linq.LinqClause).Assembly);
-        Assert.Same(assembly, typeof(Old8Lang.AST.Expression.Linq.FromClause).Assembly);
-        Assert.Same(assembly, typeof(Old8Lang.AST.Statement.FunctionSyntax).Assembly);
-        Assert.Same(assembly, typeof(Old8Lang.AST.Statement.FuncInit).Assembly);
-        Assert.Same(assembly, typeof(Old8Lang.AST.Statement.AsyncFuncInit).Assembly);
-        Assert.Same(assembly, typeof(Old8Lang.AST.Statement.ClassSyntax).Assembly);
-        Assert.Same(assembly, typeof(Old8Lang.AST.Statement.ClassInit).Assembly);
-        Assert.Same(assembly, typeof(Old8Lang.AST.Statement.ClassFuncInitStatement).Assembly);
-        Assert.Same(assembly, typeof(Old8Lang.AST.Statement.ExtensionDeclaration).Assembly);
-        Assert.Same(assembly, typeof(Old8Lang.AST.Statement.NativeStatement).Assembly);
-        Assert.Same(assembly, typeof(Old8Lang.AST.Statement.ExternStatement).Assembly);
-        Assert.Same(assembly, typeof(Old8Lang.AST.Statement.ExternFunctionDeclaration).Assembly);
-        Assert.Same(assembly, typeof(Old8Lang.AST.Expression.CallExpression).Assembly);
-        Assert.Same(assembly, typeof(Old8Lang.AST.Expression.AsyncStreamExpression).Assembly);
-        Assert.Same(assembly, typeof(Old8Lang.AST.Statement.ImportStatement).Assembly);
-        Assert.Same(assembly, typeof(Old8Lang.AST.Expression.Linq.LinqExpression).Assembly);
-        Assert.Same(assembly, typeof(Old8Lang.AST.Statement.IBlockDeclaration).Assembly);
-        Assert.Same(assembly, typeof(Old8Lang.AST.Statement.IBlockImportDeclaration).Assembly);
+        Assert.Same(assembly, typeof(AST.Statement.ThrowStatement).Assembly);
+        Assert.Same(assembly, typeof(AST.Statement.ReturnStatement).Assembly);
+        Assert.Same(assembly, typeof(AST.Statement.YieldStatement).Assembly);
+        Assert.Same(assembly, typeof(AST.Statement.BreakStatement).Assembly);
+        Assert.Same(assembly, typeof(AST.Statement.ContinueStatement).Assembly);
+        Assert.Same(assembly, typeof(AST.Statement.BlockStatement).Assembly);
+        Assert.Same(assembly, typeof(AST.Statement.IfChild).Assembly);
+        Assert.Same(assembly, typeof(AST.Statement.IfStatement).Assembly);
+        Assert.Same(assembly, typeof(AST.Statement.DeferStatement).Assembly);
+        Assert.Same(assembly, typeof(AST.Statement.WhileStatement).Assembly);
+        Assert.Same(assembly, typeof(AST.Statement.UsingStatement).Assembly);
+        Assert.Same(assembly, typeof(AST.Statement.SetStatement).Assembly);
+        Assert.Same(assembly, typeof(AST.Statement.ForStatement).Assembly);
+        Assert.Same(assembly, typeof(AST.Statement.SelectCase).Assembly);
+        Assert.Same(assembly, typeof(AST.Statement.ImportItem).Assembly);
+        Assert.Same(assembly, typeof(AST.Statement.ClassFieldSetStatement).Assembly);
+        Assert.Same(assembly, typeof(AST.Expression.Intermediates.MatchCase).Assembly);
+        Assert.Same(assembly, typeof(AST.Expression.Intermediates.TuplePattern).Assembly);
+        Assert.Same(assembly, typeof(AST.Expression.Intermediates.RangePattern).Assembly);
+        Assert.Same(assembly, typeof(AST.Statement.FuncRunStatement).Assembly);
+        Assert.Same(assembly, typeof(AST.Statement.SwitchStatement).Assembly);
+        Assert.Same(assembly, typeof(AST.Statement.CaseStatement).Assembly);
+        Assert.Same(assembly, typeof(AST.Statement.TryStatement).Assembly);
+        Assert.Same(assembly, typeof(AST.Statement.EnumInit).Assembly);
+        Assert.Same(assembly, typeof(AST.Statement.SelectStatement).Assembly);
+        Assert.Same(assembly, typeof(AST.Statement.ForInStatement).Assembly);
+        Assert.Same(assembly, typeof(AST.Statement.AsyncForInStatement).Assembly);
+        Assert.Same(assembly, typeof(AST.Expression.Intermediates.ListComprehension).Assembly);
+        Assert.Same(assembly, typeof(AST.Expression.Intermediates.MatchExpression).Assembly);
+        Assert.Same(assembly, typeof(GenericInstanceExpression).Assembly);
+        Assert.Same(assembly, typeof(AST.Expression.Intermediates.StringTemplateValue).Assembly);
+        Assert.Same(assembly, typeof(LambdaExpression).Assembly);
+        Assert.Same(assembly, typeof(FunctionDecorator).Assembly);
+        Assert.Same(assembly, typeof(AST.Expression.Linq.LinqClause).Assembly);
+        Assert.Same(assembly, typeof(AST.Expression.Linq.FromClause).Assembly);
+        Assert.Same(assembly, typeof(AST.Statement.FunctionSyntax).Assembly);
+        Assert.Same(assembly, typeof(AST.Statement.FuncInit).Assembly);
+        Assert.Same(assembly, typeof(AST.Statement.AsyncFuncInit).Assembly);
+        Assert.Same(assembly, typeof(AST.Statement.ClassSyntax).Assembly);
+        Assert.Same(assembly, typeof(AST.Statement.ClassInit).Assembly);
+        Assert.Same(assembly, typeof(AST.Statement.ClassFuncInitStatement).Assembly);
+        Assert.Same(assembly, typeof(AST.Statement.ExtensionDeclaration).Assembly);
+        Assert.Same(assembly, typeof(AST.Statement.NativeStatement).Assembly);
+        Assert.Same(assembly, typeof(AST.Statement.ExternStatement).Assembly);
+        Assert.Same(assembly, typeof(AST.Statement.ExternFunctionDeclaration).Assembly);
+        Assert.Same(assembly, typeof(CallExpression).Assembly);
+        Assert.Same(assembly, typeof(AsyncStreamExpression).Assembly);
+        Assert.Same(assembly, typeof(AST.Statement.ImportStatement).Assembly);
+        Assert.Same(assembly, typeof(AST.Expression.Linq.LinqExpression).Assembly);
+        Assert.Same(assembly, typeof(AST.Statement.IBlockDeclaration).Assembly);
+        Assert.Same(assembly, typeof(AST.Statement.IBlockImportDeclaration).Assembly);
         Assert.Same(assembly, typeof(LangId).Assembly);
         Assert.Same(assembly, typeof(ClassMemberId).Assembly);
         Assert.Same(assembly, typeof(ThisExpression).Assembly);
@@ -253,74 +253,74 @@ public class ScalarLiteralExpressionTests
         var visitor = new SyntaxOnlyVisitor();
         Assert.Equal("Bool:True", literal.Accept(visitor));
         Assert.Equal("name", new LangId("name").Accept(visitor));
-        Assert.Equal("left+right", new Operation(new LangId("left"), Old8Lang.LangParser.LangTokenType.Plus, new LangId("right")).Accept(visitor));
+        Assert.Equal("left+right", new Operation(new LangId("left"), LangParser.LangTokenType.Plus, new LangId("right")).Accept(visitor));
         Assert.Equal("call name", new FunctionCallExpression(new LangId("name"), []).Accept(visitor));
         Assert.Equal("await name", new AwaitExpression(new LangId("name")).Accept(visitor));
-        Assert.Equal("throw name", new Old8Lang.AST.Statement.ThrowStatement(new LangId("name")).Accept(visitor));
-        Assert.Equal("return name", new Old8Lang.AST.Statement.ReturnStatement(new LangId("name")).Accept(visitor));
-        Assert.Equal("yield name", new Old8Lang.AST.Statement.YieldStatement(new LangId("name")).Accept(visitor));
-        Assert.Equal("break", new Old8Lang.AST.Statement.BreakStatement().Accept(visitor));
-        Assert.Equal("continue", new Old8Lang.AST.Statement.ContinueStatement().Accept(visitor));
-        Assert.Equal("", new Old8Lang.AST.Statement.BlockStatement([]).Accept(visitor));
-        Assert.Equal("if", new Old8Lang.AST.Statement.IfStatement(
-            new Old8Lang.AST.Statement.IfChild(literal, new Old8Lang.AST.Statement.BlockStatement([])), [], null)
+        Assert.Equal("throw name", new AST.Statement.ThrowStatement(new LangId("name")).Accept(visitor));
+        Assert.Equal("return name", new AST.Statement.ReturnStatement(new LangId("name")).Accept(visitor));
+        Assert.Equal("yield name", new AST.Statement.YieldStatement(new LangId("name")).Accept(visitor));
+        Assert.Equal("break", new AST.Statement.BreakStatement().Accept(visitor));
+        Assert.Equal("continue", new AST.Statement.ContinueStatement().Accept(visitor));
+        Assert.Equal("", new AST.Statement.BlockStatement([]).Accept(visitor));
+        Assert.Equal("if", new AST.Statement.IfStatement(
+            new AST.Statement.IfChild(literal, new AST.Statement.BlockStatement([])), [], null)
             .Accept(visitor));
-        Assert.Equal("defer", new Old8Lang.AST.Statement.DeferStatement(new Old8Lang.AST.Statement.BlockStatement([]))
+        Assert.Equal("defer", new AST.Statement.DeferStatement(new AST.Statement.BlockStatement([]))
             .Accept(visitor));
-        Assert.Equal("while", new Old8Lang.AST.Statement.WhileStatement(literal,
-            new Old8Lang.AST.Statement.BlockStatement([])).Accept(visitor));
-        Assert.Equal("using", new Old8Lang.AST.Statement.UsingStatement(null, literal,
-            new Old8Lang.AST.Statement.BlockStatement([])).Accept(visitor));
-        var init = new Old8Lang.AST.Statement.SetStatement(new LangId("i"), literal);
+        Assert.Equal("while", new AST.Statement.WhileStatement(literal,
+            new AST.Statement.BlockStatement([])).Accept(visitor));
+        Assert.Equal("using", new AST.Statement.UsingStatement(null, literal,
+            new AST.Statement.BlockStatement([])).Accept(visitor));
+        var init = new AST.Statement.SetStatement(new LangId("i"), literal);
         Assert.Equal("assign", init.Accept(visitor));
-        Assert.Equal("for", new Old8Lang.AST.Statement.ForStatement(init, literal,
-            new Old8Lang.AST.Statement.SetStatement(new LangId("i"), literal),
-            new Old8Lang.AST.Statement.BlockStatement([])).Accept(visitor));
-        Assert.Equal("run", new Old8Lang.AST.Statement.FuncRunStatement(literal).Accept(visitor));
-        Assert.Equal("case", new Old8Lang.AST.Statement.CaseStatement(literal,
-            new Old8Lang.AST.Statement.BlockStatement([])).Accept(visitor));
-        Assert.Equal("switch", new Old8Lang.AST.Statement.SwitchStatement(literal,
-            [new Old8Lang.AST.Statement.CaseStatement(literal, new Old8Lang.AST.Statement.BlockStatement([]))])
+        Assert.Equal("for", new AST.Statement.ForStatement(init, literal,
+            new AST.Statement.SetStatement(new LangId("i"), literal),
+            new AST.Statement.BlockStatement([])).Accept(visitor));
+        Assert.Equal("run", new AST.Statement.FuncRunStatement(literal).Accept(visitor));
+        Assert.Equal("case", new AST.Statement.CaseStatement(literal,
+            new AST.Statement.BlockStatement([])).Accept(visitor));
+        Assert.Equal("switch", new AST.Statement.SwitchStatement(literal,
+            [new AST.Statement.CaseStatement(literal, new AST.Statement.BlockStatement([]))])
             .Accept(visitor));
-        Assert.Equal("try", new Old8Lang.AST.Statement.TryStatement(
-            new Old8Lang.AST.Statement.BlockStatement([]), []).Accept(visitor));
-        Assert.Equal("enum", new Old8Lang.AST.Statement.EnumInit("E", []).Accept(visitor));
-        Assert.Equal("select", new Old8Lang.AST.Statement.SelectStatement([], null).Accept(visitor));
-        Assert.Equal("forin", new Old8Lang.AST.Statement.ForInStatement(new LangId("x"), literal,
-            new Old8Lang.AST.Statement.BlockStatement([])).Accept(visitor));
-        Assert.Equal("asyncforin", new Old8Lang.AST.Statement.AsyncForInStatement(new LangId("x"), literal,
-            new Old8Lang.AST.Statement.BlockStatement([])).Accept(visitor));
-        Assert.Equal("comp", new Old8Lang.AST.Expression.Intermediates.ListComprehension(
+        Assert.Equal("try", new AST.Statement.TryStatement(
+            new AST.Statement.BlockStatement([]), []).Accept(visitor));
+        Assert.Equal("enum", new AST.Statement.EnumInit("E", []).Accept(visitor));
+        Assert.Equal("select", new AST.Statement.SelectStatement([], null).Accept(visitor));
+        Assert.Equal("forin", new AST.Statement.ForInStatement(new LangId("x"), literal,
+            new AST.Statement.BlockStatement([])).Accept(visitor));
+        Assert.Equal("asyncforin", new AST.Statement.AsyncForInStatement(new LangId("x"), literal,
+            new AST.Statement.BlockStatement([])).Accept(visitor));
+        Assert.Equal("comp", new AST.Expression.Intermediates.ListComprehension(
             literal, new LangId("x"), literal).Accept(visitor));
-        Assert.Equal("match", new Old8Lang.AST.Expression.Intermediates.MatchExpression(literal, []).Accept(visitor));
-        Assert.Equal("generic", new Old8Lang.AST.Expression.GenericInstanceExpression(
+        Assert.Equal("match", new AST.Expression.Intermediates.MatchExpression(literal, []).Accept(visitor));
+        Assert.Equal("generic", new GenericInstanceExpression(
             new LangId("Box"), ["int"]).Accept(visitor));
-        Assert.Equal("template", new Old8Lang.AST.Expression.Intermediates.StringTemplateValue([literal])
+        Assert.Equal("template", new AST.Expression.Intermediates.StringTemplateValue([literal])
             .Accept(visitor));
-        Assert.Equal("lambda", new Old8Lang.AST.Expression.LambdaExpression(
-            null, [], new Old8Lang.AST.Statement.BlockStatement([]), false).Accept(visitor));
-        var functionSyntax = new Old8Lang.AST.Statement.FunctionSyntax(
-            new LangId("f"), [], new Old8Lang.AST.Statement.BlockStatement([]), null, null, null, false);
-        Assert.Equal("func", new Old8Lang.AST.Statement.FuncInit(functionSyntax).Accept(visitor));
-        Assert.Equal("asyncfunc", new Old8Lang.AST.Statement.AsyncFuncInit(
-            new Old8Lang.AST.Statement.FunctionSyntax(
-                new LangId("g"), [], new Old8Lang.AST.Statement.BlockStatement([]), null, null, null, true))
+        Assert.Equal("lambda", new LambdaExpression(
+            null, [], new AST.Statement.BlockStatement([]), false).Accept(visitor));
+        var functionSyntax = new AST.Statement.FunctionSyntax(
+            new LangId("f"), [], new AST.Statement.BlockStatement([]), null, null, null, false);
+        Assert.Equal("func", new AST.Statement.FuncInit(functionSyntax).Accept(visitor));
+        Assert.Equal("asyncfunc", new AST.Statement.AsyncFuncInit(
+            new AST.Statement.FunctionSyntax(
+                new LangId("g"), [], new AST.Statement.BlockStatement([]), null, null, null, true))
             .Accept(visitor));
-        Assert.Equal("class", new Old8Lang.AST.Statement.ClassInit(
-            new Old8Lang.AST.Statement.ClassSyntax("C", new Old8Lang.AST.Statement.BlockStatement([])))
+        Assert.Equal("class", new AST.Statement.ClassInit(
+            new AST.Statement.ClassSyntax("C", new AST.Statement.BlockStatement([])))
             .Accept(visitor));
-        Assert.Equal("extension", new Old8Lang.AST.Statement.ExtensionDeclaration("string", null, [])
+        Assert.Equal("extension", new AST.Statement.ExtensionDeclaration("string", null, [])
             .Accept(visitor));
-        Assert.Equal("native", new Old8Lang.AST.Statement.NativeStatement("d", "C").Accept(visitor));
-        Assert.Equal("extern", new Old8Lang.AST.Statement.ExternStatement("d", []).Accept(visitor));
-        Assert.Equal("call", new Old8Lang.AST.Expression.CallExpression(new LangId("f"), []).Accept(visitor));
-        Assert.Equal("stream", new Old8Lang.AST.Expression.AsyncStreamExpression(
-            new Old8Lang.AST.Statement.BlockStatement([])).Accept(visitor));
-        Assert.Equal("import", new Old8Lang.AST.Statement.ImportStatement("module").Accept(visitor));
-        Assert.Equal("linq", new Old8Lang.AST.Expression.Linq.LinqExpression(
-            new Old8Lang.AST.Expression.Linq.FromClause("x", literal),
+        Assert.Equal("native", new AST.Statement.NativeStatement("d", "C").Accept(visitor));
+        Assert.Equal("extern", new AST.Statement.ExternStatement("d", []).Accept(visitor));
+        Assert.Equal("call", new CallExpression(new LangId("f"), []).Accept(visitor));
+        Assert.Equal("stream", new AsyncStreamExpression(
+            new AST.Statement.BlockStatement([])).Accept(visitor));
+        Assert.Equal("import", new AST.Statement.ImportStatement("module").Accept(visitor));
+        Assert.Equal("linq", new AST.Expression.Linq.LinqExpression(
+            new AST.Expression.Linq.FromClause("x", literal),
             [],
-            new Old8Lang.AST.Expression.Linq.SelectClause(literal)).Accept(visitor));
+            new AST.Expression.Linq.SelectClause(literal)).Accept(visitor));
         Assert.Equal("field", new ClassMemberId("field").Accept(visitor));
         Assert.Equal("Bool:True?this:super", new TernaryExpression(literal, new ThisExpression(), new SuperExpression()).Accept(visitor));
         Assert.DoesNotContain(assembly.GetReferencedAssemblies(), reference => reference.Name == "Old8Lang.Runtime");
@@ -339,41 +339,41 @@ public class ScalarLiteralExpressionTests
         public string VisitListLiteralExpression(ListLiteralExpression node) => node.ToString();
         public string VisitArrayLiteralExpression(ArrayLiteralExpression node) => node.ToString();
         public string VisitAwaitExpression(AwaitExpression node) => $"await {node.Expression.Accept(this)}";
-        public string VisitThrowStatement(Old8Lang.AST.Statement.ThrowStatement node) => $"throw {node.Expression.Accept(this)}";
-        public string VisitReturnStatement(Old8Lang.AST.Statement.ReturnStatement node) => $"return {node.Expression.Accept(this)}";
-        public string VisitYieldStatement(Old8Lang.AST.Statement.YieldStatement node) => $"yield {node.YieldExpression.Accept(this)}";
-        public string VisitBreakStatement(Old8Lang.AST.Statement.BreakStatement node) => "break";
-        public string VisitContinueStatement(Old8Lang.AST.Statement.ContinueStatement node) => "continue";
-        public string VisitBlockStatement(Old8Lang.AST.Statement.BlockStatement node) => node.ToString();
-        public string VisitIfStatement(Old8Lang.AST.Statement.IfStatement node) => "if";
-        public string VisitDeferStatement(Old8Lang.AST.Statement.DeferStatement node) => "defer";
-        public string VisitWhileStatement(Old8Lang.AST.Statement.WhileStatement node) => "while";
-        public string VisitUsingStatement(Old8Lang.AST.Statement.UsingStatement node) => "using";
-        public string VisitSetStatement(Old8Lang.AST.Statement.SetStatement node) => "assign";
-        public string VisitForStatement(Old8Lang.AST.Statement.ForStatement node) => "for";
-        public string VisitFuncRunStatement(Old8Lang.AST.Statement.FuncRunStatement node) => "run";
-        public string VisitSwitchStatement(Old8Lang.AST.Statement.SwitchStatement node) => "switch";
-        public string VisitCaseStatement(Old8Lang.AST.Statement.CaseStatement node) => "case";
-        public string VisitTryStatement(Old8Lang.AST.Statement.TryStatement node) => "try";
-        public string VisitEnumInit(Old8Lang.AST.Statement.EnumInit node) => "enum";
-        public string VisitSelectStatement(Old8Lang.AST.Statement.SelectStatement node) => "select";
-        public string VisitForInStatement(Old8Lang.AST.Statement.ForInStatement node) => "forin";
-        public string VisitAsyncForInStatement(Old8Lang.AST.Statement.AsyncForInStatement node) => "asyncforin";
-        public string VisitListComprehension(Old8Lang.AST.Expression.Intermediates.ListComprehension node) => "comp";
-        public string VisitMatchExpression(Old8Lang.AST.Expression.Intermediates.MatchExpression node) => "match";
-        public string VisitGenericInstanceExpression(Old8Lang.AST.Expression.GenericInstanceExpression node) => "generic";
-        public string VisitStringTemplateValue(Old8Lang.AST.Expression.Intermediates.StringTemplateValue node) => "template";
-        public string VisitLambdaExpression(Old8Lang.AST.Expression.LambdaExpression node) => "lambda";
-        public string VisitFuncInit(Old8Lang.AST.Statement.FuncInit node) => "func";
-        public string VisitAsyncFuncInit(Old8Lang.AST.Statement.AsyncFuncInit node) => "asyncfunc";
-        public string VisitClassInit(Old8Lang.AST.Statement.ClassInit node) => "class";
-        public string VisitExtensionDeclaration(Old8Lang.AST.Statement.ExtensionDeclaration node) => "extension";
-        public string VisitNativeStatement(Old8Lang.AST.Statement.NativeStatement node) => "native";
-        public string VisitExternStatement(Old8Lang.AST.Statement.ExternStatement node) => "extern";
-        public string VisitCallExpression(Old8Lang.AST.Expression.CallExpression node) => "call";
-        public string VisitAsyncStreamExpression(Old8Lang.AST.Expression.AsyncStreamExpression node) => "stream";
-        public string VisitImportStatement(Old8Lang.AST.Statement.ImportStatement node) => "import";
-        public string VisitLinqExpression(Old8Lang.AST.Expression.Linq.LinqExpression node) => "linq";
+        public string VisitThrowStatement(AST.Statement.ThrowStatement node) => $"throw {node.Expression.Accept(this)}";
+        public string VisitReturnStatement(AST.Statement.ReturnStatement node) => $"return {node.Expression.Accept(this)}";
+        public string VisitYieldStatement(AST.Statement.YieldStatement node) => $"yield {node.YieldExpression.Accept(this)}";
+        public string VisitBreakStatement(AST.Statement.BreakStatement node) => "break";
+        public string VisitContinueStatement(AST.Statement.ContinueStatement node) => "continue";
+        public string VisitBlockStatement(AST.Statement.BlockStatement node) => node.ToString();
+        public string VisitIfStatement(AST.Statement.IfStatement node) => "if";
+        public string VisitDeferStatement(AST.Statement.DeferStatement node) => "defer";
+        public string VisitWhileStatement(AST.Statement.WhileStatement node) => "while";
+        public string VisitUsingStatement(AST.Statement.UsingStatement node) => "using";
+        public string VisitSetStatement(AST.Statement.SetStatement node) => "assign";
+        public string VisitForStatement(AST.Statement.ForStatement node) => "for";
+        public string VisitFuncRunStatement(AST.Statement.FuncRunStatement node) => "run";
+        public string VisitSwitchStatement(AST.Statement.SwitchStatement node) => "switch";
+        public string VisitCaseStatement(AST.Statement.CaseStatement node) => "case";
+        public string VisitTryStatement(AST.Statement.TryStatement node) => "try";
+        public string VisitEnumInit(AST.Statement.EnumInit node) => "enum";
+        public string VisitSelectStatement(AST.Statement.SelectStatement node) => "select";
+        public string VisitForInStatement(AST.Statement.ForInStatement node) => "forin";
+        public string VisitAsyncForInStatement(AST.Statement.AsyncForInStatement node) => "asyncforin";
+        public string VisitListComprehension(AST.Expression.Intermediates.ListComprehension node) => "comp";
+        public string VisitMatchExpression(AST.Expression.Intermediates.MatchExpression node) => "match";
+        public string VisitGenericInstanceExpression(GenericInstanceExpression node) => "generic";
+        public string VisitStringTemplateValue(AST.Expression.Intermediates.StringTemplateValue node) => "template";
+        public string VisitLambdaExpression(LambdaExpression node) => "lambda";
+        public string VisitFuncInit(AST.Statement.FuncInit node) => "func";
+        public string VisitAsyncFuncInit(AST.Statement.AsyncFuncInit node) => "asyncfunc";
+        public string VisitClassInit(AST.Statement.ClassInit node) => "class";
+        public string VisitExtensionDeclaration(AST.Statement.ExtensionDeclaration node) => "extension";
+        public string VisitNativeStatement(AST.Statement.NativeStatement node) => "native";
+        public string VisitExternStatement(AST.Statement.ExternStatement node) => "extern";
+        public string VisitCallExpression(CallExpression node) => "call";
+        public string VisitAsyncStreamExpression(AsyncStreamExpression node) => "stream";
+        public string VisitImportStatement(AST.Statement.ImportStatement node) => "import";
+        public string VisitLinqExpression(AST.Expression.Linq.LinqExpression node) => "linq";
         public string VisitFunctionCallExpression(FunctionCallExpression node) => $"call {node.FunctionExpression.Accept(this)}";
         public string VisitOperation(Operation node) => node.ToString();
         public string VisitLangId(LangId node) => node.IdName;
@@ -402,7 +402,7 @@ public class ScalarLiteralExpressionTests
     {
         var tokens = LangInterpreter.Tokenize("answer <- 42");
         var block = new LangParser.LangParser(tokens).ParseProgram();
-        var assignment = Assert.IsType<Old8Lang.AST.Statement.SetStatement>(block[0]);
+        var assignment = Assert.IsType<AST.Statement.SetStatement>(block[0]);
         var literal = Assert.IsType<ScalarLiteralExpression>(assignment.Value);
 
         Assert.Equal(LiteralKind.Int, literal.Kind);

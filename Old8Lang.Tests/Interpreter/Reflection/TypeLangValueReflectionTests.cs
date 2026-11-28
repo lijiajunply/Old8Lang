@@ -205,7 +205,7 @@ public class TypeLangValueReflectionTests
         var typeValue = interpreter.Manager.GetValue(new LangId("personType")) as TypeLangValue;
         Assert.NotNull(typeValue);
 
-        var nameArg = new Old8Lang.AST.Expression.Value.StringLangValue("Alice");
+        var nameArg = new StringLangValue("Alice");
         var args = new List<LangExpression> { nameArg };
         var instance = typeValue.CreateInstance(interpreter.Manager, args);
 

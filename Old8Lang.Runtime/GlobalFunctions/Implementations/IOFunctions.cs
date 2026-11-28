@@ -64,7 +64,7 @@ public sealed class PrintFunction : BaseGlobalFunction
     private static string ToString(object? value)
     {
         // 与 ToStr() 同一套格式化：集合/字典/元组不再打印 .NET 类型名
-        return Old8Lang.Runtime.VMValueFormatter.ToDisplayString(value);
+        return VMValueFormatter.ToDisplayString(value);
     }
 }
 
@@ -245,7 +245,7 @@ public sealed class ErrorFunction : BaseGlobalFunction
     private static string ToString(object? value)
     {
         // 与 ToStr() 同一套格式化：集合/字典/元组不再打印 .NET 类型名
-        return Old8Lang.Runtime.VMValueFormatter.ToDisplayString(value);
+        return VMValueFormatter.ToDisplayString(value);
     }
 }
 

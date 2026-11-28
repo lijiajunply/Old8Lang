@@ -136,7 +136,7 @@ public class UnexpectedInputsTests(ITestOutputHelper output)
 
         var ast = interpreter.Build(code);
         // IL 模式在编译期就能发现未知变量/成员/方法（解释器为运行期错误）
-        Assert.Throws<Old8Lang.Error.CompilerException>(() =>
+        Assert.Throws<CompilerException>(() =>
             Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter));
     }
 

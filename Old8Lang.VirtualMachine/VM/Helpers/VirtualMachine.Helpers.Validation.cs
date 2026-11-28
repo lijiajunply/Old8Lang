@@ -110,7 +110,7 @@ public partial class VirtualMachine
 
     private bool IsAccessAllowedFromCallStack(string declaringClassName, bool allowDerived)
     {
-        if (!_callStack.TryPeek(out var callFrame)) return false;
+        if (!CallStack.TryPeek(out var callFrame)) return false;
         var funcName = callFrame.Function.Name;
         var dotIndex = funcName?.IndexOf('.') ?? -1;
         if (dotIndex > 0)
@@ -264,7 +264,7 @@ public partial class VirtualMachine
     public object? ExecuteFunctionAndGetResult(FunctionMetadata function, object?[] args)
     {
         CallFunction(function, args);
-        return _stack.Count > 0 ? _stack.PopObject() : null;
+        return Stack.Count > 0 ? Stack.PopObject() : null;
     }
 
     public object? ExecuteClosureAndGetResult(
@@ -274,7 +274,7 @@ public partial class VirtualMachine
         ConstantPool? closureConstantPool = null)
     {
         CallClosureFunction(function, args, closureEnvironment, closureConstantPool);
-        return _stack.Count > 0 ? _stack.PopObject() : null;
+        return Stack.Count > 0 ? Stack.PopObject() : null;
     }
 }
 

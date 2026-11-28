@@ -727,7 +727,7 @@ asDouble <- c as double
         Assert.Equal(20, enumVal.Value);
         Assert.Equal("Color.Green", enumVal.GetFullName());
 
-        var template = Assert.IsType<Old8Lang.AST.Expression.AnyValues.EnumTemplate>(
+        var template = Assert.IsType<AST.Expression.AnyValues.EnumTemplate>(
             interpreter.Manager.GetAny(new LangId("Color")));
         Assert.True(template.HasMember("Red"));
         Assert.False(template.HasMember("Yellow"));

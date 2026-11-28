@@ -74,16 +74,16 @@ public partial class VirtualMachine
         // 保存调用方的求值栈：生成器执行期间 _stack 要交给生成器自己的栈使用，
         // 与同步生成器 ResumeGenerator 的做法一致。不保存的话，调用方压在栈上的
         // 迭代器对象会被生成器的栈覆盖，恢复后就再也找不回来。
-        var callerStack = _stack.SnapshotBottomToTop();
+        var callerStack = Stack.SnapshotBottomToTop();
 
         // 恢复栈
-        _stack.Clear();
+        Stack.Clear();
         foreach (var item in stack.Reverse())
         {
-            _stack.PushObject(item);
+            Stack.PushObject(item);
         }
 
-        _callStack.Push(frame);
+        CallStack.Push(frame);
 
         try
         {
@@ -140,10 +140,10 @@ public partial class VirtualMachine
         finally
         {
             ExecuteDefers(frame);
-            _callStack.Pop();
+            CallStack.Pop();
 
             // 还原调用方的求值栈
-            _stack.RestoreFromBottom(callerStack);
+            Stack.RestoreFromBottom(callerStack);
         }
     }
 
@@ -175,7 +175,7 @@ public partial class VirtualMachine
             case OpCode.Await:
             {
                 // 从栈中弹出 TaskLangValue (或 Task ID)
-                var value = _stack.PopObject();
+                var value = Stack.PopObject();
 
                 TaskLangValue taskLangValue;
                 if (value is TaskLangValue t)
@@ -196,7 +196,7 @@ public partial class VirtualMachine
                 var result = taskLangValue.Await();
 
                 // 将结果压入栈（还原成栈上的原生表示）
-                _stack.PushObject(UnwrapToVmValue(result));
+                Stack.PushObject(UnwrapToVmValue(result));
             }
                 break;
 
@@ -204,7 +204,7 @@ public partial class VirtualMachine
             {
                 // 异步生成器的 yield 操作
                 // 从栈中弹出要 yield 的值
-                var yieldValue = _stack.PopObject();
+                var yieldValue = Stack.PopObject();
 
                 // 获取当前异步生成器状态
                 if (frame.AsyncGeneratorId.HasValue)
@@ -213,7 +213,7 @@ public partial class VirtualMachine
                     if (_asyncGenerators.TryGetValue(asyncGeneratorId, out var asyncGeneratorState))
                     {
                         // 保存当前执行状态
-                        var stackArray = _stack.ToObjectArrayTopToBottom();
+                        var stackArray = Stack.ToObjectArrayTopToBottom();
                         var stackCopy = new Stack<LangValueType>();
                         foreach (var item in stackArray.Reverse())
                         {

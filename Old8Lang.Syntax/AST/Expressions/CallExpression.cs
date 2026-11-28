@@ -27,7 +27,7 @@ public sealed class CallExpression(
 
     public override string ToString()
     {
-        var arguments = string.Join(", ", this.Arguments.Select(a => a.ToString()));
+        var arguments = string.Join(", ", Arguments.Select(a => a.ToString()));
         return $"{Id}({arguments})";
     }
 }

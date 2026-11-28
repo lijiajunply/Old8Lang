@@ -50,7 +50,7 @@ public class Instruction
     /// <see cref="Old8Lang.Bytecode.VM.GlobalSlot"/>），因此同一份字节码被多个虚拟机实例复用时
     /// 只会退化为一次重新解析，不会读到别的实例的全局值。
     /// </remarks>
-    internal Old8Lang.Bytecode.VM.GlobalSlot? CachedGlobalSlot;
+    internal VM.GlobalSlot? CachedGlobalSlot;
 
     /// <summary>
     /// 设置调试信息

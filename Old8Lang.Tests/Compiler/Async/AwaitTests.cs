@@ -496,7 +496,7 @@ public class AwaitTests(ITestOutputHelper output)
         Assert.Null(exception);
     }
 
-    [Fact(Skip = "Temporarily disabled due to type inference issues with Task.WhenAll in compiler mode")]
+    [Fact]
     public void AwaitWithTaskWhenAll_CompilesAndExecutesCorrectly()
     {
         // Arrange
@@ -521,7 +521,7 @@ public class AwaitTests(ITestOutputHelper output)
                 results <- await Task.WhenAll(tasks)
                 
                 // Task.WhenAll 返回一个包含所有结果的数组
-                Assert.Equal(3, results.Count)
+                Assert.Equal(3, results.Length)
                 Assert.Equal(""result1"", results[0])
                 Assert.Equal(""result2"", results[1])
                 Assert.Equal(""result3"", results[2])
@@ -530,7 +530,7 @@ public class AwaitTests(ITestOutputHelper output)
                 Assert.Equal({""result1"", ""result2"", ""result3""}, finalResults)
             }
             
-            testTaskWhenAll()
+            await testTaskWhenAll()
         ";
         var interpreter = new LangInterpreter();
 
@@ -547,7 +547,7 @@ public class AwaitTests(ITestOutputHelper output)
         Assert.Null(exception);
     }
 
-    [Fact(Skip = "Temporarily disabled due to IL verification issues with Task.WhenAny helper")]
+    [Fact]
     public void AwaitWithTaskWhenAny_CompilesAndExecutesCorrectly()
     {
         // Arrange
@@ -573,7 +573,7 @@ public class AwaitTests(ITestOutputHelper output)
                 return ""first completed""
             }
             
-            result <- testTaskWhenAny()
+            result <- await testTaskWhenAny()
             Assert.Equal(""first completed"", result)
         ";
         var interpreter = new LangInterpreter();

@@ -53,7 +53,7 @@ public sealed class GetAllTypesFunction : BaseGlobalFunction
     protected override object ExecuteInVMInternal(object?[] arguments)
     {
         // 在 VM 模式下，需要从 VMContext 获取当前 VM
-        var vm = Old8Lang.Bytecode.Core.VMContext.CurrentVM;
+        var vm = Bytecode.Core.VMContext.CurrentVM;
         if (vm == null)
         {
             return new List<string>();

@@ -186,7 +186,7 @@ public partial class DictionaryLangValue : LangValueType, ILangList
             }
         }
 
-        throw new Old8Lang.Error.KeyError(this, key.ToDisplayString());
+        throw new KeyError(this, key.ToDisplayString());
     }
 
     public void Set(LangValueType key, LangValueType value)

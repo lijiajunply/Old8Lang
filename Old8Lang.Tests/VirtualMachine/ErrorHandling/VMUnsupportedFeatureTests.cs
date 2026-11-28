@@ -55,7 +55,7 @@ public class VMUnsupportedFeatureTests
         var vm = new VM(Compile("value <- Thread.CurrentThread"));
         vm.Execute();
 
-        var value = Assert.IsType<Old8Lang.AST.Expression.Value.ThreadLangValue>(vm.GetGlobalVariable("value"));
+        var value = Assert.IsType<AST.Expression.Value.ThreadLangValue>(vm.GetGlobalVariable("value"));
         Assert.True(value.Id > 0);
     }
 

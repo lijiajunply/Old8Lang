@@ -23,7 +23,7 @@ public partial class VirtualMachine
             {
                 // 优先使用调用帧的常量池（用于模块导入的函数）
                 var constantPool = frame.ConstantPool ?? _bytecodeFile.ConstantPool;
-                _stack.Push(constantPool.GetConstantValue(instruction.IntOperand));
+                Stack.Push(constantPool.GetConstantValue(instruction.IntOperand));
             }
                 break;
 
@@ -31,14 +31,14 @@ public partial class VirtualMachine
             {
                 // 被闭包按引用捕获的局部变量槽位里放的是共享单元，读取时解引用
                 var localValue = frame.Locals[instruction.IntOperand];
-                _stack.Push(localValue.Kind == VmValueKind.UpValue ? localValue.AsUpValue.Value : localValue);
+                Stack.Push(localValue.Kind == VmValueKind.UpValue ? localValue.AsUpValue.Value : localValue);
             }
                 break;
 
             case OpCode.StoreLocal:
             {
                 int localIndex = instruction.IntOperand;
-                var localValue = _stack.Pop();
+                var localValue = Stack.Pop();
                 // 已装箱的槽位要写进共享单元，而不是把盒子本身替换掉，
                 // 否则闭包持有的盒子会与外层脱离，写回失效
                 if (frame.Locals[localIndex].Kind == VmValueKind.UpValue)
@@ -69,7 +69,7 @@ public partial class VirtualMachine
                 string varName = (string)instruction.Operand!;
                 if (frame.ClosureEnvironment is { IsEmpty: false } closureEnv)
                 {
-                    _stack.Push(ResolveGlobalVmValue(closureEnv, varName, instruction));
+                    Stack.Push(ResolveGlobalVmValue(closureEnv, varName, instruction));
                     break;
                 }
 
@@ -80,14 +80,14 @@ public partial class VirtualMachine
                     instruction.CachedGlobalSlot = slot;
                 }
 
-                _stack.Push(slot.GetValue());
+                Stack.Push(slot.GetValue());
             }
                 break;
 
             case OpCode.StoreGlobal:
             {
                 string varName = (string)instruction.Operand!;
-                var globalValue = _stack.Pop();
+                var globalValue = Stack.Pop();
                 // 被闭包捕获的名字写进共享单元；否则写全局表
                 if (frame.ClosureEnvironment is null or { IsEmpty: true })
                 {
@@ -108,27 +108,27 @@ public partial class VirtualMachine
                 break;
 
             case OpCode.Pop:
-                _stack.PopDiscard();
+                Stack.PopDiscard();
                 break;
 
             case OpCode.Dup:
-                _stack.Dup();
+                Stack.Dup();
                 break;
 
             case OpCode.LoadNull:
-                _stack.PushNull();
+                Stack.PushNull();
                 break;
 
             case OpCode.LoadTrue:
-                _stack.PushBool(true);
+                Stack.PushBool(true);
                 break;
 
             case OpCode.LoadFalse:
-                _stack.PushBool(false);
+                Stack.PushBool(false);
                 break;
 
             case OpCode.Swap:
-                _stack.Swap();
+                Stack.Swap();
                 break;
         }
     }

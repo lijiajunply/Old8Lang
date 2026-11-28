@@ -22,7 +22,7 @@ public partial class VirtualMachine
 
             case OpCode.JumpIfFalse:
             {
-                if (!ToBool(_stack.Pop()))
+                if (!ToBool(Stack.Pop()))
                 {
                     frame.IP = instruction.IntOperand;
                 }
@@ -31,7 +31,7 @@ public partial class VirtualMachine
 
             case OpCode.JumpIfTrue:
             {
-                if (ToBool(_stack.Pop()))
+                if (ToBool(Stack.Pop()))
                 {
                     frame.IP = instruction.IntOperand;
                 }
@@ -59,13 +59,13 @@ public partial class VirtualMachine
                     var args = new object?[argCount];
                     for (int i = argCount - 1; i >= 0; i--)
                     {
-                        args[i] = _stack.PopObject();
+                        args[i] = Stack.PopObject();
                     }
 
                     // 调用原生函数
                     // 必须无条件压入：原生函数常常没有返回值（如 PrintLine、Sleep），
                     // 但调用方按"一次调用在栈上留下一个值"的约定消费，漏压会导致栈失衡
-                    _stack.PushObject(CallNativeFunction(funcName, args));
+                    Stack.PushObject(CallNativeFunction(funcName, args));
                 }
                 else
                 {
@@ -79,19 +79,19 @@ public partial class VirtualMachine
                     var namedArgValues = new object?[namedCount];
                     for (int i = namedCount - 1; i >= 0; i--)
                     {
-                        namedArgValues[i] = _stack.PopObject();
+                        namedArgValues[i] = Stack.PopObject();
                     }
 
                     var positionalArgs = new object?[positionalCount];
                     for (int i = positionalCount - 1; i >= 0; i--)
                     {
-                        positionalArgs[i] = _stack.PopObject();
+                        positionalArgs[i] = Stack.PopObject();
                     }
 
                     // 调用原生函数
                     // 必须无条件压入：原生函数常常没有返回值（如 PrintLine、Sleep），
                     // 但调用方按"一次调用在栈上留下一个值"的约定消费，漏压会导致栈失衡
-                    _stack.PushObject(CallNamedNativeFunction(funcName, positionalArgs, namedArgNames, namedArgValues));
+                    Stack.PushObject(CallNamedNativeFunction(funcName, positionalArgs, namedArgNames, namedArgValues));
                 }
             }
                 break;
@@ -108,7 +108,7 @@ public partial class VirtualMachine
                 // 检查返回值类型
                 if (!string.IsNullOrEmpty(frame.Function.ReturnType) && frame.Function.ReturnType != "void")
                 {
-                    var returnValue = _stack.Count > 0 ? _stack.Peek() : VmValue.Null;
+                    var returnValue = Stack.Count > 0 ? Stack.Peek() : VmValue.Null;
                     if (!CheckTypeMatch(frame.Function.ReturnType, returnValue))
                     {
                         var actualType = GetValueTypeName(returnValue);
@@ -151,7 +151,7 @@ public partial class VirtualMachine
                 if (funcIndex >= 0 && funcIndex < _bytecodeFile.Functions.Count)
                 {
                     var funcMeta = _bytecodeFile.Functions[funcIndex];
-                    _stack.PushRef(funcMeta);
+                    Stack.PushRef(funcMeta);
                 }
                 else
                 {
@@ -224,7 +224,7 @@ public partial class VirtualMachine
                         localCapturedCells,
                         frame.ClosureEnvironment);
                 var closure = new ClosureValue(funcMeta, closureEnvironment);
-                _stack.PushRef(closure);
+                Stack.PushRef(closure);
             }
                 break;
         }

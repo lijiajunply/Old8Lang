@@ -19,12 +19,12 @@ public partial class VirtualMachine
             case OpCode.Cast:
             {
                 var targetTypeName = (string)instruction.Operand!;
-                var vmValue = _stack.Pop();
+                var vmValue = Stack.Pop();
 
                 // 1. 如果类型完全匹配（包括泛型检查），直接返回原值
                 if (CheckTypeMatch(targetTypeName, vmValue))
                 {
-                    _stack.Push(vmValue);
+                    Stack.Push(vmValue);
                     break;
                 }
 
@@ -35,12 +35,12 @@ public partial class VirtualMachine
                     // 否则 Convert.ToInt32(EnumLangValue) 会因不实现 IConvertible 抛 CastError。
                     var rawValue = value switch
                     {
-                        Old8Lang.AST.Expression.Value.EnumLangValue enumValue => enumValue.Value,
-                        Old8Lang.AST.Expression.Value.IntLangValue intValue => intValue.Value,
-                        Old8Lang.AST.Expression.Value.DoubleLangValue doubleValue => doubleValue.Value,
-                        Old8Lang.AST.Expression.Value.BoolLangValue boolValue => boolValue.Value,
-                        Old8Lang.AST.Expression.Value.CharLangValue charValue => charValue.Value,
-                        Old8Lang.AST.Expression.Value.StringLangValue stringValue => stringValue.Value,
+                        EnumLangValue enumValue => enumValue.Value,
+                        IntLangValue intValue => intValue.Value,
+                        DoubleLangValue doubleValue => doubleValue.Value,
+                        BoolLangValue boolValue => boolValue.Value,
+                        CharLangValue charValue => charValue.Value,
+                        StringLangValue stringValue => stringValue.Value,
                         _ => value
                     };
 
@@ -66,7 +66,7 @@ public partial class VirtualMachine
                                 targetClass, instruction),
                         _ => value // 其他类型直接返回原值
                     };
-                    _stack.PushObject(convertedValue);
+                    Stack.PushObject(convertedValue);
                 }
                 catch (Exception ex)
                 {
@@ -79,14 +79,14 @@ public partial class VirtualMachine
             case OpCode.IsType:
             {
                 var targetTypeName = (string)instruction.Operand!;
-                var value = _stack.Pop();
-                _stack.PushBool(CheckTypeMatch(targetTypeName, value));
+                var value = Stack.Pop();
+                Stack.PushBool(CheckTypeMatch(targetTypeName, value));
             }
                 break;
 
             case OpCode.TypeOf:
             {
-                var vmValue = _stack.Pop();
+                var vmValue = Stack.Pop();
                 string typeName = vmValue.Kind switch
                 {
                     VmValueKind.Null => "null",
@@ -105,7 +105,7 @@ public partial class VirtualMachine
                     }
                 };
 
-                _stack.PushRef(typeName);
+                Stack.PushRef(typeName);
             }
                 break;
 

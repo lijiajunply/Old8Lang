@@ -48,7 +48,7 @@ public class ExceptionWrapper
 
         if (exception is LangThrownException thrown)
         {
-            return Old8Lang.InstanceMethods.Core.IlValueBridge.Unwrap(thrown.Value);
+            return InstanceMethods.Core.IlValueBridge.Unwrap(thrown.Value);
         }
 
         return new ExceptionWrapper(exception);

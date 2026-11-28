@@ -69,7 +69,7 @@ public class TypeGetMethodNamesMethod : BaseInstanceMethod
 
     protected override object ExecuteInVMInternal(object? instance, object?[] arguments)
     {
-        var typeName = Old8Lang.Runtime.VMReflectionHelper.ResolveTypeName(instance);
+        var typeName = Runtime.VMReflectionHelper.ResolveTypeName(instance);
         if (string.IsNullOrEmpty(typeName))
         {
             throw new InvalidOperationException(
@@ -77,18 +77,18 @@ public class TypeGetMethodNamesMethod : BaseInstanceMethod
         }
 
         // 在 VM 模式下，需要从 VMContext 获取类型信息
-        var vm = Old8Lang.Bytecode.Core.VMContext.CurrentVM;
+        var vm = Bytecode.Core.VMContext.CurrentVM;
         if (vm == null)
         {
             return new List<string>();
         }
 
-        var classMetadata = Old8Lang.Runtime.VMReflectionHelper.GetClassMetadata(vm, typeName);
+        var classMetadata = Runtime.VMReflectionHelper.GetClassMetadata(vm, typeName);
         if (classMetadata == null)
         {
             return new List<string>();
         }
 
-        return Old8Lang.Runtime.VMReflectionHelper.GetAllMethodNames(vm, classMetadata).Cast<object?>().ToList();
+        return Runtime.VMReflectionHelper.GetAllMethodNames(vm, classMetadata).Cast<object?>().ToList();
     }
 }

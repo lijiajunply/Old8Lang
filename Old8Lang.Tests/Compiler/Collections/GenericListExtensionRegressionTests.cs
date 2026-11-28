@@ -41,10 +41,10 @@ Assert.Equal(1, items.Length())
         var interpreter = new LangInterpreter();
         var action = Old8Lang.Compiler.Compiler.Compile(interpreter.Build(code), "test", interpreter);
         action();
-        var items = Assert.IsType<Old8Lang.AST.Expression.Value.ArrayLangValue>(
-            interpreter.Manager.GetValue(new Old8Lang.AST.Expression.LangId("items")));
-        var receiver = Assert.IsType<Old8Lang.AST.Expression.Value.ListLangValue>(
-            interpreter.Manager.GetValue(new Old8Lang.AST.Expression.LangId("receiver")));
+        var items = Assert.IsType<AST.Expression.Value.ArrayLangValue>(
+            interpreter.Manager.GetValue(new AST.Expression.LangId("items")));
+        var receiver = Assert.IsType<AST.Expression.Value.ListLangValue>(
+            interpreter.Manager.GetValue(new AST.Expression.LangId("receiver")));
         Assert.Same(items, items.RunResult[0]);
         Assert.Same(items, receiver.Values[0]);
     }
@@ -302,9 +302,9 @@ Assert.Equal(2, res)
         using (var writer = new BinaryWriter(ms, System.Text.Encoding.UTF8, leaveOpen: true))
             bytecode.WriteTo(writer);
         ms.Position = 0;
-        Old8Lang.Bytecode.BytecodeFile reloaded;
+        Bytecode.BytecodeFile reloaded;
         using (var reader = new BinaryReader(ms, System.Text.Encoding.UTF8, leaveOpen: true))
-            reloaded = Old8Lang.Bytecode.BytecodeFile.ReadFrom(reader);
+            reloaded = Bytecode.BytecodeFile.ReadFrom(reader);
         var vm = new Old8Lang.Bytecode.VM.VirtualMachine(reloaded);
         vm.Execute();
         Assert.Equal(2, vm.GetGlobalVariable("res"));

@@ -94,7 +94,7 @@ public class LangInterpreter : ILangInterpreter, ISourceContextProvider
     {
         ArgumentNullException.ThrowIfNull(standardLibraries);
         PerformanceMonitor = performanceMonitor;
-        if (performanceMonitor is global::Old8Lang.Profiler.PerformanceMonitor concretePerformanceMonitor)
+        if (performanceMonitor is PerformanceMonitor concretePerformanceMonitor)
         {
             concretePerformanceMonitor.SetObjectPoolStatisticsSource(ObjectPoolManager.Instance.GetAllStats);
         }

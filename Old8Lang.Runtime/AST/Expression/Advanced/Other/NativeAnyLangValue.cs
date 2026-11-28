@@ -98,7 +98,7 @@ public partial class NativeAnyLangValue : ImportInfo
     /// <summary>
     /// 按实参个数与可转换性选择构造函数（构造函数在初始化时只固定了一个，带参构造需要重新匹配）。
     /// </summary>
-    private System.Reflection.ConstructorInfo? SelectConstructor(object[] args, out object?[]? converted)
+    private ConstructorInfo? SelectConstructor(object[] args, out object?[]? converted)
     {
         converted = null;
         if (Constructor is { } fixedCtor && fixedCtor.GetParameters().Length == args.Length)
@@ -221,7 +221,7 @@ public partial class NativeAnyLangValue : ImportInfo
 
     public override TResult Accept<TResult>(IVisitor<TResult> visitor)
     {
-        return ((Old8Lang.AST.Visitor.IRuntimeVisitor<TResult>)visitor).VisitNativeAnyLangValue(this);
+        return ((IRuntimeVisitor<TResult>)visitor).VisitNativeAnyLangValue(this);
     }
 
     /// <summary>

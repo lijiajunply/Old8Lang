@@ -235,7 +235,7 @@ public class GenericFunctionTests(ITestOutputHelper output)
         Assert.Null(exception);
     }
 
-    [Fact(Skip = "Generic nullable division returns int 2 instead of double 2.5 in compiler mode")]
+    [Fact]
     public void GenericNullableType_CompilesAndExecutesCorrectly()
     {
         // Arrange
@@ -269,7 +269,7 @@ public class GenericFunctionTests(ITestOutputHelper output)
         Assert.Null(exception);
     }
 
-    [Fact(Skip = "GenericMethodSpecializer.CreateSpecialization 编译期无限递归导致栈溢出崩溃")]
+    [Fact]
     public void GenericRecursiveFunction_CompilesAndExecutesCorrectly()
     {
         // Arrange

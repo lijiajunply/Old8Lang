@@ -387,10 +387,10 @@ public partial class TypeInferenceVisitor
     {
         var right = node.Opera == LangTokenType.Dot ? CallSyntaxAdapter.Normalize(node.Right) : node.Right;
 
-        // 同一个方法 AST 会被多个泛型类特化复用；node 的字段类型依当前特化而变。
+        // 同一个方法 AST 会被多个泛型函数/泛型类特化复用；缓存按 LocalManager 隔离，避免跨特化污染。
         var isThisField = node.Opera == LangTokenType.Dot &&
                           (node.Left is LangId { IdName: "this" } || node.Left is ThisExpression) && right is LangId;
-        if (!isThisField && OperationTypeCache.Get(node) is { } cachedType) return cachedType;
+        if (!isThisField && OperationTypeCache.Get(local, node) is { } cachedType) return cachedType;
         if (node.Opera == LangTokenType.Dot && StandardLibraryILHelper.TryResolve(node.Left, right, local, out var library, out var libraryCall))
             return StandardLibraryILHelper.GetReturnType(library, libraryCall);
         if (node.Opera == LangTokenType.Dot && StandardLibraryILHelper.TryResolveStaticMember(node.Left, right, local, out _, out _))

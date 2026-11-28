@@ -78,7 +78,7 @@ sleepMethod <- Thread.Sleep";
         var method = Assert.IsType<ThreadLangValue>(interpreter.Manager.GetValue(new LangId("methodThread")));
         Assert.Equal(Environment.CurrentManagedThreadId, property.ManagedThreadId);
         Assert.Equal(Environment.CurrentManagedThreadId, method.ManagedThreadId);
-        Assert.IsType<Old8Lang.AST.Expression.StaticValues.ThreadStaticMethodWrapper>(
+        Assert.IsType<AST.Expression.StaticValues.ThreadStaticMethodWrapper>(
             interpreter.Manager.GetValue(new LangId("sleepMethod")));
     }
 

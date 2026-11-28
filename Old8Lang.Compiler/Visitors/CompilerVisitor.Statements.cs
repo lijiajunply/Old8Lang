@@ -568,7 +568,7 @@ public partial class CompilerVisitor
             return null;
         }
 
-        if (Old8Lang.Runtime.LiteralCollectionRuntimeFactory.TryCreateNestedIndex(node.LeftExpression, out var nestedIndexAccess))
+        if (Runtime.LiteralCollectionRuntimeFactory.TryCreateNestedIndex(node.LeftExpression, out var nestedIndexAccess))
         {
             // 成员或方法结果后再索引的赋值（例如 node.data_dict[key]）会被解析成
             // NestedIndexAccess。静态元素类型在这里通常不可知，交给运行期分派，
@@ -1009,7 +1009,7 @@ public partial class CompilerVisitor
                     }
                     // 如果是TypeBuilder或typeof(object)，跳过此操作
                 }
-                else if (operation.Opera == LangTokenType.Dot && Old8Lang.Runtime.LiteralCollectionRuntimeFactory.TryCreateIndex(operation.Right, out var nestedListItem))
+                else if (operation.Opera == LangTokenType.Dot && Runtime.LiteralCollectionRuntimeFactory.TryCreateIndex(operation.Right, out var nestedListItem))
                 {
                     // 解析器将 obj.field[key] 表示为 obj . LangListItem(field, key)，
                     // 而不是以 obj.field 作为索引表达式。先在运行期读取该字段，再用
@@ -1146,7 +1146,7 @@ public partial class CompilerVisitor
                     }
                 }
             }
-            else if (Old8Lang.Runtime.LiteralCollectionRuntimeFactory.TryCreateIndex(node.LeftExpression, out var listItem))
+            else if (Runtime.LiteralCollectionRuntimeFactory.TryCreateIndex(node.LeftExpression, out var listItem))
             {
                 // 处理LangListItem索引赋值: listId[key] <- value
                 // 获取集合类型
@@ -1432,7 +1432,7 @@ public partial class CompilerVisitor
         // 检查是否在finally块中使用了return语句，这在.NET IL中是不允许的
         if (local.IsInFinallyBlock)
         {
-            throw new Error.CompilerException("在finally块中不允许使用return语句", node.Position);
+            throw new CompilerException("在finally块中不允许使用return语句", node.Position);
         }
 
         // 获取返回值表达式的类型
@@ -2000,7 +2000,7 @@ public partial class CompilerVisitor
 
         node.Expression.Accept(this);
         var outputType = node.Expression is Operation operation
-            ? OperationTypeCache.Get(operation) ?? node.Expression.Accept(new TypeInferenceVisitor(local))
+            ? OperationTypeCache.Get(local, operation) ?? node.Expression.Accept(new TypeInferenceVisitor(local))
             : node.Expression.Accept(new TypeInferenceVisitor(local));
         if (outputType != typeof(void)) ilGenerator.Emit(OpCodes.Pop);
         return null;

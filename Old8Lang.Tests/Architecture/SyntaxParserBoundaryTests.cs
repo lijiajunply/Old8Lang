@@ -13,14 +13,14 @@ public class SyntaxParserBoundaryTests
         var assembly = typeof(LiteralSyntax).Assembly;
 
         Assert.Same(assembly, typeof(Old8Lang.LangParser.LangParser).Assembly);
-        Assert.Same(assembly, typeof(Old8Lang.LangParser.Parsers.PrimaryParser).Assembly);
-        Assert.Same(assembly, typeof(Old8Lang.LangParser.Parsers.ExpressionParser).Assembly);
-        Assert.Same(assembly, typeof(Old8Lang.LangParser.Parsers.StatementParser).Assembly);
-        Assert.Same(assembly, typeof(Old8Lang.LangParser.Parsers.FunctionParser).Assembly);
-        Assert.Same(assembly, typeof(Old8Lang.LangParser.Parsers.ClassParser).Assembly);
-        Assert.Same(assembly, typeof(Old8Lang.LangParser.Parsers.LinqParser).Assembly);
-        Assert.Same(assembly, typeof(Old8Lang.LangParser.Parsers.ExtensionParser).Assembly);
-        Assert.Same(assembly, typeof(Old8Lang.LangParser.Core.ParserBase).Assembly);
+        Assert.Same(assembly, typeof(LangParser.Parsers.PrimaryParser).Assembly);
+        Assert.Same(assembly, typeof(LangParser.Parsers.ExpressionParser).Assembly);
+        Assert.Same(assembly, typeof(LangParser.Parsers.StatementParser).Assembly);
+        Assert.Same(assembly, typeof(LangParser.Parsers.FunctionParser).Assembly);
+        Assert.Same(assembly, typeof(LangParser.Parsers.ClassParser).Assembly);
+        Assert.Same(assembly, typeof(LangParser.Parsers.LinqParser).Assembly);
+        Assert.Same(assembly, typeof(LangParser.Parsers.ExtensionParser).Assembly);
+        Assert.Same(assembly, typeof(LangParser.Core.ParserBase).Assembly);
 
         Assert.DoesNotContain(
             assembly.GetReferencedAssemblies(),

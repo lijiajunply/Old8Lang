@@ -19,7 +19,7 @@ public partial class VirtualMachine
         {
             case OpCode.Throw:
             {
-                var exceptionValue = _stack.Pop();
+                var exceptionValue = Stack.Pop();
                 // 快速路径：当前帧存在匹配的 catch 块时直接跳转，跳过 new VmException + .NET 栈回溯
                 if (TryHandleExceptionInline(exceptionValue, frame, frame.Function))
                     return;
@@ -43,7 +43,7 @@ public partial class VirtualMachine
                     EndIP = -1, // 将在TryEnd时设置
                     InFinally = false
                 };
-                _exceptionHandlers.Push(handler);
+                ExceptionHandlers.Push(handler);
             }
                 break;
 
@@ -51,9 +51,9 @@ public partial class VirtualMachine
             {
                 // TryEnd操作：结束try块
                 // 如果没有异常，跳过catch块，执行finally块（如果有）
-                if (_exceptionHandlers.Count > 0)
+                if (ExceptionHandlers.Count > 0)
                 {
-                    var handler = _exceptionHandlers.Peek();
+                    var handler = ExceptionHandlers.Peek();
 
                     // 如果有finally块，跳转到finally
                     if (handler.FinallyIP >= 0)
@@ -81,9 +81,9 @@ public partial class VirtualMachine
             {
                 // CatchEnd操作：结束catch块
                 // 跳转到finally块（如果有）或结束
-                if (_exceptionHandlers.Count > 0)
+                if (ExceptionHandlers.Count > 0)
                 {
-                    var handler = _exceptionHandlers.Peek();
+                    var handler = ExceptionHandlers.Peek();
 
                     // 如果有finally块，跳转到finally
                     if (handler.FinallyIP >= 0)
@@ -102,9 +102,9 @@ public partial class VirtualMachine
             case OpCode.FinallyBegin:
             {
                 // FinallyBegin操作：开始finally块
-                if (_exceptionHandlers.Count > 0)
+                if (ExceptionHandlers.Count > 0)
                 {
-                    var handler = _exceptionHandlers.Peek();
+                    var handler = ExceptionHandlers.Peek();
                     handler.InFinally = true;
                 }
             }
@@ -114,9 +114,9 @@ public partial class VirtualMachine
             {
                 // FinallyEnd操作：结束finally块
                 // 弹出异常处理器
-                if (_exceptionHandlers.Count > 0)
+                if (ExceptionHandlers.Count > 0)
                 {
-                    _exceptionHandlers.Pop();
+                    ExceptionHandlers.Pop();
                 }
             }
                 break;
@@ -125,7 +125,7 @@ public partial class VirtualMachine
             {
                 // 栈顶: object
                 // 操作数: fieldName (string)
-                var obj = _stack.PopObject();
+                var obj = Stack.PopObject();
                 string fieldName = (string)instruction.Operand!;
 
                 if (obj == null)
@@ -151,12 +151,12 @@ public partial class VirtualMachine
                     if (nestedClass != null)
                     {
                         // 这是嵌套类访问，将嵌套类的 ClassMetadata 压入栈
-                        _stack.PushRef(nestedClass);
+                        Stack.PushRef(nestedClass);
                     }
                     else if (classMetadata.StaticFieldValues.TryGetValue(fieldName, out var staticValue))
                     {
                         ValidateFieldAccess(classMetadata.Name, fieldName, isStatic: true, instruction);
-                        _stack.PushObject(staticValue);
+                        Stack.PushObject(staticValue);
                     }
                     else
                     {
@@ -169,7 +169,7 @@ public partial class VirtualMachine
                     if (bytecodeObj.Fields.TryGetValue(fieldName, out var value))
                     {
                         ValidateFieldAccess(bytecodeObj.ClassName, fieldName, isStatic: false, instruction, bytecodeObj.Metadata);
-                        _stack.PushObject(value);
+                        Stack.PushObject(value);
                     }
                     else
                     {
@@ -181,7 +181,7 @@ public partial class VirtualMachine
                 {
                     if (dictObj.TryGetValue(fieldName, out var value))
                     {
-                        _stack.PushObject(value);
+                        Stack.PushObject(value);
                     }
                     else
                     {
@@ -189,7 +189,7 @@ public partial class VirtualMachine
                     }
                 }
                 // 如果是 from 导入的原生类（访问静态成员，如 Vector2.Zero）
-                else if (obj is Old8Lang.AST.Expression.Intermediates.NativeAnyLangValue
+                else if (obj is AST.Expression.Intermediates.NativeAnyLangValue
                          { InstanceObj: null, ClassType: { } nativeStaticType })
                 {
                     const System.Reflection.BindingFlags staticFlags =
@@ -201,7 +201,7 @@ public partial class VirtualMachine
                         throw new AttributeError(GetPosition(instruction), fieldName, nativeStaticType.Name);
                     }
 
-                    _stack.PushObject(staticProperty is not null
+                    Stack.PushObject(staticProperty is not null
                         ? staticProperty.GetValue(null)
                         : staticField!.GetValue(null));
                 }
@@ -209,7 +209,7 @@ public partial class VirtualMachine
                 else if (obj is EnumTemplate enumTemplate)
                 {
                     var enumValue = enumTemplate.GetMemberValue(fieldName);
-                    _stack.PushRef(enumValue);
+                    Stack.PushRef(enumValue);
                 }
                 else if (obj is Tuple<object?, object?> tuple)
                 {
@@ -234,7 +234,7 @@ public partial class VirtualMachine
                             }
                         }
 
-                        _stack.PushInt(length);
+                        Stack.PushInt(length);
                     }
                     else if (fieldName.StartsWith("Item") && int.TryParse(fieldName.Substring(4), out int itemNum))
                     {
@@ -258,7 +258,7 @@ public partial class VirtualMachine
                             {
                                 if (currentIdx == idx)
                                 {
-                                    _stack.PushObject(current);
+                                    Stack.PushObject(current);
                                     found = true;
                                     break;
                                 }
@@ -281,7 +281,7 @@ public partial class VirtualMachine
                 {
                     if (fieldName == "Length")
                     {
-                        _stack.PushInt(list.Count);
+                        Stack.PushInt(list.Count);
                     }
                     else
                     {
@@ -290,14 +290,14 @@ public partial class VirtualMachine
                         var prop = type.GetProperty(fieldName);
                         if (prop != null)
                         {
-                            _stack.PushObject(prop.GetValue(obj));
+                            Stack.PushObject(prop.GetValue(obj));
                         }
                         else
                         {
                             var field = type.GetField(fieldName);
                             if (field != null)
                             {
-                                _stack.PushObject(field.GetValue(obj));
+                                Stack.PushObject(field.GetValue(obj));
                             }
                             else
                             {
@@ -310,7 +310,7 @@ public partial class VirtualMachine
                 {
                     if (fieldName == "Length")
                     {
-                        _stack.PushInt(array.Length);
+                        Stack.PushInt(array.Length);
                     }
                     else
                     {
@@ -319,7 +319,7 @@ public partial class VirtualMachine
                         var prop = type.GetProperty(fieldName);
                         if (prop != null)
                         {
-                            _stack.PushObject(prop.GetValue(obj));
+                            Stack.PushObject(prop.GetValue(obj));
                         }
                         else
                         {
@@ -327,10 +327,10 @@ public partial class VirtualMachine
                         }
                     }
                 }
-                else if (obj is System.Collections.IDictionary dictionaryAttr && fieldName == "Length")
+                else if (obj is IDictionary dictionaryAttr && fieldName == "Length")
                 {
                     // 字典：Length 与 Count 等价（其他属性继续走下面的反射路径）
-                    _stack.PushInt(dictionaryAttr.Count);
+                    Stack.PushInt(dictionaryAttr.Count);
                 }
                 else
                 {
@@ -340,7 +340,7 @@ public partial class VirtualMachine
                     // 特殊处理：Old8Exception 的 Message 属性返回 OriginalMessage
                     if (obj is Old8Exception old8Ex && fieldName == "Message")
                     {
-                        _stack.PushRef(old8Ex.OriginalMessage);
+                        Stack.PushRef(old8Ex.OriginalMessage);
                     }
                     else
                     {
@@ -348,7 +348,7 @@ public partial class VirtualMachine
                         var property = objType.GetProperty(fieldName);
                         if (property != null)
                         {
-                            _stack.PushObject(property.GetValue(obj));
+                            Stack.PushObject(property.GetValue(obj));
                         }
                         else
                         {
@@ -356,7 +356,7 @@ public partial class VirtualMachine
                             var field = objType.GetField(fieldName);
                             if (field != null)
                             {
-                                _stack.PushObject(field.GetValue(obj));
+                                Stack.PushObject(field.GetValue(obj));
                             }
                             else
                             {
@@ -372,8 +372,8 @@ public partial class VirtualMachine
             {
                 // 栈布局(从栈顶到栈底): value, object
                 // 操作数: fieldName (string)
-                var value = _stack.PopObject();
-                var obj = _stack.PopObject();
+                var value = Stack.PopObject();
+                var obj = Stack.PopObject();
                 string fieldName = (string)instruction.Operand!;
 
                 if (obj == null)
@@ -441,7 +441,7 @@ public partial class VirtualMachine
             {
                 // 栈顶: this 实例
                 // 操作数: fieldName (string)
-                var thisInstance = _stack.PopObject();
+                var thisInstance = Stack.PopObject();
                 string fieldName = (string)instruction.Operand!;
 
                 if (thisInstance == null)
@@ -457,7 +457,7 @@ public partial class VirtualMachine
                     // 因此我们直接从对象的 Fields 字典中获取字段值即可
 
                     // 字段不存在,返回 null
-                    _stack.PushObject(bytecodeObj.Fields.GetValueOrDefault(fieldName));
+                    Stack.PushObject(bytecodeObj.Fields.GetValueOrDefault(fieldName));
                 }
                 else
                 {
@@ -474,7 +474,7 @@ public partial class VirtualMachine
                     var property = baseType.GetProperty(fieldName);
                     if (property != null)
                     {
-                        _stack.PushObject(property.GetValue(thisInstance));
+                        Stack.PushObject(property.GetValue(thisInstance));
                     }
                     else
                     {
@@ -482,7 +482,7 @@ public partial class VirtualMachine
                         var field = baseType.GetField(fieldName);
                         if (field != null)
                         {
-                            _stack.PushObject(field.GetValue(thisInstance));
+                            Stack.PushObject(field.GetValue(thisInstance));
                         }
                         else
                         {
@@ -497,8 +497,8 @@ public partial class VirtualMachine
             {
                 // 栈布局(从栈顶到栈底): value, this 实例
                 // 操作数: fieldName (string)
-                var value = _stack.PopObject();
-                var thisInstance = _stack.PopObject();
+                var value = Stack.PopObject();
+                var thisInstance = Stack.PopObject();
                 string fieldName = (string)instruction.Operand!;
 
                 if (thisInstance == null)
@@ -593,7 +593,7 @@ public partial class VirtualMachine
                 }
 
                 var classFile = FindClassModule(classMetadata)?.BytecodeFile ?? _bytecodeFile;
-                _stack.PushRef(AllocateObjectInstance(classMetadata, classFile));
+                Stack.PushRef(AllocateObjectInstance(classMetadata, classFile));
             }
                 break;
 
@@ -608,7 +608,7 @@ public partial class VirtualMachine
                 var args = new object?[argCount - 1]; // -1 因为第一个参数是对象本身
                 for (int i = args.Length - 1; i >= 0; i--)
                 {
-                    args[i] = _stack.PopObject();
+                    args[i] = Stack.PopObject();
                 }
 
                 // 命名参数的值紧跟在位置参数之后；只有标准库模块调用按名绑定，
@@ -622,13 +622,13 @@ public partial class VirtualMachine
                 }
 
                 // 弹出对象
-                var obj = _stack.PopObject();
+                var obj = Stack.PopObject();
                 if (obj == null)
                 {
                     // 与解释器/IL 一致：空引用的 ToStr() 返回 "null"。
                     if (methodName == "ToStr" && args.Length == 0)
                     {
-                        _stack.PushRef("null");
+                        Stack.PushRef("null");
                         break;
                     }
 
@@ -728,12 +728,12 @@ public partial class VirtualMachine
                             }
 
                             // 将对象实例压入栈
-                            _stack.PushRef(nestedObj);
+                            Stack.PushRef(nestedObj);
                         }
                         else
                         {
                             // 没有参数，只是访问嵌套类，将嵌套类的 ClassMetadata 压入栈
-                            _stack.PushRef(nestedClass);
+                            Stack.PushRef(nestedClass);
                         }
                         break;
                     }
@@ -751,7 +751,7 @@ public partial class VirtualMachine
                     {
                         // 检查是否在类内部调用
                         bool isInternalCall = false;
-                        foreach (var callFrame in _callStack)
+                        foreach (var callFrame in CallStack)
                         {
                             // 检查当前帧的第一个参数（this）是否是同一个类的实例
                             if (callFrame.Arguments is { Length: > 0 } &&
@@ -873,12 +873,12 @@ public partial class VirtualMachine
                         // 若类没有同名方法，但存在保存函数值的字段（如 `this.validator(x)`），
                         // 按字段访问权限校验后直接调用该函数值
                         if (bytecodeObj.Fields.TryGetValue(methodName, out var fieldValue) &&
-                            fieldValue is FunctionMetadata or Old8Lang.Bytecode.Closures.ClosureValue)
+                            fieldValue is FunctionMetadata or Closures.ClosureValue)
                         {
                             ValidateFieldAccess(bytecodeObj.ClassName, methodName, isStatic: false, instruction,
                                 objectClass: classMetadata);
                             var fieldCallResult = CallFunctionObject(fieldValue, args);
-                            _stack.Push(VmValue.FromObject(fieldCallResult));
+                            Stack.Push(VmValue.FromObject(fieldCallResult));
                             break;
                         }
 
@@ -890,7 +890,7 @@ public partial class VirtualMachine
                     {
                         // 检查是否在类内部调用（通过检查当前调用栈中是否有该类的方法）
                         bool isInternalCall = false;
-                        foreach (var callFrame in _callStack)
+                        foreach (var callFrame in CallStack)
                         {
                             // 检查当前帧的第一个参数（this）是否是同一个类的实例
                             if (callFrame.Arguments is { Length: > 0 } &&
@@ -938,7 +938,7 @@ public partial class VirtualMachine
                     // 必须无条件压入：调用方按"一次调用在栈上留下一个值"的约定消费。
                     // 无返回值的方法本身就以 VoidLangValue 表示"没有值"，直接压它即可
                     // （与解释器语义一致：void 不是 null）；漏压则会把无返回值的方法调用当作值使用时读到空栈。
-                    _stack.PushObject(result);
+                    Stack.PushObject(result);
                 }
             }
                 break;
@@ -947,7 +947,7 @@ public partial class VirtualMachine
             {
                 // 加载当前实例（this）作为 super 上下文
                 // this 是方法的第一个参数
-                var currentFrame = _callStack.Peek();
+                var currentFrame = CallStack.Peek();
 
                 // 优先从 Arguments 中获取 this（第一个参数）
                 if (currentFrame.Arguments is { Length: > 0 })
@@ -958,7 +958,7 @@ public partial class VirtualMachine
                         throw new StateError(GetPosition(instruction), "super 只能在实例方法中使用");
                     }
 
-                    _stack.PushObject(thisInstance);
+                    Stack.PushObject(thisInstance);
                 }
                 // 如果 Arguments 为空，尝试从 Locals 获取
                 else if (currentFrame.Locals.Length > 0)
@@ -970,7 +970,7 @@ public partial class VirtualMachine
                         throw new StateError(GetPosition(instruction), "super 只能在实例方法中使用");
                     }
 
-                    _stack.Push(resolved);
+                    Stack.Push(resolved);
                 }
                 else
                 {
@@ -983,7 +983,7 @@ public partial class VirtualMachine
             {
                 // 加载当前实例（this）
                 // this 是方法的第一个参数
-                var currentFrame = _callStack.Peek();
+                var currentFrame = CallStack.Peek();
 
                 // 优先从 Arguments 中获取 this（第一个参数）
                 if (currentFrame.Arguments is { Length: > 0 })
@@ -994,7 +994,7 @@ public partial class VirtualMachine
                         throw new StateError(GetPosition(instruction), "this 只能在实例方法中使用");
                     }
 
-                    _stack.PushObject(thisInstance);
+                    Stack.PushObject(thisInstance);
                 }
                 // 如果 Arguments 为空，尝试从 Locals 获取
                 else if (currentFrame.Locals.Length > 0)
@@ -1006,7 +1006,7 @@ public partial class VirtualMachine
                         throw new StateError(GetPosition(instruction), "this 只能在实例方法中使用");
                     }
 
-                    _stack.Push(resolved);
+                    Stack.Push(resolved);
                 }
                 else
                 {
@@ -1026,11 +1026,11 @@ public partial class VirtualMachine
                 var args = new object?[argCount - 1]; // -1 因为第一个参数是 this
                 for (int i = args.Length - 1; i >= 0; i--)
                 {
-                    args[i] = _stack.PopObject();
+                    args[i] = Stack.PopObject();
                 }
 
                 // 弹出 this 实例
-                var thisInstance = _stack.PopObject();
+                var thisInstance = Stack.PopObject();
                 if (thisInstance == null)
                 {
                     throw new NullReferenceError(GetPosition(instruction), methodName);
@@ -1090,7 +1090,7 @@ public partial class VirtualMachine
                     // 如果方法有返回值，压入栈
                     if (method.ReturnType != typeof(void))
                     {
-                        _stack.PushObject(result);
+                        Stack.PushObject(result);
                     }
                 }
             }

@@ -116,8 +116,8 @@ public partial class VirtualMachine
         // 与解释器/IL 一致；CLR ToString 会得到 True / System.Int32[]。
         if (a is string || b is string)
         {
-            return Old8Lang.Runtime.VMValueFormatter.ToDisplayString(a) +
-                   Old8Lang.Runtime.VMValueFormatter.ToDisplayString(b);
+            return Runtime.VMValueFormatter.ToDisplayString(a) +
+                   Runtime.VMValueFormatter.ToDisplayString(b);
         }
 
         // 数组拼接：arr + [item] 或 [item] + arr

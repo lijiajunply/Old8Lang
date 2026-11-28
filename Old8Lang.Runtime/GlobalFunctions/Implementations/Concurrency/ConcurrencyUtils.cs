@@ -37,7 +37,7 @@ public static class ConcurrencyIlHelpers
             // for-in 循环变量可能是语言值（LangValueType 引用）。
             ilGenerator.Emit(OpCodes.Call,
                 typeof(Old8Lang.InstanceMethods.Core.IlValueBridge).GetMethod(
-                    nameof(Old8Lang.InstanceMethods.Core.IlValueBridge.Unwrap))!);
+                    nameof(InstanceMethods.Core.IlValueBridge.Unwrap))!);
             ilGenerator.Emit(OpCodes.Unbox_Any, typeof(int));
             return;
         }

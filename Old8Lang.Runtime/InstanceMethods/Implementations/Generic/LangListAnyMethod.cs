@@ -118,7 +118,7 @@ public class LangListAnyMethod : BaseLangListMethod, IIlNativeValueInstanceMetho
 
         // 有参数：检查是否有元素满足条件
         var predicate = arguments[0];
-        var vm = Old8Lang.Bytecode.Core.VMContext.CurrentVM;
+        var vm = Bytecode.Core.VMContext.CurrentVM;
         if (vm == null)
         {
             throw new InvalidOperationException("VM 上下文未初始化");

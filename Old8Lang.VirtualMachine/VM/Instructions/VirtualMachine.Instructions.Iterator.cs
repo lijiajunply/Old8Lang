@@ -19,7 +19,7 @@ public partial class VirtualMachine
         {
             case OpCode.GetIterator:
             {
-                var collection = _stack.PopObject();
+                var collection = Stack.PopObject();
 
                 // 字典要放在 IEnumerable 之前判断：Dictionary 本身也是 IEnumerable，
                 // 落到下面那支会拿到 KeyValuePair 而不是 (键, 值) 元组。
@@ -33,18 +33,18 @@ public partial class VirtualMachine
                         pairs.Add(new Tuple<object?, object?>(entry.Key, entry.Value));
                     }
 
-                    _stack.PushObject(pairs.GetEnumerator());
+                    Stack.PushObject(pairs.GetEnumerator());
                 }
                 else if (collection is IEnumerable enumerable)
                 {
                     var enumerator = enumerable.GetEnumerator();
-                    _stack.PushRef(enumerator);
+                    Stack.PushRef(enumerator);
                 }
                 else if (collection is ILangList langList)
                 {
                     // Old8Lang 列表只实现 ILangList（既不是 IList 也不是 IEnumerable），
                     // 必须单独处理，否则 await Task.WhenAll(...) 之类产出的列表值无法 for-in。
-                    _stack.PushRef(langList.GetItems().GetEnumerator());
+                    Stack.PushRef(langList.GetItems().GetEnumerator());
                 }
                 else
                 {
@@ -57,14 +57,14 @@ public partial class VirtualMachine
             {
                 // 栈顶应该是迭代器，调用MoveNext后将bool结果压入栈
                 // 注意：迭代器对象保持在栈上，以便后续的IteratorCurrent使用
-                if (_stack.PeekObject() is IEnumerator enumerator)
+                if (Stack.PeekObject() is IEnumerator enumerator)
                 {
                     bool hasNext = enumerator.MoveNext();
-                    _stack.PushBool(hasNext);
+                    Stack.PushBool(hasNext);
                 }
                 else
                 {
-                    var top = _stack.Count > 0 ? _stack.PeekObject() : null;
+                    var top = Stack.Count > 0 ? Stack.PeekObject() : null;
                     var topType = top?.GetType().FullName ?? "null";
                     throw new StateError(GetPosition(instruction), $"栈顶不是迭代器对象，而是: {topType}");
                 }
@@ -74,24 +74,24 @@ public partial class VirtualMachine
             case OpCode.IteratorCurrent:
             {
                 // 栈顶应该是迭代器
-                if (_stack.Count == 0)
+                if (Stack.Count == 0)
                 {
                     throw new StateError(GetPosition(instruction), "IteratorCurrent: 栈为空");
                 }
 
-                var top = _stack.PeekObject();
+                var top = Stack.PeekObject();
                 if (top is IEnumerator enumerator)
                 {
-                    _stack.PushObject(enumerator.Current);
+                    Stack.PushObject(enumerator.Current);
                 }
                 else
                 {
                     // 调试：输出栈的详细信息
                     var stackContents = string.Join(", ",
-                        _stack.ToObjectArrayTopToBottom().Select(x => x is null ? "null" : DescribeValueType(x)));
+                        Stack.ToObjectArrayTopToBottom().Select(x => x is null ? "null" : DescribeValueType(x)));
                     var topType = top?.GetType().FullName ?? "null";
                     throw new StateError(GetPosition(instruction),
-                        $"IteratorCurrent 失败: 栈顶类型是 {topType}, 栈内容({_stack.Count}): [{stackContents}]");
+                        $"IteratorCurrent 失败: 栈顶类型是 {topType}, 栈内容({Stack.Count}): [{stackContents}]");
                 }
             }
                 break;
@@ -99,10 +99,10 @@ public partial class VirtualMachine
             case OpCode.Slice:
             {
                 // 栈顶: step, end, start, collection
-                var stepVal = _stack.Pop();
-                var endVal = _stack.Pop();
-                var startVal = _stack.Pop();
-                var collection = _stack.PopObject();
+                var stepVal = Stack.Pop();
+                var endVal = Stack.Pop();
+                var startVal = Stack.Pop();
+                var collection = Stack.PopObject();
 
                 int startIdx = startVal.ToInt32();
                 int endIdx = !endVal.IsNull ? endVal.ToInt32() : int.MaxValue;
@@ -111,17 +111,17 @@ public partial class VirtualMachine
                 if (collection is Array array)
                 {
                     var result = SliceArray(array, startIdx, endIdx, stepValInt);
-                    _stack.PushObject(result);
+                    Stack.PushObject(result);
                 }
                 else if (collection is IList list)
                 {
                     var result = SliceList(list, startIdx, endIdx, stepValInt);
-                    _stack.PushObject(result);
+                    Stack.PushObject(result);
                 }
                 else if (collection is string str)
                 {
                     var result = SliceString(str, startIdx, endIdx, stepValInt);
-                    _stack.PushObject(result);
+                    Stack.PushObject(result);
                 }
                 else if (collection is Tuple<object?, object?> tuple)
                 {
@@ -185,7 +185,7 @@ public partial class VirtualMachine
                         resultTuple = current;
                     }
 
-                    _stack.PushObject(resultTuple);
+                    Stack.PushObject(resultTuple);
                 }
                 else
                 {
@@ -197,15 +197,15 @@ public partial class VirtualMachine
             case OpCode.NewGroupDict:
             {
                 var groupDict = new Dictionary<object, List<object?>>(new ObjectEqualityComparer());
-                _stack.PushRef(groupDict);
+                Stack.PushRef(groupDict);
             }
                 break;
 
             case OpCode.AddToGroup:
             {
-                var element = _stack.PopObject();
-                var key = _stack.PopObject();
-                var groupDict = _stack.PopObject() as Dictionary<object, List<object?>>;
+                var element = Stack.PopObject();
+                var key = Stack.PopObject();
+                var groupDict = Stack.PopObject() as Dictionary<object, List<object?>>;
 
                 if (groupDict == null)
                 {
@@ -224,7 +224,7 @@ public partial class VirtualMachine
 
             case OpCode.GroupDictToList:
             {
-                var groupDict = _stack.PopObject() as Dictionary<object, List<object?>>;
+                var groupDict = Stack.PopObject() as Dictionary<object, List<object?>>;
 
                 if (groupDict == null)
                 {
@@ -243,7 +243,7 @@ public partial class VirtualMachine
                     resultList.Add(group);
                 }
 
-                _stack.PushRef(resultList);
+                Stack.PushRef(resultList);
             }
                 break;
         }

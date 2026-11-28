@@ -421,7 +421,7 @@ public partial class InterpreterVisitor
             {
                 // 没有找到匹配的函数，使用原来的方式查找
                 var idResult = node.Id.Accept(this);
-                if (idResult is AST.Expression.ModuleObjects.LazySymbolProxy lazyProxy)
+                if (idResult is Expression.ModuleObjects.LazySymbolProxy lazyProxy)
                 {
                     idResult = lazyProxy.ResolveSymbol();
                 }
@@ -507,7 +507,7 @@ public partial class InterpreterVisitor
         {
             // 如果没有找到重载函数，使用原来的方式查找
             var idResult = node.Id.Accept(this);
-            if (idResult is AST.Expression.ModuleObjects.LazySymbolProxy lazyProxy)
+            if (idResult is Expression.ModuleObjects.LazySymbolProxy lazyProxy)
             {
                 idResult = lazyProxy.ResolveSymbol();
             }

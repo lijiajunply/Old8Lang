@@ -24,7 +24,7 @@ public partial class VirtualMachine
         var args = new object?[argCount];
         for (int i = argCount - 1; i >= 0; i--)
         {
-            args[i] = _stack.PopObject();
+            args[i] = Stack.PopObject();
         }
 
         return args;
@@ -63,7 +63,7 @@ public partial class VirtualMachine
         {
             for (var i = argCount - 1; i >= 0; i--)
             {
-                var argValue = _stack.Pop();
+                var argValue = Stack.Pop();
                 fastFrame.Locals[i] = argValue;
 
                 if (!hasFastTypeChecks)
@@ -95,7 +95,7 @@ public partial class VirtualMachine
         {
             for (var i = argCount - 1; i >= 0; i--)
             {
-                var argValue = _stack.Pop();
+                var argValue = Stack.Pop();
                 if (i < function.LocalCount)
                 {
                     fastFrame.Locals[i] = argValue;
@@ -149,17 +149,17 @@ public partial class VirtualMachine
             {
                 var externArgs = PopArguments(argCount);
                 var result = externFunc.Invoke(externArgs);
-                _stack.PushObject(result);
+                Stack.PushObject(result);
                 return;
             }
 
-            if (externFuncObj is Old8Lang.AST.Expression.Value.FuncLangValue { Method: not null } nativeFunction)
+            if (externFuncObj is FuncLangValue { Method: not null } nativeFunction)
             {
                 var nativeArgs = PopArguments(argCount);
-                var expressions = nativeArgs.Select(value => (Old8Lang.AST.LangExpression)
-                    (value as Old8Lang.AST.Expression.LangValueType ?? Old8Lang.AST.Expression.LangValueType.ObjToValue(value))).ToList();
-                var result = nativeFunction.Run(new Old8Lang.Interpreter.VariateManager(), expressions);
-                _stack.PushObject(UnwrapToVmValue(result));
+                var expressions = nativeArgs.Select(value => (AST.LangExpression)
+                    (value as AST.Expression.LangValueType ?? AST.Expression.LangValueType.ObjToValue(value))).ToList();
+                var result = nativeFunction.Run(new Interpreter.VariateManager(), expressions);
+                Stack.PushObject(UnwrapToVmValue(result));
                 return;
             }
 
@@ -193,33 +193,33 @@ public partial class VirtualMachine
 
             // import { Vector2 } from "Vector"：导入的原生类按构造调用，每次得到独立对象
             if (TryGetGlobalValue(funcName, out var nativeClassObj) &&
-                nativeClassObj is Old8Lang.AST.Expression.Intermediates.NativeAnyLangValue nativeClass)
+                nativeClassObj is AST.Expression.Intermediates.NativeAnyLangValue nativeClass)
             {
                 var holder = nativeClass.CreateInstanceHolder();
-                holder.New([.. fallbackArgs.Select(item => item is Old8Lang.AST.Expression.LangValueType langItem
-                    ? Old8Lang.Apis.ListToObjects([langItem]).First()
+                holder.New([.. fallbackArgs.Select(item => item is AST.Expression.LangValueType langItem
+                    ? Apis.ListToObjects([langItem]).First()
                     : item)!]);
-                _stack.PushObject(UnwrapToVmValue(holder));
+                Stack.PushObject(UnwrapToVmValue(holder));
                 return;
             }
             if (TryResolveClassByName(funcName, out var classMetadata))
             {
                 var obj = CreateObjectInstance(classMetadata, fallbackArgs);
-                _stack.PushRef(obj);
+                Stack.PushRef(obj);
                 return;
             }
 
             // 虚拟机专属的静态类「构造函数」形式（CancellationTokenSource() / TaskCompletionSource()）
             if (TryInvokeVmConstructor(funcName, fallbackArgs, out var constructed))
             {
-                _stack.PushObject(constructed);
+                Stack.PushObject(constructed);
                 return;
             }
 
             var globalFunction = GlobalFunctionRegistry.Instance.TryGetFunction(funcName);
             if (globalFunction != null)
             {
-                _stack.PushObject(globalFunction.ExecuteInVM(fallbackArgs));
+                Stack.PushObject(globalFunction.ExecuteInVM(fallbackArgs));
                 return;
             }
 
@@ -254,9 +254,9 @@ public partial class VirtualMachine
 
         // 零分配快速路径：纯位置调用普通闭包/函数时，直接从类型化栈弹出 VmValue 写入池化 Locals，
         // 避免每次调用分配 new object?[argCount] 并避免基础类型装箱。
-        if (_stack.Count > argCount)
+        if (Stack.Count > argCount)
         {
-            var peekFunc = _stack.PeekAt(argCount);
+            var peekFunc = Stack.PeekAt(argCount);
             if (peekFunc.Kind == VmValueKind.Object)
             {
                 if (peekFunc.ObjectRef is ClosureValue fastClosure &&
@@ -272,14 +272,14 @@ public partial class VirtualMachine
 
                     for (int i = argCount - 1; i >= 0; i--)
                     {
-                        var argVal = _stack.Pop();
+                        var argVal = Stack.Pop();
                         if (i < funcMeta.LocalCount)
                         {
                             fastFrame.Locals[i] = argVal;
                         }
                     }
 
-                    _stack.PopDiscard(); // 弹出闭包对象
+                    Stack.PopDiscard(); // 弹出闭包对象
                     ExecuteFrame(fastFrame);
                     return;
                 }
@@ -294,14 +294,14 @@ public partial class VirtualMachine
 
                     for (int i = argCount - 1; i >= 0; i--)
                     {
-                        var argVal = _stack.Pop();
+                        var argVal = Stack.Pop();
                         if (i < fastFunc.LocalCount)
                         {
                             fastFrame.Locals[i] = argVal;
                         }
                     }
 
-                    _stack.PopDiscard(); // 弹出函数对象
+                    Stack.PopDiscard(); // 弹出函数对象
                     ExecuteFrame(fastFrame);
                     return;
                 }
@@ -309,12 +309,12 @@ public partial class VirtualMachine
         }
 
         var args = PopArguments(argCount);
-        var funcObj = _stack.PopObject();
+        var funcObj = Stack.PopObject();
 
         // 静态类方法被当作函数值保存后调用（f <- Task.Delay; await f(10)）
         if (funcObj is VmStaticMethodValue staticMethod)
         {
-            _stack.PushObject(CallNativeFunction(staticMethod.QualifiedName, args));
+            Stack.PushObject(CallNativeFunction(staticMethod.QualifiedName, args));
             return;
         }
 
@@ -373,7 +373,7 @@ public partial class VirtualMachine
                 : asyncVm.ExecuteFunctionAndGetResult(function, args);
             return asyncVm.ConvertResultToLangValue(result);
         });
-        _stack.PushRef(new TaskLangValue(task));
+        Stack.PushRef(new TaskLangValue(task));
     }
 
     private void PushGeneratorForFunction(FunctionMetadata function, object?[] args)
@@ -382,13 +382,13 @@ public partial class VirtualMachine
         {
             var asyncGeneratorId = _nextAsyncGeneratorId++;
             _asyncGenerators[asyncGeneratorId] = new AsyncGeneratorState(function, args);
-            _stack.PushRef(new BytecodeAsyncGeneratorLangValue(asyncGeneratorId, this));
+            Stack.PushRef(new BytecodeAsyncGeneratorLangValue(asyncGeneratorId, this));
             return;
         }
 
         var generatorId = _nextGeneratorId++;
         _generators[generatorId] = new GeneratorState(function, args);
-        _stack.PushRef(new BytecodeGeneratorLangValue(generatorId, this));
+        Stack.PushRef(new BytecodeGeneratorLangValue(generatorId, this));
     }
 
     private bool TryResolveCallableFunction(CallFrame frame, string funcName, int functionIndexHint,

@@ -58,16 +58,16 @@ public class MemoryLeakTest
     public void TestObjectPoolReturnLogic()
     {
         // 测试 CharBufferPool
-        var buffer1 = Old8Lang.LangParser.Optimization.CharBufferPool.Rent(256);
-        var buffer2 = Old8Lang.LangParser.Optimization.CharBufferPool.Rent(512);
+        var buffer1 = LangParser.Optimization.CharBufferPool.Rent(256);
+        var buffer2 = LangParser.Optimization.CharBufferPool.Rent(512);
 
         // 归还缓冲区
         buffer1.Dispose();
         buffer2.Dispose();
 
         // 再次租用，应该能够重用之前的缓冲区
-        var buffer3 = Old8Lang.LangParser.Optimization.CharBufferPool.Rent(256);
-        var buffer4 = Old8Lang.LangParser.Optimization.CharBufferPool.Rent(512);
+        var buffer3 = LangParser.Optimization.CharBufferPool.Rent(256);
+        var buffer4 = LangParser.Optimization.CharBufferPool.Rent(512);
 
         buffer3.Dispose();
         buffer4.Dispose();
@@ -83,27 +83,27 @@ public class MemoryLeakTest
     public void TestTokenListPoolReturnLogic()
     {
         // 租用列表
-        var list1 = Old8Lang.LangParser.Optimization.TokenListPool.Rent();
-        var list2 = Old8Lang.LangParser.Optimization.TokenListPool.Rent();
+        var list1 = LangParser.Optimization.TokenListPool.Rent();
+        var list2 = LangParser.Optimization.TokenListPool.Rent();
 
         // 添加一些数据
         list1.Add(new LangToken("test", LangTokenType.Identifier, 1, 0));
         list2.Add(new LangToken("test2", LangTokenType.Identifier, 1, 0));
 
         // 归还列表
-        Old8Lang.LangParser.Optimization.TokenListPool.Return(list1);
-        Old8Lang.LangParser.Optimization.TokenListPool.Return(list2);
+        LangParser.Optimization.TokenListPool.Return(list1);
+        LangParser.Optimization.TokenListPool.Return(list2);
 
         // 再次租用，应该能够重用之前的列表（且已清空）
-        var list3 = Old8Lang.LangParser.Optimization.TokenListPool.Rent();
-        var list4 = Old8Lang.LangParser.Optimization.TokenListPool.Rent();
+        var list3 = LangParser.Optimization.TokenListPool.Rent();
+        var list4 = LangParser.Optimization.TokenListPool.Rent();
 
         // 验证列表已清空
         Assert.Empty(list3);
         Assert.Empty(list4);
 
-        Old8Lang.LangParser.Optimization.TokenListPool.Return(list3);
-        Old8Lang.LangParser.Optimization.TokenListPool.Return(list4);
+        LangParser.Optimization.TokenListPool.Return(list3);
+        LangParser.Optimization.TokenListPool.Return(list4);
     }
 
     /// <summary>
@@ -113,7 +113,7 @@ public class MemoryLeakTest
     public void TestStringCacheDoesNotGrowIndefinitely()
     {
         // 创建一个小容量的缓存用于测试
-        var cache = new Old8Lang.LangParser.Optimization.StringCache(maxCacheSize: 1000);
+        var cache = new LangParser.Optimization.StringCache(maxCacheSize: 1000);
 
         // 添加 1000 个不同的短字符串
         for (int i = 0; i < 1000; i++)

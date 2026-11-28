@@ -471,7 +471,7 @@ public class AsyncStateMachineGenerator : IAsyncStateMachineGenerator
         }
 
         // 三元表达式：条件被分支指令消耗，两个分支沿用外层的栈状态
-        if (expression is AST.Expression.TernaryExpression ternary)
+        if (expression is TernaryExpression ternary)
         {
             AnalyzeExpression(ternary.Condition, region, unsupportedContext, pendingValues);
             AnalyzeExpression(ternary.TrueExpression, region, unsupportedContext, pendingValues);
@@ -505,14 +505,14 @@ public class AsyncStateMachineGenerator : IAsyncStateMachineGenerator
             return;
         }
 
-        if (expression is AST.Expression.NestedIndexExpression nestedIndexSyntax)
+        if (expression is NestedIndexExpression nestedIndexSyntax)
         {
             AnalyzeExpression(nestedIndexSyntax.Target, region, unsupportedContext, pendingValues);
             AnalyzeExpression(nestedIndexSyntax.Index, region, unsupportedContext, pendingValues: true);
             return;
         }
 
-        if (expression is AST.Expression.NestedSliceExpression nestedSliceSyntax)
+        if (expression is NestedSliceExpression nestedSliceSyntax)
         {
             AnalyzeExpression(nestedSliceSyntax.Target, region, unsupportedContext, pendingValues);
             AnalyzeExpression(nestedSliceSyntax.Start, region, unsupportedContext, pendingValues: true);
@@ -523,13 +523,13 @@ public class AsyncStateMachineGenerator : IAsyncStateMachineGenerator
             return;
         }
 
-        if (expression is AST.Expression.IndexExpression indexSyntax)
+        if (expression is IndexExpression indexSyntax)
         {
             AnalyzeExpression(indexSyntax.Key, region, unsupportedContext, pendingValues);
             return;
         }
 
-        if (expression is AST.Expression.SliceExpression sliceSyntax)
+        if (expression is SliceExpression sliceSyntax)
         {
             if (sliceSyntax.Start is not null)
                 AnalyzeExpression(sliceSyntax.Start, region, unsupportedContext, pendingValues);
@@ -540,7 +540,7 @@ public class AsyncStateMachineGenerator : IAsyncStateMachineGenerator
             return;
         }
 
-        if (expression is AST.Expression.RangeLiteralExpression rangeSyntax)
+        if (expression is RangeLiteralExpression rangeSyntax)
         {
             if (rangeSyntax.Start is not null)
                 AnalyzeExpression(rangeSyntax.Start, region, unsupportedContext, pendingValues);
@@ -549,7 +549,7 @@ public class AsyncStateMachineGenerator : IAsyncStateMachineGenerator
             return;
         }
 
-        if (expression is AST.Expression.TupleLiteralExpression tupleSyntax)
+        if (expression is TupleLiteralExpression tupleSyntax)
         {
             for (int i = 0; i < tupleSyntax.Elements.Count; i++)
             {
@@ -560,7 +560,7 @@ public class AsyncStateMachineGenerator : IAsyncStateMachineGenerator
             return;
         }
 
-        if (expression is AST.Expression.DictionaryLiteralExpression dictionarySyntax)
+        if (expression is DictionaryLiteralExpression dictionarySyntax)
         {
             for (int i = 0; i < dictionarySyntax.Entries.Count; i++)
             {
@@ -572,7 +572,7 @@ public class AsyncStateMachineGenerator : IAsyncStateMachineGenerator
             return;
         }
 
-        if (expression is AST.Expression.ListLiteralExpression listSyntax)
+        if (expression is ListLiteralExpression listSyntax)
         {
             for (int i = 0; i < listSyntax.Elements.Count; i++)
             {
@@ -583,7 +583,7 @@ public class AsyncStateMachineGenerator : IAsyncStateMachineGenerator
             return;
         }
 
-        if (expression is AST.Expression.ArrayLiteralExpression arraySyntax)
+        if (expression is ArrayLiteralExpression arraySyntax)
         {
             for (int i = 0; i < arraySyntax.Elements.Count; i++)
             {

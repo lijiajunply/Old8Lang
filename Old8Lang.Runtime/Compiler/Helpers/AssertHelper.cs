@@ -188,14 +188,14 @@ public static class AssertHelper
         if (a is null || b is null) return false;
 
         // 比较前把语言值解包成原生值（列表元素可能是 IntLangValue/StringLangValue）
-        if (a is Old8Lang.AST.Expression.LangValueType leftLangValue)
+        if (a is AST.Expression.LangValueType leftLangValue)
         {
-            return AreEqual(Old8Lang.InstanceMethods.Core.IlValueBridge.Unwrap(leftLangValue), b);
+            return AreEqual(InstanceMethods.Core.IlValueBridge.Unwrap(leftLangValue), b);
         }
 
-        if (b is Old8Lang.AST.Expression.LangValueType rightLangValue)
+        if (b is AST.Expression.LangValueType rightLangValue)
         {
-            return AreEqual(a, Old8Lang.InstanceMethods.Core.IlValueBridge.Unwrap(rightLangValue));
+            return AreEqual(a, InstanceMethods.Core.IlValueBridge.Unwrap(rightLangValue));
         }
 
         // 处理字符串比较

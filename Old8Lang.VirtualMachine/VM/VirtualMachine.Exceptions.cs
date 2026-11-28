@@ -79,7 +79,7 @@ public partial class VirtualMachine
                         if (frame.HasDeferredInstructions)
                             ExecuteDefers(frame);
 
-                        _stack.Push(exceptionValue);
+                        Stack.Push(exceptionValue);
                         frame.IP = entry.CatchStart;
                         return true;
                     }
@@ -145,7 +145,7 @@ public partial class VirtualMachine
                     if (entry.CatchStart >= 0)
                     {
                         // 将异常对象压入栈
-                        _stack.PushObject(exceptionValue);
+                        Stack.PushObject(exceptionValue);
                         frame.IP = entry.CatchStart;
                         return true;
                     }

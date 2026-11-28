@@ -101,7 +101,7 @@ public class TaskCatchMethod : BaseInstanceMethod, IIlNativeValueInstanceMethod
     /// 返回原生 <c>Task&lt;object&gt;</c>，与 IL 模式下 Task 的既有表示保持一致，
     /// 以便结果可以继续被 <c>await</c> / 链式调用使用。
     /// </remarks>
-    public static System.Threading.Tasks.Task<object> CatchHelper(LangValueType instance, LangValueType errorHandler)
+    public static Task<object> CatchHelper(LangValueType instance, LangValueType errorHandler)
     {
         if (instance is not TaskLangValue task)
         {
@@ -140,7 +140,7 @@ public class TaskCatchMethod : BaseInstanceMethod, IIlNativeValueInstanceMethod
 
     protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)
     {
-        return typeof(System.Threading.Tasks.Task<object>);
+        return typeof(Task<object>);
     }
 
     /// <summary>

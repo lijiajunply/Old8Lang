@@ -35,7 +35,7 @@ public class DictGetValueMethod : BaseInstanceMethod
             }
         }
 
-        throw new Old8Lang.Error.KeyError(instance, key.ToDisplayString());
+        throw new Error.KeyError(instance, key.ToDisplayString());
     }
 
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
@@ -58,7 +58,7 @@ protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpres
             {
                 return value;
             }
-            throw new Old8Lang.Error.KeyError(new Old8Lang.SourcePosition(), key ?? "null");
+            throw new Error.KeyError(new SourcePosition(), key ?? "null");
         }
         throw new ArgumentException("实例必须是 Dictionary 类型");
     }

@@ -27,7 +27,7 @@ public class LinqJoinWhereTests
         var interpreter = new LangInterpreter();
         interpreter.Build(code).Run(interpreter.Manager);
         CompileAndRun(code);
-        new Old8Lang.Bytecode.VM.VirtualMachine(new Old8Lang.Bytecode.BytecodeCompiler().Compile(new LangInterpreter().Build(code))).Execute();
+        new Old8Lang.Bytecode.VM.VirtualMachine(new Bytecode.BytecodeCompiler().Compile(new LangInterpreter().Build(code))).Execute();
     }
 
     [Fact]
@@ -43,7 +43,7 @@ public class LinqJoinWhereTests
         var interpreter = new LangInterpreter();
         interpreter.Build(code).Run(interpreter.Manager);
         CompileAndRun(code);
-        new Old8Lang.Bytecode.VM.VirtualMachine(new Old8Lang.Bytecode.BytecodeCompiler().Compile(new LangInterpreter().Build(code))).Execute();
+        new Old8Lang.Bytecode.VM.VirtualMachine(new Bytecode.BytecodeCompiler().Compile(new LangInterpreter().Build(code))).Execute();
     }
 
     [Fact]
@@ -59,7 +59,7 @@ public class LinqJoinWhereTests
         var interpreter = new LangInterpreter();
         interpreter.Build(code).Run(interpreter.Manager);
         CompileAndRun(code);
-        new Old8Lang.Bytecode.VM.VirtualMachine(new Old8Lang.Bytecode.BytecodeCompiler().Compile(new LangInterpreter().Build(code))).Execute();
+        new Old8Lang.Bytecode.VM.VirtualMachine(new Bytecode.BytecodeCompiler().Compile(new LangInterpreter().Build(code))).Execute();
     }
 
     [Fact]
@@ -73,7 +73,7 @@ public class LinqJoinWhereTests
         var interpreter = new LangInterpreter();
         interpreter.Build(code).Run(interpreter.Manager);
         CompileAndRun(code);
-        new Old8Lang.Bytecode.VM.VirtualMachine(new Old8Lang.Bytecode.BytecodeCompiler().Compile(new LangInterpreter().Build(code))).Execute();
+        new Old8Lang.Bytecode.VM.VirtualMachine(new Bytecode.BytecodeCompiler().Compile(new LangInterpreter().Build(code))).Execute();
     }
 
     [Fact]
@@ -87,7 +87,7 @@ public class LinqJoinWhereTests
         var interpreter = new LangInterpreter();
         interpreter.Build(code).Run(interpreter.Manager);
         CompileAndRun(code);
-        new Old8Lang.Bytecode.VM.VirtualMachine(new Old8Lang.Bytecode.BytecodeCompiler().Compile(new LangInterpreter().Build(code))).Execute();
+        new Old8Lang.Bytecode.VM.VirtualMachine(new Bytecode.BytecodeCompiler().Compile(new LangInterpreter().Build(code))).Execute();
     }
 
     [Fact]
@@ -103,7 +103,7 @@ public class LinqJoinWhereTests
         var interpreter = new LangInterpreter();
         interpreter.Build(code).Run(interpreter.Manager);
         CompileAndRun(code);
-        new Old8Lang.Bytecode.VM.VirtualMachine(new Old8Lang.Bytecode.BytecodeCompiler().Compile(new LangInterpreter().Build(code))).Execute();
+        new Old8Lang.Bytecode.VM.VirtualMachine(new Bytecode.BytecodeCompiler().Compile(new LangInterpreter().Build(code))).Execute();
     }
 
     [Fact]
@@ -119,7 +119,7 @@ public class LinqJoinWhereTests
         var interpreter = new LangInterpreter();
         interpreter.Build(code).Run(interpreter.Manager);
         CompileAndRun(code);
-        new Old8Lang.Bytecode.VM.VirtualMachine(new Old8Lang.Bytecode.BytecodeCompiler().Compile(new LangInterpreter().Build(code))).Execute();
+        new Old8Lang.Bytecode.VM.VirtualMachine(new Bytecode.BytecodeCompiler().Compile(new LangInterpreter().Build(code))).Execute();
     }
 
     [Fact]
@@ -133,7 +133,7 @@ public class LinqJoinWhereTests
         var interpreter = new LangInterpreter();
         interpreter.Build(code).Run(interpreter.Manager);
         CompileAndRun(code);
-        new Old8Lang.Bytecode.VM.VirtualMachine(new Old8Lang.Bytecode.BytecodeCompiler().Compile(new LangInterpreter().Build(code))).Execute();
+        new Old8Lang.Bytecode.VM.VirtualMachine(new Bytecode.BytecodeCompiler().Compile(new LangInterpreter().Build(code))).Execute();
     }
 
     [Fact]
@@ -147,7 +147,7 @@ public class LinqJoinWhereTests
         var interpreter = new LangInterpreter();
         interpreter.Build(code).Run(interpreter.Manager);
         CompileAndRun(code);
-        new Old8Lang.Bytecode.VM.VirtualMachine(new Old8Lang.Bytecode.BytecodeCompiler().Compile(new LangInterpreter().Build(code))).Execute();
+        new Old8Lang.Bytecode.VM.VirtualMachine(new Bytecode.BytecodeCompiler().Compile(new LangInterpreter().Build(code))).Execute();
     }
 
     [Fact]
@@ -175,7 +175,7 @@ public class LinqJoinWhereTests
         var interpreter = new LangInterpreter();
         interpreter.Build(code).Run(interpreter.Manager);
         CompileAndRun(code);
-        new Old8Lang.Bytecode.VM.VirtualMachine(new Old8Lang.Bytecode.BytecodeCompiler().Compile(new LangInterpreter().Build(code))).Execute();
+        new Old8Lang.Bytecode.VM.VirtualMachine(new Bytecode.BytecodeCompiler().Compile(new LangInterpreter().Build(code))).Execute();
     }
 
     [Fact]
@@ -189,7 +189,7 @@ public class LinqJoinWhereTests
         var interpreter = new LangInterpreter();
         interpreter.Build(code).Run(interpreter.Manager);
         CompileAndRun(code);
-        new Old8Lang.Bytecode.VM.VirtualMachine(new Old8Lang.Bytecode.BytecodeCompiler().Compile(new LangInterpreter().Build(code))).Execute();
+        new Old8Lang.Bytecode.VM.VirtualMachine(new Bytecode.BytecodeCompiler().Compile(new LangInterpreter().Build(code))).Execute();
     }
 
     [Fact]
@@ -390,13 +390,13 @@ public class LinqJoinWhereTests
 
         CompileAndRun(code);
 
-        var bytecode = new Old8Lang.Bytecode.BytecodeCompiler().Compile(new LangInterpreter().Build(code));
+        var bytecode = new Bytecode.BytecodeCompiler().Compile(new LangInterpreter().Build(code));
         using var ms = new MemoryStream();
         using (var writer = new BinaryWriter(ms, System.Text.Encoding.UTF8, leaveOpen: true))
             bytecode.WriteTo(writer);
         ms.Position = 0;
         using var reader = new BinaryReader(ms);
-        var reloaded = Old8Lang.Bytecode.BytecodeFile.ReadFrom(reader);
+        var reloaded = Bytecode.BytecodeFile.ReadFrom(reader);
         new Old8Lang.Bytecode.VM.VirtualMachine(reloaded).Execute();
     }
 

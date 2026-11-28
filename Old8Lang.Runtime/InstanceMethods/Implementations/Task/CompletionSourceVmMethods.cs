@@ -255,7 +255,7 @@ public class CancellationTokenSourceCancelAfterMethod : CompletionSourceVmMethod
         if (arguments[0] is not int delayMs)
         {
             throw new TypeError(new SourcePosition(), "int",
-                Old8Lang.Runtime.VMReflectionHelper.DescribeValueType(arguments[0]));
+                Runtime.VMReflectionHelper.DescribeValueType(arguments[0]));
         }
 
         ((CancellationTokenSourceLangValue)instance!).CancelAfter(delayMs);

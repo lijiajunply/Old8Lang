@@ -91,7 +91,7 @@ public class TaskContinueWithMethod : BaseInstanceMethod, IIlNativeValueInstance
     /// 返回原生 <c>Task&lt;object&gt;</c>，与 IL 模式下 Task 的既有表示保持一致，
     /// 以便结果可以继续被 <c>await</c> / 链式调用使用。
     /// </remarks>
-    public static System.Threading.Tasks.Task<object> ContinueWithHelper(LangValueType instance, LangValueType callback)
+    public static Task<object> ContinueWithHelper(LangValueType instance, LangValueType callback)
     {
         if (instance is not TaskLangValue task)
         {
@@ -128,7 +128,7 @@ public class TaskContinueWithMethod : BaseInstanceMethod, IIlNativeValueInstance
 
     protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)
     {
-        return typeof(System.Threading.Tasks.Task<object>);
+        return typeof(Task<object>);
     }
 
     /// <summary>
