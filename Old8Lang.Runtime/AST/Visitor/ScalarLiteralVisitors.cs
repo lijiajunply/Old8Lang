@@ -19,7 +19,8 @@ public partial class TypeInferenceVisitor
         VisitSliceLangValue(LiteralCollectionRuntimeFactory.CreateSlice(node));
 
     /// <summary>推断范围字面量的静态类型。</summary>
-    public Type? VisitRangeLiteralExpression(RangeLiteralExpression node) => typeof(int[]);
+    public Type? VisitRangeLiteralExpression(RangeLiteralExpression node) =>
+        VisitRangeLangValue(LiteralCollectionRuntimeFactory.CreateRange(node));
 
     /// <summary>推断元组字面量的静态类型。</summary>
     public Type? VisitTupleLiteralExpression(TupleLiteralExpression node) =>

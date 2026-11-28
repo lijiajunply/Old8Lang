@@ -49,7 +49,7 @@ internal static class LiteralCollectionRuntimeFactory
         new(node.Id, node.Start, node.End, node.Step) { Position = node.Position };
 
     internal static RangeLangValue CreateRange(RangeLiteralExpression node) =>
-        new(node.Start, node.End, node.Position, node.IncludeStart, node.IncludeEnd);
+        new(node.Start, node.End, node.Position, node.IncludeStart, node.IncludeEnd, node.Step);
 
     internal static TupleLangValue CreateTuple(TupleLiteralExpression node) =>
         new(node.Elements.ToList(), node.FieldNames?.ToList(), node.Position);

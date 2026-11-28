@@ -958,6 +958,7 @@ public class SemanticAnalyzer(DocumentParseResult document, WorkspaceIndex? work
             case RangeLiteralExpression rangeLit:
                 AnalyzeExpression(rangeLit.Start, scope, activeGenerics);
                 AnalyzeExpression(rangeLit.End, scope, activeGenerics);
+                AnalyzeExpression(rangeLit.Step, scope, activeGenerics);
                 break;
 
             case IndexExpression indexExpr:

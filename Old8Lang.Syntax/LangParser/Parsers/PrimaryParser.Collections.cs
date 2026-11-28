@@ -85,7 +85,7 @@ public partial class PrimaryParser
 
     /// <summary>
     /// array = "[" expression ( "," expression )* "]" ;
-    /// range = "[" expression "~" expression "]" ;
+    /// range = "[" expression ("~" | "~&lt;" | ">~" | ">~&lt;") expression [ ":" expression ] "]" ;
     /// list_comprehension = "[" expression ( "if" expression "else" expression )? "for" identifier "in" expression ( "if" expression )* ( "for" identifier "in" expression ( "if" expression )* )* "]" ;
     /// </summary>
     /// <returns>数组初始化、Range或者列表推导式</returns>
@@ -143,10 +143,16 @@ public partial class PrimaryParser
             }
 
             Expect(rangeTokenType);
-            elements.Add(expressionParserFactory().ParseExpression());
+            var end = expressionParserFactory().ParseExpression();
+            LangExpression? step = null;
+            if (CurrentToken.Type == LangTokenType.Colon)
+            {
+                Expect(LangTokenType.Colon);
+                step = expressionParserFactory().ParseExpression();
+            }
             Expect(LangTokenType.RightBracket);
 
-            return new RangeLiteralExpression(elements[0], elements[1], rangePosition, includeStart, includeEnd);
+            return new RangeLiteralExpression(elements[0], end, rangePosition, includeStart, includeEnd, step);
         }
 
         // 检查是否是列表推导式

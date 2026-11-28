@@ -333,38 +333,13 @@ public partial class VirtualMachine
 
             case OpCode.NewRange:
             {
-                // 栈顶: includeEnd, includeStart, end, start
                 bool includeEnd = ToBool(Stack.Pop());
                 bool includeStart = ToBool(Stack.Pop());
-                int end = Stack.PopInt32();
-                int start = Stack.PopInt32();
-
-                var results = new List<int>();
-
-                var startNum = start;
-                var endNum = end;
-
-                if (!includeStart)
-                    startNum++;
-                if (!includeEnd)
-                    endNum--;
-
-                if (start > end)
-                {
-                    for (var i = startNum; i >= endNum; i--)
-                    {
-                        results.Add(i);
-                    }
-                }
-                else if (startNum <= endNum)
-                {
-                    for (var i = startNum; i <= endNum; i++)
-                    {
-                        results.Add(i);
-                    }
-                }
-
-                Stack.PushRef(results.ToArray());
+                var step = instruction.Operand is true ? Stack.PopObject() : 1;
+                var end = Stack.PopObject();
+                var start = Stack.PopObject();
+                Stack.PushRef(RangeLangValue.CreateRange(start, end, step, includeStart, includeEnd,
+                    GetPosition(instruction)));
             }
                 break;
         }

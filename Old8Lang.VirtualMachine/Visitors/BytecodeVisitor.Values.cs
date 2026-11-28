@@ -600,42 +600,22 @@ public partial class BytecodeVisitor
     public Instruction? VisitRangeLangValue(RangeLangValue node)
     {
         MarkPosition(node);
-        // 注意：LoadConst 的操作数是**常量池下标**，不是字面值。
-        // 这里曾经直接写 Emit(LoadConst, 0/1)，等于假定常量池槽 0 放着 0、槽 1 放着 1。
-        // 只要此前有别的常量占用了这两个槽（典型：extern 块先放入库名与函数名，
-        // 槽 1 变成函数名字符串），区间表达式就会取到错误的操作数 ——
-        // 例如 `extern "..." { func abs(...) }` 之后的 `for i in [1~3]` 会把
-        // 布尔标志读成字符串 "abs"，报 “String 'abs' was not recognized as a valid Boolean”。
-        // 因此一律先入池再按下标加载。
-
-        // 访问start表达式
-        if (node.Start != null)
-        {
+        if (node.Start is not null)
             node.Start.Accept(this);
-        }
         else
-        {
-            Emit(OpCode.LoadConst, _compiler.ConstantPool.AddConstant(0)); // 默认起始值为0
-        }
+            Emit(OpCode.LoadConst, _compiler.ConstantPool.AddConstant(0));
 
-        // 访问end表达式
-        if (node.End != null)
-        {
+        if (node.End is not null)
             node.End.Accept(this);
-        }
         else
-        {
-            Emit(OpCode.LoadConst, _compiler.ConstantPool.AddConstant(0)); // 默认结束值为0
-        }
+            Emit(OpCode.LoadConst, _compiler.ConstantPool.AddConstant(0));
 
-        // 加载includeStart和includeEnd标志
-        // 栈布局(从下到上): start, end, includeStart, includeEnd
+        node.Step?.Accept(this);
         Emit(node.IncludeStart ? OpCode.LoadTrue : OpCode.LoadFalse);
         Emit(node.IncludeEnd ? OpCode.LoadTrue : OpCode.LoadFalse);
 
-        // 使用 NewRange 指令创建范围数组
-        // NewRange 将从栈中弹出4个参数
-        Emit(OpCode.NewRange);
+        // 无操作数的旧指令仍从栈弹出四项，显式步长使用第五项。
+        Emit(OpCode.NewRange, node.Step is null ? null : true);
 
         return null;
     }

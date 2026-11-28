@@ -27,6 +27,70 @@ public class CrossModeDefectsRegressionTests
     }
 
     [Fact]
+    public void SteppedAndCharacterRanges_WorkAcrossModesAndBytecodeSerialization()
+    {
+        RunAllThreeModes("""
+            values <- [1~10:2]
+            Assert.Equal(5, values.Length)
+            Assert.Equal(9, values[4])
+            Assert.Equal(0, [5>~5:2].Length)
+            Assert.Equal(2147483647, [2147483647~2147483647][0])
+            Assert.Equal(2, [4>~<1].Length)
+
+            first <- 'F'
+            last <- 'A'
+            chars <- [first>~last:2]
+            Assert.Equal(2, chars.Length)
+            Assert.Equal('D', chars[0])
+            Assert.Equal('B', chars[1])
+            """);
+    }
+
+    [Theory]
+    [InlineData("[1~10:0]", "范围步长必须大于 0")]
+    [InlineData("[1~10:-2]", "范围步长必须大于 0")]
+    [InlineData("[1~10:1.5]", "范围步长必须是整数")]
+    [InlineData("[1~'Z']", "范围端点必须同为整数或同为字符")]
+    public void RangesRejectInvalidStepsAndMixedEndpoints(string expression, string message)
+    {
+        var code = $"values <- {expression}";
+        var interpreter = new LangInterpreter();
+        var ast = interpreter.Build(code);
+        Assert.Contains(message, Assert.ThrowsAny<Old8Exception>(() => ast.Run(interpreter.Manager)).Message);
+
+        var ilInterpreter = new LangInterpreter();
+        Assert.Contains(message, Assert.ThrowsAny<Old8Exception>(() =>
+            Old8Lang.Compiler.Compiler.Compile(ilInterpreter.Build(code), "test", ilInterpreter)()).Message);
+
+        var bytecode = new BytecodeCompiler().Compile(new LangInterpreter().Build(code));
+        Assert.Contains(message, Assert.ThrowsAny<Old8Exception>(() => new VM(bytecode).Execute()).Message);
+    }
+
+    [Fact]
+    public void SteppedRange_AwaitsStepInIlMode()
+    {
+        const string code = """
+            async func getStep() -> int {
+                await Task.Delay(1)
+                return 2
+            }
+
+            async func checkRange() -> int {
+                values <- [1~10:await getStep()]
+                Assert.Equal(5, values.Length)
+                return values[4]
+            }
+
+            result <- checkRange()
+            result.Wait()
+            Assert.Equal(9, result.Result)
+            """;
+        var interpreter = new LangInterpreter();
+
+        Old8Lang.Compiler.Compiler.Compile(interpreter.Build(code), "test", interpreter)();
+    }
+
+    [Fact]
     public void MatchTupleDestructuring_ThreeAndFourElements_WorksAcrossAllThreeModes()
     {
         const string code = @"

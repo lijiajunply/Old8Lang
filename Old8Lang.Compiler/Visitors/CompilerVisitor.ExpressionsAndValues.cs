@@ -1941,33 +1941,37 @@ public partial class CompilerVisitor
 
     public object? VisitRangeLangValue(RangeLangValue node)
     {
+        var inference = new TypeInferenceVisitor(local);
+        var endpointType = node.Start?.Accept(inference);
+        var endType = node.End?.Accept(inference);
+        if ((endpointType != typeof(int) && endpointType != typeof(char)) || endpointType != endType)
+            throw new TypeError(node, "范围端点必须同为整数或同为字符");
 
-        // 我们需要生成与解释器相同的行为：
-        // 1. 根据 includeStart 和 includeEnd 调整范围
-        // 2. 检查是正向还是反向
-        // 3. 生成相应的数组
+        var stepType = node.Step?.Accept(inference) ?? typeof(object);
+        if (node.Step is not null && stepType != typeof(int) && stepType != typeof(object))
+            throw new TypeError(node, "范围步长必须是整数");
 
-        // 为了简化，我们直接调用一个辅助方法来生成范围数组
-        // 加载起始值
-        node.Start?.Accept(new CompilerVisitor(ilGenerator, local));
+        node.Start!.Accept(this);
+        node.End!.Accept(this);
+        if (node.Step is not null)
+        {
+            node.Step.Accept(this);
+            if (stepType == typeof(object))
+                ilGenerator.Emit(OpCodes.Call, typeof(RangeLangValue).GetMethod(nameof(RangeLangValue.RequireRangeStep))!);
+        }
+        else
+        {
+            ilGenerator.Emit(OpCodes.Ldc_I4_1);
+        }
 
-        // 加载结束值
-        node.End?.Accept(new CompilerVisitor(ilGenerator, local));
-
-        // 加载 includeStart
         ilGenerator.Emit(node.IncludeStart ? OpCodes.Ldc_I4_1 : OpCodes.Ldc_I4_0);
-
-        // 加载 includeEnd
         ilGenerator.Emit(node.IncludeEnd ? OpCodes.Ldc_I4_1 : OpCodes.Ldc_I4_0);
 
-        // 调用辅助方法 CreateRangeArray(int start, int end, bool includeStart, bool includeEnd)
-        var createRangeMethod = typeof(RangeLangValue).GetMethod(nameof(node.CreateRangeArray),
-            System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static)!;
-
-        ilGenerator.Emit(OpCodes.Call, createRangeMethod);
-
+        var methodName = endpointType == typeof(char)
+            ? nameof(RangeLangValue.CreateCharacterRangeArray)
+            : nameof(RangeLangValue.CreateSteppedRangeArray);
+        ilGenerator.Emit(OpCodes.Call, typeof(RangeLangValue).GetMethod(methodName)!);
         return null;
-    
     }
 
     public object? VisitSliceLangValue(SliceLangValue node)

@@ -194,7 +194,7 @@ public enum OpCode : byte
     /// <summary>创建元组 (操作数: elementCount)</summary>
     NewTuple = 0x64,
 
-    /// <summary>创建范围 (start, end, step)</summary>
+    /// <summary>创建范围 (start, end, [step], includeStart, includeEnd)，操作数 true 表示有显式步长</summary>
     NewRange = 0x65,
 
     /// <summary>获取迭代器 (从集合获取迭代器)</summary>

@@ -2,6 +2,7 @@ using Old8Lang.Syntax;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Statement;
 using Old8Lang.Interpreter;
+using Old8Lang.Error;
 
 namespace Old8Lang.Tests.Parser.Expression;
 
@@ -493,6 +494,30 @@ public class PrimaryParserTests
         Assert.Equal(1, result.Count);
         var setStmt = Assert.IsType<SetStatement>(result[0]);
         Assert.IsType<RangeLiteralExpression>(setStmt.Value);
+    }
+
+    [Fact]
+    public void ParseArrayOrRange_CharacterBoundsAndStep_PreservesExpressionsAndFlags()
+    {
+        const string code = "a <- ['Z'>~<'A':2]";
+        var parser = new LangParser.LangParser(LangInterpreter.Tokenize(code), code);
+
+        var assignment = Assert.IsType<SetStatement>(Assert.Single(parser.ParseProgram().OtherStatements));
+        var range = Assert.IsType<RangeLiteralExpression>(assignment.Value);
+        Assert.Equal('Z', Assert.IsType<char>(Assert.IsType<ScalarLiteralExpression>(range.Start).LiteralValue));
+        Assert.Equal('A', Assert.IsType<char>(Assert.IsType<ScalarLiteralExpression>(range.End).LiteralValue));
+        Assert.Equal(2, Assert.IsType<int>(Assert.IsType<ScalarLiteralExpression>(range.Step).LiteralValue));
+        Assert.False(range.IncludeStart);
+        Assert.False(range.IncludeEnd);
+    }
+
+    [Fact]
+    public void ParseArrayOrRange_ColonWithoutStep_ThrowsSyntaxError()
+    {
+        const string code = "a <- [1~10:]";
+        var parser = new LangParser.LangParser(LangInterpreter.Tokenize(code), code);
+
+        Assert.ThrowsAny<SyntaxError>(() => parser.ParseProgram());
     }
 
     #endregion
