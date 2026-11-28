@@ -231,7 +231,7 @@ public class RangeTests(ITestOutputHelper output)
         Assert.Null(exception);
     }
 
-    [Fact(Skip = "Unicode character ranges are not yet supported in compiler mode")]
+    [Fact]
     public void UnicodeCharacterRange_CompilesAndExecutesCorrectly()
     {
         // Arrange

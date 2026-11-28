@@ -751,7 +751,7 @@ public class VMExecutionPerformanceTests
 
     #region 选择语句性能测试
 
-    [Fact(Skip = "先跳过")]
+    [Fact(Skip = "用例本身存在死锁：仅向 ch1/ch2 各发 1 条消息但循环 select 10 次且无 default 分支")]
     public void Performance_Select_ChannelSelect()
     {
         var code = @"

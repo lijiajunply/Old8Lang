@@ -220,7 +220,7 @@ public class FunctionOverloadTests
         Assert.Null(exception);
     }
 
-    [Fact(Skip = "类参数类型推断在 IL 模式下需要进一步修复")]
+    [Fact]
     public void FunctionOverload_WithComplexTypes_OverloadsClassParameters()
     {
         // Arrange

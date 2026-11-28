@@ -297,7 +297,7 @@ public class UnexpectedInputsTests(ITestOutputHelper output)
         Assert.Null(exception);
     }
 
-    [Fact(Skip = "生成无效IL代码导致CLR崩溃，中止整个测试运行")]
+    [Fact(Skip = "会导致真正的运行时栈溢出并使测试主机崩溃（.NET 无法捕获 StackOverflowException）")]
     public void StackOverflow_CompilesAndExecutesCorrectly()
     {
         var code = @"
@@ -361,7 +361,7 @@ public class UnexpectedInputsTests(ITestOutputHelper output)
         var ast = interpreter.Build(code);
         var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
 
-        var exception = Record.Exception(() => compiledAction());
+        var exception = Record.Exception(compiledAction);
         Assert.Null(exception);
     }
 

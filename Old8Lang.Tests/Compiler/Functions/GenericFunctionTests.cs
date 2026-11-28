@@ -10,7 +10,7 @@ public class GenericFunctionTests(ITestOutputHelper output)
 {
     public ITestOutputHelper Output { get; } = output;
 
-    [Fact(Skip = "Generic function instantiation not supported in compiler mode")]
+    [Fact]
     public void BasicGenericFunction_CompilesAndExecutesCorrectly()
     {
         // Arrange
@@ -38,7 +38,7 @@ public class GenericFunctionTests(ITestOutputHelper output)
         Assert.Null(exception);
     }
 
-    [Fact(Skip = "Generic function instantiation not supported in compiler mode")]
+    [Fact]
     public void MultipleTypeParameters_CompilesAndExecutesCorrectly()
     {
         // Arrange
@@ -66,7 +66,7 @@ public class GenericFunctionTests(ITestOutputHelper output)
         Assert.Null(exception);
     }
 
-    [Fact(Skip = "Generic function instantiation not supported in compiler mode")]
+    [Fact]
     public void GenericFunctionWithConstraints_CompilesAndExecutesCorrectly()
     {
         // Arrange
@@ -98,7 +98,7 @@ public class GenericFunctionTests(ITestOutputHelper output)
         Assert.Null(exception);
     }
 
-    [Fact(Skip = "Generic function instantiation not supported in compiler mode")]
+    [Fact]
     public void GenericArrayOperations_CompilesAndExecutesCorrectly()
     {
         // Arrange
@@ -146,7 +146,7 @@ public class GenericFunctionTests(ITestOutputHelper output)
         Assert.Null(exception);
     }
 
-    [Fact(Skip = "Generic function instantiation not supported in compiler mode")]
+    [Fact]
     public void GenericListOperations_CompilesAndExecutesCorrectly()
     {
         // Arrange
@@ -193,7 +193,7 @@ public class GenericFunctionTests(ITestOutputHelper output)
         Assert.Null(exception);
     }
 
-    [Fact(Skip = "Generic function instantiation not supported in compiler mode")]
+    [Fact]
     public void GenericComparator_CompilesAndExecutesCorrectly()
     {
         // Arrange
@@ -235,7 +235,7 @@ public class GenericFunctionTests(ITestOutputHelper output)
         Assert.Null(exception);
     }
 
-    [Fact(Skip = "Generic function instantiation not supported in compiler mode")]
+    [Fact(Skip = "Generic nullable division returns int 2 instead of double 2.5 in compiler mode")]
     public void GenericNullableType_CompilesAndExecutesCorrectly()
     {
         // Arrange
@@ -269,7 +269,7 @@ public class GenericFunctionTests(ITestOutputHelper output)
         Assert.Null(exception);
     }
 
-    [Fact(Skip = "Generic function instantiation not supported in compiler mode")]
+    [Fact(Skip = "GenericMethodSpecializer.CreateSpecialization 编译期无限递归导致栈溢出崩溃")]
     public void GenericRecursiveFunction_CompilesAndExecutesCorrectly()
     {
         // Arrange
@@ -305,7 +305,7 @@ public class GenericFunctionTests(ITestOutputHelper output)
         Assert.Null(exception);
     }
 
-    [Fact(Skip = "Generic function instantiation not supported in compiler mode")]
+    [Fact]
     public void GenericFunctionComposition_CompilesAndExecutesCorrectly()
     {
         // Arrange
@@ -342,7 +342,7 @@ public class GenericFunctionTests(ITestOutputHelper output)
         Assert.Null(exception);
     }
 
-    [Fact(Skip = "Generic function instantiation not supported in compiler mode")]
+    [Fact]
     public void GenericTypeInference_CompilesAndExecutesCorrectly()
     {
         // Arrange
@@ -376,7 +376,7 @@ public class GenericFunctionTests(ITestOutputHelper output)
         Assert.Null(exception);
     }
 
-    [Fact(Skip = "Generic function instantiation not supported in compiler mode")]
+    [Fact]
     public void GenericFunctionOverloading_CompilesAndExecutesCorrectly()
     {
         // Arrange

@@ -28,7 +28,7 @@ public class CompletionHandler_AdvancedCoverageTests
             "}\n";
 
         var (handler, uri) = Setup(code);
-        var result = await CompleteAt(handler, uri, 10, 13);
+        var result = await CompleteAtAsync(handler, uri, 10, 13);
         var items = result.Items.ToList();
 
         var sizeItem = items.FirstOrDefault(i => i.Label == "size");
@@ -52,7 +52,7 @@ public class CompletionHandler_AdvancedCoverageTests
             "}\n";
 
         var (handler, uri) = Setup(code);
-        var result = await CompleteAt(handler, uri, 5, 14);
+        var result = await CompleteAtAsync(handler, uri, 5, 14);
         var items = result.Items.ToList();
 
         var powerItem = items.FirstOrDefault(i => i.Label == "Power");
@@ -75,7 +75,7 @@ public class CompletionHandler_AdvancedCoverageTests
             "msg <- gr\n";
 
         var (handler, uri) = Setup(code);
-        var result = await CompleteAt(handler, uri, 5, 9);
+        var result = await CompleteAtAsync(handler, uri, 5, 9);
         var items = result.Items.ToList();
 
         Assert.Contains(items, i => i.Label == "greet" && i.Kind == CompletionItemKind.Function);
@@ -105,7 +105,7 @@ public class CompletionHandler_AdvancedCoverageTests
             "}\n";
 
         var (handler, uri) = Setup(code);
-        var result = await CompleteAt(handler, uri, 16, 42);
+        var result = await CompleteAtAsync(handler, uri, 16, 42);
         var nickname = result.Items.FirstOrDefault(i => i.Label == "nickname");
 
         Assert.NotNull(nickname);
@@ -123,7 +123,7 @@ public class CompletionHandler_AdvancedCoverageTests
             "}\n";
 
         var (handler, uri) = Setup(code);
-        var result = await CompleteAt(handler, uri, 2, 27);
+        var result = await CompleteAtAsync(handler, uri, 2, 27);
         var labels = result.Items.Select(i => i.Label).ToHashSet();
 
         Assert.Contains("input", labels);
@@ -148,7 +148,7 @@ public class CompletionHandler_AdvancedCoverageTests
 
         var (handler, uri) = Setup(code);
         // Line 4 inside lambda body: should see lambda param `item`, lambda local `scaled`, outer `factor` & `baseVal`
-        var result = await CompleteAt(handler, uri, 4, 15);
+        var result = await CompleteAtAsync(handler, uri, 4, 15);
         var labels = result.Items.Select(i => i.Label).ToHashSet();
 
         Assert.Contains("item", labels);
@@ -167,7 +167,7 @@ public class CompletionHandler_AdvancedCoverageTests
         return (new CompletionHandler(dm, wi), uri);
     }
 
-    private static Task<CompletionList> CompleteAt(CompletionHandler handler, string uri, int line, int character) =>
+    private static Task<CompletionList> CompleteAtAsync(CompletionHandler handler, string uri, int line, int character) =>
         handler.Handle(new CompletionParams
         {
             TextDocument = new TextDocumentIdentifier { Uri = new Uri(uri) },

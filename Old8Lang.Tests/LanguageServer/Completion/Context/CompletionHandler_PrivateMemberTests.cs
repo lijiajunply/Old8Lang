@@ -50,7 +50,7 @@ public class CompletionHandler_PrivateMemberTests
         var (handler, uri) = Setup(HierarchyCode);
 
         // Line 29: `    e1 <- obj.` (dot at col 13, cursor at 14)
-        var result = await CompleteAt(handler, uri, 29, 14);
+        var result = await CompleteAtAsync(handler, uri, 29, 14);
         var labels = result.Items.Select(i => i.Label).ToHashSet();
 
         Assert.Contains("basePub", labels);
@@ -73,7 +73,7 @@ public class CompletionHandler_PrivateMemberTests
             "x <- v.\n";
 
         var (handler, uri) = Setup(code);
-        var result = await CompleteAt(handler, uri, 5, 7);
+        var result = await CompleteAtAsync(handler, uri, 5, 7);
 
         Assert.Empty(result.Items);
     }
@@ -84,7 +84,7 @@ public class CompletionHandler_PrivateMemberTests
         var (handler, uri) = Setup(HierarchyCode);
 
         // Line 11: `        a <- this.` (col 18)
-        var thisResult = await CompleteAt(handler, uri, 11, 18);
+        var thisResult = await CompleteAtAsync(handler, uri, 11, 18);
         var thisLabels = thisResult.Items.Select(i => i.Label).ToHashSet();
         Assert.Contains("basePub", thisLabels);
         Assert.Contains("baseProt", thisLabels);
@@ -92,7 +92,7 @@ public class CompletionHandler_PrivateMemberTests
         Assert.Contains("basePrivMethod", thisLabels);
 
         // Line 12: `        b <- other.` (col 19)
-        var otherResult = await CompleteAt(handler, uri, 12, 19);
+        var otherResult = await CompleteAtAsync(handler, uri, 12, 19);
         var otherLabels = otherResult.Items.Select(i => i.Label).ToHashSet();
         Assert.Contains("basePub", otherLabels);
         Assert.Contains("baseProt", otherLabels);
@@ -106,7 +106,7 @@ public class CompletionHandler_PrivateMemberTests
         var (handler, uri) = Setup(HierarchyCode);
 
         // Line 20: `        x <- this.` in Child (col 18)
-        var childThis = await CompleteAt(handler, uri, 20, 18);
+        var childThis = await CompleteAtAsync(handler, uri, 20, 18);
         var childThisLabels = childThis.Items.Select(i => i.Label).ToHashSet();
         Assert.Contains("childPriv", childThisLabels);
         Assert.Contains("basePub", childThisLabels);
@@ -116,7 +116,7 @@ public class CompletionHandler_PrivateMemberTests
         Assert.DoesNotContain("basePrivMethod", childThisLabels);
 
         // Line 21: `        y <- super.` in Child (col 19)
-        var childSuper = await CompleteAt(handler, uri, 21, 19);
+        var childSuper = await CompleteAtAsync(handler, uri, 21, 19);
         var childSuperLabels = childSuper.Items.Select(i => i.Label).ToHashSet();
         Assert.Contains("basePub", childSuperLabels);
         Assert.Contains("baseProt", childSuperLabels);
@@ -131,19 +131,19 @@ public class CompletionHandler_PrivateMemberTests
         var (handler, uri) = Setup(HierarchyCode);
 
         // Line 13: `Base.` inside Base -> sees private/protected/public static
-        var insideBase = (await CompleteAt(handler, uri, 13, 18)).Items.Select(i => i.Label).ToHashSet();
+        var insideBase = (await CompleteAtAsync(handler, uri, 13, 18)).Items.Select(i => i.Label).ToHashSet();
         Assert.Contains("basePubStatic", insideBase);
         Assert.Contains("baseProtStatic", insideBase);
         Assert.Contains("basePrivStatic", insideBase);
 
         // Line 22: `Base.` inside Child -> sees protected/public static, NOT private static
-        var insideChild = (await CompleteAt(handler, uri, 22, 18)).Items.Select(i => i.Label).ToHashSet();
+        var insideChild = (await CompleteAtAsync(handler, uri, 22, 18)).Items.Select(i => i.Label).ToHashSet();
         Assert.Contains("basePubStatic", insideChild);
         Assert.Contains("baseProtStatic", insideChild);
         Assert.DoesNotContain("basePrivStatic", insideChild);
 
         // Line 30: `Base.` outside -> sees ONLY public static
-        var outside = (await CompleteAt(handler, uri, 30, 15)).Items.Select(i => i.Label).ToHashSet();
+        var outside = (await CompleteAtAsync(handler, uri, 30, 15)).Items.Select(i => i.Label).ToHashSet();
         Assert.Contains("basePubStatic", outside);
         Assert.DoesNotContain("baseProtStatic", outside);
         Assert.DoesNotContain("basePrivStatic", outside);
@@ -155,7 +155,7 @@ public class CompletionHandler_PrivateMemberTests
         var (handler, uri) = Setup(HierarchyCode);
 
         // Line 23: `        bare <- 0` inside Child.inspectChild
-        var bareResult = await CompleteAt(handler, uri, 23, 8);
+        var bareResult = await CompleteAtAsync(handler, uri, 23, 8);
         var labels = bareResult.Items.Select(i => i.Label).ToHashSet();
 
         Assert.Contains("childPriv", labels);
@@ -176,7 +176,7 @@ public class CompletionHandler_PrivateMemberTests
         return (new CompletionHandler(dm, wi), uri);
     }
 
-    private static Task<CompletionList> CompleteAt(CompletionHandler handler, string uri, int line, int character) =>
+    private static Task<CompletionList> CompleteAtAsync(CompletionHandler handler, string uri, int line, int character) =>
         handler.Handle(new CompletionParams
         {
             TextDocument = new TextDocumentIdentifier { Uri = new Uri(uri) },

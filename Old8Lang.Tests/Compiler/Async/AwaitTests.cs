@@ -75,7 +75,7 @@ public class AwaitTests(ITestOutputHelper output)
         Assert.Null(exception);
     }
 
-    [Fact(Skip = "Temporarily disabled due to runtime crash")]
+    [Fact]
     public void AwaitWithDoubleTask_CompilesAndExecutesCorrectly()
     {
         // Arrange

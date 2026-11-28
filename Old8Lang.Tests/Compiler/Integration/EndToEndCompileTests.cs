@@ -122,7 +122,7 @@ public class EndToEndCompileTests
     /// <summary>
     /// 测试 IL 模式下的类和对象
     /// </summary>
-    [Fact(Skip = "类方法调用的IL生成有已知bug - 需要编译器层面修复")]
+    [Fact]
     public void EndToEndCompile_ClassAndObject_CompilesCorrectly()
     {
         // 测试类声明、实例化和方法调用在 IL 模式下的表现
@@ -186,7 +186,7 @@ public class EndToEndCompileTests
     /// <summary>
     /// 测试 IL 模式下的lambda表达式
     /// </summary>
-    [Fact(Skip = "Lambda表达式调用的IL生成有已知bug - 需要编译器层面修复")]
+    [Fact]
     public void EndToEndCompile_LambdaExpressions_CompilesCorrectly()
     {
         // 测试lambda表达式在 IL 模式下的表现
@@ -345,7 +345,7 @@ public class EndToEndCompileTests
     /// <summary>
     /// 测试 IL 模式下的递归函数
     /// </summary>
-    [Fact(Skip = "递归函数调用的IL生成有已知bug - 需要编译器层面修复")]
+    [Fact]
     public void EndToEndCompile_RecursiveFunctions_CompilesCorrectly()
     {
         // 测试递归函数在 IL 模式下的表现

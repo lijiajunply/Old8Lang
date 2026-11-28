@@ -355,7 +355,7 @@ public class ErrorHandlingTests
         Assert.ThrowsAny<Exception>(() => compiledAction());
     }
 
-    [Fact(Skip = "此测试会导致真正的栈溢出，使测试主机崩溃。栈溢出是预期行为，但无法在单元测试中安全捕获。")]
+    [Fact(Skip = "64位环境下 deep(10000) 不会触发栈溢出，且若加深递归会导致测试主机崩溃而无法安全捕获")]
     public void DeepRecursion_ThrowsStackOverflowException_WhenExecuted()
     {
         // Arrange

@@ -35,7 +35,7 @@ public class IlAsyncGeneratorStreamTests
     [Fact]
     public async Task ValueTypeAsyncEnumerableCanBeAdapted()
     {
-        using var iterator = IlAsyncLoopEnumerator.Create(Numbers());
+        using var iterator = IlAsyncLoopEnumerator.Create(NumbersAsync());
         Assert.True(await iterator.MoveNextTask());
         Assert.Equal(42, iterator.Current);
         Assert.False(await iterator.MoveNextTask());
@@ -229,7 +229,7 @@ public class IlAsyncGeneratorStreamTests
         }
     }
 
-    private static async IAsyncEnumerable<int> Numbers()
+    private static async IAsyncEnumerable<int> NumbersAsync()
     {
         await Task.Yield();
         yield return 42;
