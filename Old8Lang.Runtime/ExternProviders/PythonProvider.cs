@@ -447,13 +447,22 @@ public class PythonProvider : IExternProvider
     /// </summary>
     private string? DetectPythonDllLinux()
     {
-        // 先尝试使用 python3 命令查询
+        // 先尝试使用 python3 sysconfig 精准查询共享库路径
         try
         {
             var processInfo = new ProcessStartInfo
             {
                 FileName = "python3",
-                Arguments = "-c \"import sys; print(sys.base_prefix + '/lib/libpython' + str(sys.version_info.major) + '.' + str(sys.version_info.minor) + '.so')\"",
+                Arguments = "-c \"import os, sys, sysconfig; " +
+                            "libdir = sysconfig.get_config_var('LIBDIR') or (sys.base_prefix + '/lib'); " +
+                            "multiarch = sysconfig.get_config_var('MULTIARCH') or ''; " +
+                            "names = [sysconfig.get_config_var('INSTSONAME'), sysconfig.get_config_var('LDLIBRARY'), " +
+                            "f'libpython{sys.version_info.major}.{sys.version_info.minor}.so.1.0', " +
+                            "f'libpython{sys.version_info.major}.{sys.version_info.minor}.so.1', " +
+                            "f'libpython{sys.version_info.major}.{sys.version_info.minor}.so']; " +
+                            "dirs = [libdir, os.path.join(libdir, multiarch) if multiarch else '', sys.base_prefix + '/lib']; " +
+                            "found = [os.path.join(d, n) for d in dirs if d for n in names if n and os.path.exists(os.path.join(d, n))]; " +
+                            "print(found[0] if found else '')\"",
                 RedirectStandardOutput = true,
                 UseShellExecute = false,
                 CreateNoWindow = true
@@ -465,7 +474,7 @@ public class PythonProvider : IExternProvider
                 var output = process.StandardOutput.ReadToEnd().Trim();
                 process.WaitForExit();
 
-                if (process.ExitCode == 0 && File.Exists(output))
+                if (process.ExitCode == 0 && !string.IsNullOrEmpty(output) && File.Exists(output))
                 {
                     return output;
                 }
@@ -477,22 +486,28 @@ public class PythonProvider : IExternProvider
         }
 
         var versions = new[] { "3.13", "3.12", "3.11", "3.10", "3.9", "3.8", "3.7" };
+        var suffixes = new[] { ".so.1.0", ".so.1", ".so" };
+        var directories = new[]
+        {
+            "/usr/lib/x86_64-linux-gnu",
+            "/usr/lib/aarch64-linux-gnu",
+            "/usr/lib",
+            "/usr/local/lib",
+            "/lib/x86_64-linux-gnu",
+            "/lib/aarch64-linux-gnu"
+        };
 
         foreach (var ver in versions)
         {
-            var paths = new[]
+            foreach (var dir in directories)
             {
-                $"/usr/lib/x86_64-linux-gnu/libpython{ver}.so",
-                $"/usr/lib/libpython{ver}.so",
-                $"/usr/local/lib/libpython{ver}.so",
-                $"/lib/x86_64-linux-gnu/libpython{ver}.so"
-            };
-
-            foreach (var path in paths)
-            {
-                if (File.Exists(path))
+                foreach (var suffix in suffixes)
                 {
-                    return path;
+                    var path = Path.Combine(dir, $"libpython{ver}{suffix}");
+                    if (File.Exists(path))
+                    {
+                        return path;
+                    }
                 }
             }
         }

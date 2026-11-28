@@ -23,6 +23,16 @@ jobs:
         run: dotnet restore Old8Lang.sln
       - name: Build solution
         run: dotnet build Old8Lang.sln --configuration Release --no-restore
+      - name: Configure Python runtime for tests
+        run: |
+          PYDLL=$(python3 -c "import os, sysconfig; libdir = sysconfig.get_config_var('LIBDIR') or ''; name = sysconfig.get_config_var('INSTSONAME') or sysconfig.get_config_var('LDLIBRARY') or ''; p = os.path.join(libdir, name); print(p if os.path.exists(p) else '')")
+          if [ -z "$PYDLL" ]; then
+            PYDLL=$(find /usr/lib /usr/local/lib /lib -maxdepth 3 -name 'libpython3.*.so*' 2>/dev/null | head -n 1)
+          fi
+          if [ -n "$PYDLL" ]; then
+            echo "PYTHONNET_PYDLL=$PYDLL" >> "$GITHUB_ENV"
+            echo "Detected PYTHONNET_PYDLL=$PYDLL"
+          fi
       - name: Run unit tests
         id: unit
         run: dotnet test Old8Lang.Tests/Old8Lang.Tests.csproj --configuration Release --no-build --logger "trx;LogFileName=test_results.trx"

@@ -27,6 +27,13 @@ public class VMExternConventionTests
         : OperatingSystem.IsMacOS() ? "libSystem.dylib"
         : "libc.so.6";
 
+    /// <summary>
+    /// 当前平台的 C 数学库名称（Linux 下 cos 等数学函数位于 libm.so.6）
+    /// </summary>
+    private static string MathLibrary => OperatingSystem.IsWindows() ? "msvcrt.dll"
+        : OperatingSystem.IsMacOS() ? "libSystem.dylib"
+        : "libm.so.6";
+
     private static string RunVm(string code)
     {
         var interpreter = new LangInterpreter();
@@ -151,7 +158,7 @@ public class VMExternConventionTests
     {
         // cos(0.0) == 1.0，覆盖 double 参数的封送与 double 返回值的转换
         var output = RunVm($$"""
-            extern "{{CLibrary}}" {
+            extern "{{MathLibrary}}" {
                 func cos(x:double) -> double
             }
             print(cos(0.0))
