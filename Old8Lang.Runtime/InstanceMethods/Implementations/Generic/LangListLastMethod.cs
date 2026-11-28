@@ -92,8 +92,12 @@ public class LangListLastMethod : BaseLangListMethod, IIlNativeValueInstanceMeth
             return items[items.Count - 1];
         }
 
-        if (instance is System.Collections.IList list && list.Count > 0)
+        if (instance is System.Collections.IList list)
         {
+            if (list.Count == 0)
+            {
+                throw new InvalidOperationException("序列不包含任何元素");
+            }
             return list[list.Count - 1];
         }
 

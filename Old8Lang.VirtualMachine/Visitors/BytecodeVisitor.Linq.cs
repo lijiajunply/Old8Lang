@@ -114,42 +114,62 @@ public partial class BytecodeVisitor
     }
 
     /// <summary>
-    /// 处理 OrderBy 子句
+    /// 处理带 OrderBy 的终止子句：收集 [值..., key0, key1, ...] 行到列表，循环结束后统一按键稳定排序。
+    /// </summary>
+    private void ProcessLinqOrderedTerminationClause(
+        LinqClause terminationClause,
+        OrderByClause orderByClause,
+        int sortRowsLocal)
+    {
+        int payloadCount;
+        if (terminationClause is SelectClause selectClause)
+        {
+            selectClause.Projection.Accept(this);
+            payloadCount = 1;
+        }
+        else if (terminationClause is GroupByClause groupByClause)
+        {
+            groupByClause.KeyExpression.Accept(this);
+            groupByClause.ElementExpression.Accept(this);
+            payloadCount = 2;
+        }
+        else
+        {
+            return;
+        }
+
+        foreach (var ordering in orderByClause.Orderings)
+        {
+            ordering.KeyExpression.Accept(this);
+        }
+
+        Emit(OpCode.NewArray, payloadCount + orderByClause.Orderings.Count);
+        int rowLocal = _compiler.AllocateLocal();
+        Emit(OpCode.StoreLocal, rowLocal);
+
+        Emit(OpCode.LoadLocal, sortRowsLocal);
+        Emit(OpCode.LoadLocal, rowLocal);
+        Emit(OpCode.CallMethod, new object[] { 2, "Add" });
+        Emit(OpCode.Pop);
+
+        _compiler.FreeLocal(rowLocal);
+    }
+
+    /// <summary>
+    /// 处理 OrderBy 子句：按键对已收集的排序行稳定排序，并还原为最终结果列表（或分组列表）。
     /// </summary>
     private void ProcessLinqOrderBy(
         OrderByClause orderByClause,
+        bool isGroupBy,
         int resultListLocal)
     {
-        // OrderBy 的实现策略:
-        // 调用原生排序函数对结果列表进行排序
-        // 由于字节码模式下难以传递 lambda 表达式,我们使用简化实现:
-        // 假设排序键是简单的字段访问或表达式
-
-        // 加载结果列表
         Emit(OpCode.LoadLocal, resultListLocal);
-
-        // 对于每个排序键,生成排序调用
-        for (int i = 0; i < orderByClause.Orderings.Count; i++)
+        foreach (var ordering in orderByClause.Orderings)
         {
-            var ordering = orderByClause.Orderings[i];
-
-            // 加载排序方向 (true = ascending, false = descending)
             Emit(OpCode.LoadConst, _compiler.AddConstant(ordering.IsAscending));
-
-            // 调用原生排序函数
-            // 参数: list, isAscending
-            // 注意: 这需要在虚拟机中实现相应的原生函数
-            if (i == 0)
-            {
-                Emit(OpCode.CallNative, new object[] { 2, "LinqOrderBy" });
-            }
-            else
-            {
-                Emit(OpCode.CallNative, new object[] { 2, "LinqThenBy" });
-            }
         }
-
-        // 将排序后的列表存回
+        Emit(OpCode.NewArray, orderByClause.Orderings.Count);
+        Emit(OpCode.CallNative, new object[] { 2, isGroupBy ? "LinqGroupSortedEntries" : "LinqSortByKeys" });
         Emit(OpCode.StoreLocal, resultListLocal);
     }
 }

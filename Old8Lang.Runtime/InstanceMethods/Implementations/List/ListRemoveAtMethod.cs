@@ -46,44 +46,10 @@ public class ListRemoveAtMethod : BaseInstanceMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        // 加载列表实例
-        instance.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
-
-        // 获取 Values 字段
-        var valuesField = typeof(ListLangValue).GetField("Values");
-        ilGenerator.Emit(OpCodes.Ldfld, valuesField!);
-
-        // 加载索引参数
-        parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
-
-        // 调用辅助方法
-        var removeAtHelperMethod = typeof(ListRemoveAtMethod).GetMethod(nameof(RemoveAtHelper),
-            System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);
-        ilGenerator.Emit(OpCodes.Call, removeAtHelperMethod!);
+        IlNativeCollectionBridge.EmitBridgeCall(this, instance, parameters, ilGenerator, local);
     }
 
-    /// <summary>
-    /// 辅助方法：根据索引移除元素
-    /// </summary>
-    public static LangValueType RemoveAtHelper(List<LangValueType> list, LangValueType indexParam)
-    {
-        if (indexParam is not IntLangValue indexValue)
-        {
-            throw new Exception($"RemoveAt 方法的参数必须是整数类型");
-        }
-
-        var index = indexValue.Value;
-        if (index < 0 || index >= list.Count)
-        {
-            throw new Exception($"索引 {index} 超出范围");
-        }
-
-        var removed = list[index];
-        list.RemoveAt(index);
-        return removed;
-    }
-
-    protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)
+protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)
     {
         return typeof(LangValueType);
     }

@@ -1,3 +1,4 @@
+using Old8Lang.InstanceMethods.Core;
 using System.Reflection.Emit;
 using Old8Lang.AST;
 using Old8Lang.AST.Expression;
@@ -63,8 +64,7 @@ public class LangListGroupByMethod : BaseLangListMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        // IL 模式暂不支持高阶函数
-        ilGenerator.Emit(OpCodes.Ldnull);
+        IlNativeCollectionBridge.EmitBridgeCall(this, instance, parameters, ilGenerator, local);
     }
 
     protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)

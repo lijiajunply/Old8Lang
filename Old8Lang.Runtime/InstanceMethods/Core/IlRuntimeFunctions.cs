@@ -72,6 +72,113 @@ public static class IlRuntimeFunctions
         return IlValueBridge.Unwrap(result);
     }
 
+    /// <summary>按名字调用解释器里的异步函数（供带装饰器的 IL async func 转发使用）。</summary>
+    public static async Task<object?> InvokeAsyncByName(string name, object?[] arguments)
+    {
+        var manager = RuntimeGlobalWriter.CurrentManager ?? new VariateManager();
+
+        var asyncCandidate = manager.ImportInfos
+            .OfType<AsyncFuncLangValue>()
+            .FirstOrDefault(func => func.Id?.IdName == name && func.Ids?.Count == arguments.Length);
+
+        var parameters = arguments
+            .Select(argument => (LangExpression)IlValueBridge.Wrap(argument))
+            .ToList();
+
+        var slotSnapshot = RuntimeGlobals.Snapshot();
+        foreach (var (slotName, slotValue) in slotSnapshot)
+        {
+            RuntimeGlobalWriter.Write(slotName, slotValue);
+        }
+
+        LangValueType langResult;
+        if (asyncCandidate is not null)
+        {
+            var taskLangValue = asyncCandidate.RunAsync(manager, parameters);
+            langResult = await taskLangValue.Task.ConfigureAwait(false);
+        }
+        else
+        {
+            var syncCandidate = manager.ImportInfos
+                .OfType<FuncLangValue>()
+                .FirstOrDefault(func => func.Id?.IdName == name && func.Ids?.Count == arguments.Length);
+            if (syncCandidate is null)
+            {
+                throw new NameError(new SourcePosition(), name);
+            }
+
+            var syncResult = syncCandidate.Run(manager, parameters);
+            langResult = syncResult is TaskLangValue tlv
+                ? await tlv.Task.ConfigureAwait(false)
+                : syncResult;
+        }
+
+        foreach (var slotName in slotSnapshot.Keys)
+        {
+            try
+            {
+                var slotValue = manager.GetValue(new LangId(slotName));
+                if (slotValue is not null)
+                {
+                    RuntimeGlobals.Set(slotName, IlValueBridge.Unwrap(slotValue));
+                }
+            }
+            catch
+            {
+                // 管理器里没有该变量时保留原槽位值
+            }
+        }
+
+        return IlValueBridge.Unwrap(langResult);
+    }
+
+    /// <summary>将运行期动态对象规范化为 <see cref="Task{TResult}"/> 以支持动态 await。</summary>
+    public static Task<object?> ToAwaitableTask(object? value)
+    {
+        if (value is Task<object?> objectTask)
+        {
+            return objectTask;
+        }
+
+        if (value is TaskLangValue taskLangValue)
+        {
+            return AwaitTaskLangValue(taskLangValue);
+        }
+
+        if (value is Task task)
+        {
+            return AwaitGeneralTask(task);
+        }
+
+        throw new TypeError(
+            new SourcePosition(),
+            "Task",
+            value?.GetType().Name ?? "null",
+            "await 只能用于 Task 类型");
+    }
+
+    private static async Task<object?> AwaitTaskLangValue(TaskLangValue taskLangValue)
+    {
+        var result = await taskLangValue.Task.ConfigureAwait(false);
+        return IlValueBridge.Unwrap(result);
+    }
+
+    private static async Task<object?> AwaitGeneralTask(Task task)
+    {
+        await task.ConfigureAwait(false);
+        var taskType = task.GetType();
+        if (taskType.IsGenericType)
+        {
+            var resultProp = taskType.GetProperty("Result");
+            if (resultProp != null && resultProp.PropertyType.Name != "VoidTaskResult")
+            {
+                return IlValueBridge.UnwrapDynamic(resultProp.GetValue(task));
+            }
+        }
+
+        return null;
+    }
+
     /// <summary>按解释器语义执行一次函数调用。</summary>
     public static object? InvokeInstance(
         string name,

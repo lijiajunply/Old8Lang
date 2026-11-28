@@ -391,7 +391,10 @@ public class BytecodeCompiler : IBytecodeCompiler
     {
         var extensionMetadata = new ExtensionMetadata
         {
-            TargetTypeName = extensionDecl.TargetTypeName
+            TargetTypeName = extensionDecl.TargetTypeName,
+            TargetGenericParameters = extensionDecl.TargetGenericParameters is { Count: > 0 }
+                ? [.. extensionDecl.TargetGenericParameters]
+                : []
         };
 
         // 编译每个扩展方法
@@ -526,7 +529,7 @@ public class BytecodeCompiler : IBytecodeCompiler
     /// 编译异步函数
     /// </summary>
     public FunctionMetadata CompileAsyncFunction(string funcName, List<string> parameters, List<string> parameterTypes, List<object?> defaultValues,
-        BlockStatement body, int paramsParameterIndex = -1, string returnType = "")
+        BlockStatement body, int paramsParameterIndex = -1, string returnType = "", List<string>? capturedVars = null)
     {
         var func = new FunctionMetadata
         {
@@ -550,6 +553,11 @@ public class BytecodeCompiler : IBytecodeCompiler
 
         // 嵌套闭包会按引用捕获本函数的局部变量，提前为这些变量分配槽位
         PredeclareLocalsCapturedByNestedClosures(body, parameters);
+
+        if (capturedVars is { Count: > 0 })
+        {
+            func.CapturedVariables = new List<string>(capturedVars);
+        }
 
         // 编译函数体
         var visitor = RuntimeVisitors.CreateBytecode(this);

@@ -33,20 +33,7 @@ public class ListClearMethod : BaseInstanceMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        // 加载列表实例
-        instance.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
-
-        // 获取 Values 字段
-        var valuesField = typeof(ListLangValue).GetField("Values");
-        ilGenerator.Emit(OpCodes.Ldfld, valuesField!);
-
-        // 调用 Clear 方法
-        var clearMethod = typeof(List<LangValueType>).GetMethod("Clear");
-        ilGenerator.Emit(OpCodes.Callvirt, clearMethod!);
-
-        // 返回 VoidLangValue
-        var voidCtor = typeof(VoidLangValue).GetConstructor(Type.EmptyTypes);
-        ilGenerator.Emit(OpCodes.Newobj, voidCtor!);
+        IlNativeCollectionBridge.EmitBridgeCall(this, instance, parameters, ilGenerator, local);
     }
 
     protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)

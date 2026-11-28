@@ -80,18 +80,12 @@ internal static class AsyncFuncLangValueIlCompilerExtensions
 
         local.AsyncStateMachineGenerator = stateMachineGenerator;
 
-        // 提升参数到状态机字段
-        if (func.Ids != null)
+        // 提升参数与已解包的闭包捕获变量到状态机字段
+        var hoistedLocals = new List<(string Name, LocalBuilder Local)>();
+        foreach (var (varName, varLocal) in local.LocalVar)
         {
-            foreach (var id in func.Ids)
-            {
-                var argName = id.IdName;
-                var argLocal = local.GetLocalVar(argName);
-                if (argLocal != null)
-                {
-                    stateMachineGenerator.DefineVariable(argName, argLocal.LocalType);
-                }
-            }
+            stateMachineGenerator.DefineVariable(varName, varLocal.LocalType);
+            hoistedLocals.Add((varName, varLocal));
         }
 
         stateMachineGenerator.GenerateStateMachine(typeBuilder);
@@ -112,18 +106,14 @@ internal static class AsyncFuncLangValueIlCompilerExtensions
         ilGenerator.Emit(OpCodes.Ldloca, smLocal);
         ilGenerator.Emit(OpCodes.Initobj, stateMachineType);
 
-        // 初始化提升的参数字段
-        if (func.Ids != null)
+        // 初始化提升的参数与捕获变量字段
+        foreach (var (varName, varLocal) in hoistedLocals)
         {
-            foreach (var argName in func.Ids.Select(id => id.IdName))
-            {
-                if (!stateMachineGenerator.VariableFields.TryGetValue(argName, out var fieldBuilder)) continue;
-                var field = stateMachineType.GetField(fieldBuilder.Name)!;
-                var argLocal = local.GetLocalVar(argName)!;
-                ilGenerator.Emit(OpCodes.Ldloca, smLocal);
-                ilGenerator.Emit(OpCodes.Ldloc, argLocal);
-                ilGenerator.Emit(OpCodes.Stfld, field);
-            }
+            if (!stateMachineGenerator.VariableFields.TryGetValue(varName, out var fieldBuilder)) continue;
+            var field = stateMachineType.GetField(fieldBuilder.Name)!;
+            ilGenerator.Emit(OpCodes.Ldloca, smLocal);
+            ilGenerator.Emit(OpCodes.Ldloc, varLocal);
+            ilGenerator.Emit(OpCodes.Stfld, field);
         }
 
         // 2. sm.builder = AsyncTaskMethodBuilder<object>.Create();

@@ -13,7 +13,7 @@ namespace Old8Lang.InstanceMethods.Implementations.Array;
 /// <summary>
 /// Array.SelectionSort() - 使用选择排序算法对数组进行排序
 /// </summary>
-public class ArraySelectionSortMethod : BaseInstanceMethod
+public class ArraySelectionSortMethod : BaseInstanceMethod, IIlNativeValueInstanceMethod
 {
     public override string[] Names => ["SelectionSort", "selectionSort"];
     public override Type TargetType => typeof(ArrayLangValue);
@@ -34,17 +34,13 @@ public class ArraySelectionSortMethod : BaseInstanceMethod
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
         instance.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
-        var helperMethod = typeof(ArraySelectionSortMethod).GetMethod(nameof(SelectionSortHelper),
+        var helperMethod = typeof(ArraySelectionSortMethod).GetMethod(nameof(SelectionSortNativeHelper),
             System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
         ilGenerator.Emit(OpCodes.Call, helperMethod!);
     }
 
-    public static ArrayLangValue SelectionSortHelper(ArrayLangValue array)
-    {
-        var items = array.GetItems().ToArray();
-        SelectionSortImpl(items);
-        return new ArrayLangValue(items, array.ElementType, array.Position);
-    }
+    public static object?[] SelectionSortNativeHelper(object? instance) =>
+        ArraySortVmSupport.SortAndReturn(instance, SelectionSort);
 
     private static void SelectionSortImpl(LangValueType[] nums)
     {
@@ -68,7 +64,7 @@ public class ArraySelectionSortMethod : BaseInstanceMethod
 
     protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)
     {
-        return typeof(ArrayLangValue);
+        return typeof(object?[]);
     }
 
     protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)

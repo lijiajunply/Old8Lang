@@ -186,6 +186,10 @@ public class LangListSumWithSelectorMethod : BaseLangListMethod, IIlNativeValueI
             {
                 sum += intValue;
             }
+            else if (value is long longValue)
+            {
+                sum += longValue;
+            }
             else if (value is double doubleValue)
             {
                 sum += doubleValue;
@@ -210,6 +214,6 @@ public class LangListSumWithSelectorMethod : BaseLangListMethod, IIlNativeValueI
             }
         }
 
-        return hasDouble ? sum : (int)sum;
+        return hasDouble ? (object)sum : (int)sum;
     }
 }

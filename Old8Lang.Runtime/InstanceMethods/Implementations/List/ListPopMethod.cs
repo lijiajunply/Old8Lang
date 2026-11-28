@@ -41,27 +41,10 @@ public class ListPopMethod : BaseInstanceMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        instance.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
-
-        var helperMethod = typeof(ListPopMethod).GetMethod(nameof(PopHelper),
-            System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
-        ilGenerator.Emit(OpCodes.Call, helperMethod!);
+        IlNativeCollectionBridge.EmitBridgeCall(this, instance, parameters, ilGenerator, local);
     }
 
-    public static object? PopHelper(List<object?> list)
-    {
-        if (list.Count == 0)
-        {
-            throw new InvalidOperationException("无法从空列表中弹出元素");
-        }
-
-        var lastIndex = list.Count - 1;
-        var item = list[lastIndex];
-        list.RemoveAt(lastIndex);
-        return item;
-    }
-
-    protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)
+protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)
     {
         return typeof(object);
     }

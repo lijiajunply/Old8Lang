@@ -376,8 +376,12 @@ public static class TypeChecker
         var expectedBase = GetBaseTypeName(expectedType);
         var actualBase = GetBaseTypeName(actualType);
 
-        // 两者都必须是 function 类型
-        if (expectedBase != "function" || actualBase != "function")
+        // 期望为 function 时兼容 function 与 async_func；期望为 async_func 时仅兼容 async_func
+        var expectedIsFunc = expectedBase is "function" or "async_func";
+        var actualIsFunc = expectedBase == "async_func"
+            ? actualBase == "async_func"
+            : actualBase is "function" or "async_func";
+        if (!expectedIsFunc || !actualIsFunc)
         {
             return false;
         }
@@ -610,6 +614,123 @@ public static class TypeChecker
                 $"变量 '{variableName}' 赋值类型不匹配"
             );
         }
+
+        // 对显式泛型集合注解（list<T> / array<T> / dict<K, V>）递归校验实际元素类型，
+        // 使解释器与 IL / VM 的集合元素类型约束保持一致。
+        ValidateGenericCollectionRuntimeElements(expectedType, actualValue, node, variableName);
+    }
+
+    private static void ValidateGenericCollectionRuntimeElements(
+        string expectedType,
+        LangValueType actualValue,
+        IOldLangTree node,
+        string variableName)
+    {
+        var trimmed = expectedType.Trim();
+        if (trimmed.EndsWith('?'))
+        {
+            if (actualValue is NullLangValue) return;
+            trimmed = trimmed[..^1].Trim();
+        }
+
+        if (!IsGenericType(trimmed)) return;
+        var openIdx = trimmed.IndexOf('<');
+        var closeIdx = trimmed.LastIndexOf('>');
+        if (openIdx <= 0 || closeIdx != trimmed.Length - 1) return;
+
+        var baseName = trimmed[..openIdx].Trim().ToLowerInvariant();
+        var innerSpec = trimmed[(openIdx + 1)..closeIdx].Trim();
+
+        if (baseName == "list" && actualValue is ListLangValue listVal)
+        {
+            for (int i = 0; i < listVal.Values.Count; i++)
+            {
+                var elem = listVal.Values[i];
+                var elemType = GetLangValueType(elem);
+                if (!IsPolymorphicCompatible(elemType, innerSpec))
+                {
+                    throw new TypeError(
+                        node,
+                        innerSpec,
+                        elemType,
+                        $"变量 '{variableName}' 列表元素类型不匹配: 第 {i} 个元素期望 {innerSpec}，实际 {elemType}");
+                }
+                ValidateGenericCollectionRuntimeElements(innerSpec, elem, node, $"{variableName}[{i}]");
+            }
+        }
+        else if (baseName == "array" && actualValue is ArrayLangValue arrayVal)
+        {
+            for (int i = 0; i < arrayVal.RunResult.Length; i++)
+            {
+                var elem = arrayVal.RunResult[i];
+                var elemType = GetLangValueType(elem);
+                if (!IsPolymorphicCompatible(elemType, innerSpec))
+                {
+                    throw new TypeError(
+                        node,
+                        innerSpec,
+                        elemType,
+                        $"变量 '{variableName}' 数组元素类型不匹配: 第 {i} 个元素期望 {innerSpec}，实际 {elemType}");
+                }
+                ValidateGenericCollectionRuntimeElements(innerSpec, elem, node, $"{variableName}[{i}]");
+            }
+        }
+        else if (baseName == "dict" && actualValue is DictionaryLangValue dictVal)
+        {
+            var typeArgs = SplitTopLevelGenericArgs(innerSpec);
+            if (typeArgs.Count != 2) return;
+            var keyExpected = typeArgs[0];
+            var valExpected = typeArgs[1];
+
+            for (int i = 0; i < dictVal.Value.Count; i++)
+            {
+                var (k, v) = dictVal.Value[i];
+                var kType = GetLangValueType(k);
+                if (!IsPolymorphicCompatible(kType, keyExpected))
+                {
+                    throw new TypeError(
+                        node,
+                        keyExpected,
+                        kType,
+                        $"变量 '{variableName}' 字典键类型不匹配: 第 {i} 个键期望 {keyExpected}，实际 {kType}");
+                }
+                ValidateGenericCollectionRuntimeElements(keyExpected, k, node, $"{variableName}.key[{i}]");
+
+                var vType = GetLangValueType(v);
+                if (!IsPolymorphicCompatible(vType, valExpected))
+                {
+                    throw new TypeError(
+                        node,
+                        valExpected,
+                        vType,
+                        $"变量 '{variableName}' 字典值类型不匹配: 第 {i} 个值期望 {valExpected}，实际 {vType}");
+                }
+                ValidateGenericCollectionRuntimeElements(valExpected, v, node, $"{variableName}.value[{i}]");
+            }
+        }
+    }
+
+    private static List<string> SplitTopLevelGenericArgs(string spec)
+    {
+        var result = new List<string>();
+        int depth = 0;
+        int start = 0;
+        for (int i = 0; i < spec.Length; i++)
+        {
+            char c = spec[i];
+            if (c == '<') depth++;
+            else if (c == '>') depth--;
+            else if (c == ',' && depth == 0)
+            {
+                result.Add(spec[start..i].Trim());
+                start = i + 1;
+            }
+        }
+        if (start < spec.Length)
+        {
+            result.Add(spec[start..].Trim());
+        }
+        return result;
     }
 
     /// <summary>
@@ -810,6 +931,11 @@ public static class TypeChecker
     /// <returns>是否兼容</returns>
     public static bool IsPolymorphicCompatible(string sourceTypeName, string targetTypeName)
     {
+        if (IsFunctionTypeCompatible(targetTypeName, sourceTypeName))
+        {
+            return true;
+        }
+
         // 如果目标类型涉及 const，使用基本兼容性检查
         if (targetTypeName.StartsWith("const ", StringComparison.OrdinalIgnoreCase) ||
             targetTypeName.Equals("const", StringComparison.OrdinalIgnoreCase))

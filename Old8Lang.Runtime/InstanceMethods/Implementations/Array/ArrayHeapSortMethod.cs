@@ -13,7 +13,7 @@ namespace Old8Lang.InstanceMethods.Implementations.Array;
 /// <summary>
 /// Array.HeapSort() - 使用堆排序算法对数组进行排序
 /// </summary>
-public class ArrayHeapSortMethod : BaseInstanceMethod
+public class ArrayHeapSortMethod : BaseInstanceMethod, IIlNativeValueInstanceMethod
 {
     public override string[] Names => ["HeapSort", "heapSort"];
     public override Type TargetType => typeof(ArrayLangValue);
@@ -34,17 +34,13 @@ public class ArrayHeapSortMethod : BaseInstanceMethod
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
         instance.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
-        var helperMethod = typeof(ArrayHeapSortMethod).GetMethod(nameof(HeapSortHelper),
+        var helperMethod = typeof(ArrayHeapSortMethod).GetMethod(nameof(HeapSortNativeHelper),
             System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
         ilGenerator.Emit(OpCodes.Call, helperMethod!);
     }
 
-    public static ArrayLangValue HeapSortHelper(ArrayLangValue array)
-    {
-        var items = array.GetItems().ToArray();
-        HeapSortImpl(items);
-        return new ArrayLangValue(items, array.ElementType, array.Position);
-    }
+    public static object?[] HeapSortNativeHelper(object? instance) =>
+        ArraySortVmSupport.SortAndReturn(instance, HeapSort);
 
     private static void HeapSortImpl(LangValueType[] nums)
     {
@@ -89,7 +85,7 @@ public class ArrayHeapSortMethod : BaseInstanceMethod
 
     protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)
     {
-        return typeof(ArrayLangValue);
+        return typeof(object?[]);
     }
 
     protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)

@@ -40,6 +40,11 @@ public class CharCompareToMethod : BaseInstanceMethod
     {
         instance.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
         parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        var paramType = parameters[0].Accept(new TypeInferenceVisitor(local));
+        if (paramType == typeof(object))
+        {
+            ilGenerator.Emit(OpCodes.Unbox_Any, typeof(char));
+        }
 
         var helperMethod = typeof(CharCompareToMethod).GetMethod(nameof(CompareToHelper),
             System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);

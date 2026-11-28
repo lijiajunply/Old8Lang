@@ -1,3 +1,4 @@
+using Old8Lang.InstanceMethods.Core;
 using System.Reflection.Emit;
 using Old8Lang.AST;
 using Old8Lang.AST.Expression;
@@ -64,49 +65,10 @@ public class LangListToDictMethod : BaseLangListMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        instance.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
-
-        var helperMethod = typeof(LangListToDictMethod).GetMethod(nameof(ToDictHelper),
-            System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
-        ilGenerator.Emit(OpCodes.Call, helperMethod!);
+        IlNativeCollectionBridge.EmitBridgeCall(this, instance, parameters, ilGenerator, local);
     }
 
-    public static DictionaryLangValue ToDictHelper(ILangList langList)
-    {
-        if (langList is DictionaryLangValue dictValue)
-        {
-            return dictValue;
-        }
-
-        var items = langList.GetItems();
-        var tuples = new List<TupleLangValue>();
-
-        foreach (var item in items)
-        {
-            if (item is TupleLangValue tuple)
-            {
-                tuples.Add(tuple);
-            }
-            else if (item is ILangList list)
-            {
-                var listItems = list.GetItems().ToList();
-                if (listItems.Count >= 2)
-                {
-                    var key = listItems[0] as LangExpression ?? new LangId(listItems[0].ToString() ?? "");
-                    var value = listItems[1] as LangExpression ?? new LangId(listItems[1].ToString() ?? "");
-                    tuples.Add(new TupleLangValue(key, value));
-                }
-            }
-            else
-            {
-                throw new InvalidOperationException($"ToDict 要求列表元素是键值对（元组或包含两个元素的列表），但得到了 {item.GetType().Name}");
-            }
-        }
-
-        return new DictionaryLangValue(tuples);
-    }
-
-    protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)
+protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)
     {
         return typeof(DictionaryLangValue);
     }

@@ -55,6 +55,15 @@ public class LangListElementAtMethod : BaseLangListMethod, IIlNativeValueInstanc
     {
         IlValueBridge.EmitLoadWrapped(instance, ilGenerator, local);
         parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        var paramType = parameters[0].Accept(new TypeInferenceVisitor(local));
+        if (paramType == typeof(object))
+        {
+            ilGenerator.Emit(OpCodes.Unbox_Any, typeof(int));
+        }
+        else if (paramType is not null && paramType != typeof(int) && paramType.IsValueType)
+        {
+            ilGenerator.Emit(OpCodes.Conv_I4);
+        }
 
         var helperMethod = typeof(LangListElementAtMethod).GetMethod(nameof(ElementAtNativeHelper),
             System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
@@ -100,9 +109,14 @@ public class LangListElementAtMethod : BaseLangListMethod, IIlNativeValueInstanc
 
         if (instance is System.Collections.IList list && arguments[0] is int idx)
         {
+            var originalIdx = idx;
             if (idx < 0)
             {
                 idx = list.Count + idx;
+            }
+            if (idx < 0 || idx >= list.Count)
+            {
+                throw new IndexOutOfRangeException($"索引 {originalIdx} 超出范围");
             }
             return list[idx];
         }

@@ -31,11 +31,7 @@ public class DictIsEmptyMethod : BaseInstanceMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        instance.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
-
-        var helperMethod = typeof(DictIsEmptyMethod).GetMethod(nameof(IsEmptyHelper),
-            System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);
-        ilGenerator.Emit(OpCodes.Call, helperMethod!);
+        IlNativeCollectionBridge.EmitBridgeCall(this, instance, parameters, ilGenerator, local);
     }
 
     public static bool IsEmptyHelper(Dictionary<object, object> dict)

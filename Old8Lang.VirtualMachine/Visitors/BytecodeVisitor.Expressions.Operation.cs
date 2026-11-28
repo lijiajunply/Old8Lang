@@ -40,19 +40,30 @@ public partial class BytecodeVisitor
                 // 这是方法调用：object.method(args) 或 super.method(args)
                 // 左操作数（对象或super）已经在栈上
 
-                // 生成所有参数的代码
+                // 生成所有参数的代码（位置参数在前，命名参数的值紧随其后）
                 foreach (var arg in instance.Ids)
                 {
                     arg.Accept(this);
                 }
 
+                var namedCallArgs = instance.NamedArgs ?? [];
+                foreach (var namedArg in namedCallArgs)
+                {
+                    namedArg.Value.Accept(this);
+                }
+
                 string methodName = instance.Id.IdName;
-                int argCount = instance.Ids.Count + 1; // +1 因为对象本身是第一个参数
+                int argCount = instance.Ids.Count + namedCallArgs.Count + 1; // +1 因为对象本身是第一个参数
 
                 if (isSuperAccess)
                 {
                     // super.method(args) - 调用父类方法
                     Emit(OpCode.CallSuperMethod, new object[] { argCount, methodName });
+                }
+                else if (namedCallArgs.Count > 0)
+                {
+                    Emit(OpCode.CallMethod,
+                        new object[] { argCount, methodName, namedCallArgs.Select(item => item.Name).ToArray() });
                 }
                 else
                 {

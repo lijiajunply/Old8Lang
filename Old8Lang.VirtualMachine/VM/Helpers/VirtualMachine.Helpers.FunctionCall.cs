@@ -127,10 +127,25 @@ public partial class VirtualMachine
                 return false;
 
             case "FlattenTuple":
-                // 展平元组为列表
-                if (args.Length > 0 && args[0] is TupleLangValue tuple)
+                // 展平元组为列表（支持 TupleLangValue、VM 原生右嵌套 ITuple 以及列表）
+                if (args.Length > 0)
                 {
-                    return FlattenTupleHelper(tuple);
+                    if (args[0] is TupleLangValue tuple)
+                    {
+                        return FlattenTupleHelper(tuple);
+                    }
+
+                    if (args[0] is System.Runtime.CompilerServices.ITuple vmTuple)
+                    {
+                        return FlattenVmTuple(vmTuple);
+                    }
+
+                    if (args[0] is IList listVal)
+                    {
+                        var copy = new List<object?>(listVal.Count);
+                        foreach (var elem in listVal) copy.Add(elem);
+                        return copy;
+                    }
                 }
 
                 return new List<object?>();
@@ -272,6 +287,22 @@ public partial class VirtualMachine
                 }
                 return args.Length > 0 ? args[0] : new List<object?>();
 
+            case "LinqSortByKeys":
+                // 参数: rows ([projectedValue, key0, key1, ...]), ascendingFlags (bool[])
+                if (args.Length >= 2 && args[0] is IList keyedRows && args[1] is IList ascFlags)
+                {
+                    return SortRowsByKeys(keyedRows, ascFlags);
+                }
+                return new List<object?>();
+
+            case "LinqGroupSortedEntries":
+                // 参数: rows ([groupKey, groupElem, sortKey0, sortKey1, ...]), ascendingFlags (bool[])
+                if (args.Length >= 2 && args[0] is IList groupRows && args[1] is IList groupAscFlags)
+                {
+                    return GroupSortedEntries(groupRows, groupAscFlags);
+                }
+                return new List<object?>();
+
             default:
                 throw new MethodNotFoundError(new SourcePosition(), funcName);
         }
@@ -386,6 +417,92 @@ public partial class VirtualMachine
         return result;
     }
 
+    private static List<object?> SortRowsByKeys(IList rows, IList ascFlags)
+    {
+        var ascending = new bool[ascFlags.Count];
+        for (int i = 0; i < ascFlags.Count; i++)
+            ascending[i] = Convert.ToBoolean(ascFlags[i]);
+
+        var indexed = new List<(object? Value, object?[] Keys, int Index)>(rows.Count);
+        for (int i = 0; i < rows.Count; i++)
+        {
+            if (rows[i] is IList entry && entry.Count >= 1 + ascending.Length)
+            {
+                var keys = new object?[ascending.Length];
+                for (int k = 0; k < ascending.Length; k++)
+                    keys[k] = entry[1 + k];
+                indexed.Add((entry[0], keys, i));
+            }
+        }
+
+        indexed.Sort((left, right) =>
+        {
+            for (int k = 0; k < ascending.Length; k++)
+            {
+                int cmp = CompareObjects(left.Keys[k], right.Keys[k]);
+                if (cmp != 0) return ascending[k] ? cmp : -cmp;
+            }
+            return left.Index.CompareTo(right.Index);
+        });
+
+        var result = new List<object?>(indexed.Count);
+        foreach (var item in indexed)
+            result.Add(item.Value);
+        return result;
+    }
+
+    private static List<object?> GroupSortedEntries(IList rows, IList ascFlags)
+    {
+        var ascending = new bool[ascFlags.Count];
+        for (int i = 0; i < ascFlags.Count; i++)
+            ascending[i] = Convert.ToBoolean(ascFlags[i]);
+
+        var indexed = new List<(object? GroupKey, object? Element, object?[] Keys, int Index)>(rows.Count);
+        for (int i = 0; i < rows.Count; i++)
+        {
+            if (rows[i] is IList entry && entry.Count >= 2 + ascending.Length)
+            {
+                var keys = new object?[ascending.Length];
+                for (int k = 0; k < ascending.Length; k++)
+                    keys[k] = entry[2 + k];
+                indexed.Add((entry[0], entry[1], keys, i));
+            }
+        }
+
+        indexed.Sort((left, right) =>
+        {
+            for (int k = 0; k < ascending.Length; k++)
+            {
+                int cmp = CompareObjects(left.Keys[k], right.Keys[k]);
+                if (cmp != 0) return ascending[k] ? cmp : -cmp;
+            }
+            return left.Index.CompareTo(right.Index);
+        });
+
+        var groupDict = new Dictionary<object, List<object?>>();
+        foreach (var item in indexed)
+        {
+            var actualKey = item.GroupKey ?? NullGroupKey;
+            if (!groupDict.TryGetValue(actualKey, out var bucket))
+            {
+                bucket = [];
+                groupDict[actualKey] = bucket;
+            }
+            bucket.Add(item.Element);
+        }
+
+        var result = new List<object?>(groupDict.Count);
+        foreach (var kvp in groupDict)
+        {
+            result.Add(new Dictionary<string, object?>
+            {
+                ["Key"] = ReferenceEquals(kvp.Key, NullGroupKey) ? null : kvp.Key,
+                ["Values"] = kvp.Value
+            });
+        }
+        return result;
+    }
+
     /// <summary>
     /// 比较两个对象
     /// </summary>
@@ -394,6 +511,13 @@ public partial class VirtualMachine
         if (a == null && b == null) return 0;
         if (a == null) return -1;
         if (b == null) return 1;
+
+        if (a is string leftStr && b is string rightStr)
+            return string.CompareOrdinal(leftStr, rightStr);
+
+        if (a is int or long or double or float or decimal &&
+            b is int or long or double or float or decimal)
+            return Convert.ToDouble(a).CompareTo(Convert.ToDouble(b));
 
         // 尝试使用 IComparable
         if (a is IComparable comparableA)

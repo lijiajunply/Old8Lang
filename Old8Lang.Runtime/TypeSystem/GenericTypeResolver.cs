@@ -170,6 +170,38 @@ public class GenericTypeResolver(
             return typeof(void);
         }
 
-        return ResolveType(returnTypeAnnotation);
+        var trimmed = returnTypeAnnotation.Trim();
+        if (trimmed.EndsWith('?') && !trimmed.Contains('|') && !trimmed.Contains('&'))
+        {
+            var baseResolved = ResolveType(trimmed[..^1].Trim());
+            return baseResolved.IsValueType ? typeof(object) : baseResolved;
+        }
+
+        return ResolveType(trimmed);
+    }
+
+    /// <summary>
+    /// 解析返回类型注解中的泛型参数（如将 <c>T?</c> 替换为 <c>int?</c>），供运行期可空返回校验使用。
+    /// </summary>
+    public string? ResolveReturnTypeAnnotation(string? returnTypeAnnotation)
+    {
+        if (string.IsNullOrWhiteSpace(returnTypeAnnotation))
+        {
+            return null;
+        }
+
+        var trimmed = returnTypeAnnotation.Trim();
+        if (trimmed.EndsWith('?') && !trimmed.Contains('|') && !trimmed.Contains('&'))
+        {
+            var baseResolved = ResolveType(trimmed[..^1].Trim());
+            if (baseResolved == typeof(object))
+            {
+                return null;
+            }
+
+            return $"{InstanceMethods.Core.IlTypeErrors.TypeName(baseResolved)}?";
+        }
+
+        return trimmed;
     }
 }

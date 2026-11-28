@@ -32,11 +32,7 @@ public class ListToArrayMethod : BaseInstanceMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        instance.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
-
-        var helperMethod = typeof(ListToArrayMethod).GetMethod(nameof(ToArrayHelper),
-            System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
-        ilGenerator.Emit(OpCodes.Call, helperMethod!);
+        IlNativeCollectionBridge.EmitBridgeCall(this, instance, parameters, ilGenerator, local);
     }
 
     public static object[] ToArrayHelper(List<object?> list)

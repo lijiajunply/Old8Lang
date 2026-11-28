@@ -29,7 +29,10 @@ public static partial class AsyncFuncInitRuntimeExtensions
                 asyncTarget.Ids,
                 asyncTarget.BlockStatement,
                 asyncTarget.Position
-            );
+            )
+            {
+                CapturedScope = asyncTarget.CapturedScope
+            };
             manager.AddClassAndFunc(tempAsyncFunc);
         }
         else if (targetFunc is FuncLangValue funcTarget)
@@ -41,7 +44,10 @@ public static partial class AsyncFuncInitRuntimeExtensions
                 funcTarget.GenericParameters,
                 funcTarget.Position,
                 isLambda: false
-            );
+            )
+            {
+                CapturedScope = funcTarget.CapturedScope
+            };
             manager.AddClassAndFunc(tempFunc);
         }
 
@@ -63,7 +69,7 @@ public static partial class AsyncFuncInitRuntimeExtensions
                 throw new InvalidOperationError(decorator.Position, $"装饰器 '{decorator.Name}' 必须返回一个函数");
             }
 
-            // 将包装器临时注册
+            // 将包装器临时注册（保留其闭包作用域，支持带参装饰器捕获外层参数）
             var wrapperVarName = $"__decorator_wrapper_{Guid.NewGuid():N}";
             var wrapperWithId = new FuncLangValue(
                 new LangId(wrapperVarName, position: decorator.Position),
@@ -72,7 +78,10 @@ public static partial class AsyncFuncInitRuntimeExtensions
                 wrapper.GenericParameters,
                 wrapper.Position,
                 isLambda: false
-            );
+            )
+            {
+                CapturedScope = wrapper.CapturedScope
+            };
             manager.AddClassAndFunc(wrapperWithId);
 
             // 调用包装器，传入目标函数

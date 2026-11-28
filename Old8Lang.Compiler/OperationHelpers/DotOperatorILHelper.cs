@@ -1176,6 +1176,49 @@ public static class DotOperatorILHelper
 
             if (m is null)
             {
+                // 函数值字段当方法调用（如 `this.validator(x)` 或 `obj.callback(x)`，常见于泛型类特化或 object/function 字段）
+                var callableField = leftType.GetField(
+                    instance.Id.IdName,
+                    BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                if (callableField is not null &&
+                    (callableField.FieldType == typeof(object) ||
+                     typeof(Delegate).IsAssignableFrom(callableField.FieldType) ||
+                     typeof(FuncLangValue).IsAssignableFrom(callableField.FieldType) ||
+                     typeof(AsyncFuncLangValue).IsAssignableFrom(callableField.FieldType)))
+                {
+                    // 当前栈：[left, arg0, arg1, ..., argN-1]
+                    var argLocals = new LocalBuilder[types.Count];
+                    for (int i = types.Count - 1; i >= 0; i--)
+                    {
+                        argLocals[i] = ilGenerator.DeclareLocal(types[i]);
+                        ilGenerator.Emit(OpCodes.Stloc, argLocals[i]);
+                    }
+
+                    ilGenerator.Emit(OpCodes.Ldfld, callableField);
+                    if (callableField.FieldType.IsValueType)
+                    {
+                        ilGenerator.Emit(OpCodes.Box, callableField.FieldType);
+                    }
+
+                    ilGenerator.Emit(OpCodes.Ldc_I4, types.Count);
+                    ilGenerator.Emit(OpCodes.Newarr, typeof(object));
+                    for (int i = 0; i < types.Count; i++)
+                    {
+                        ilGenerator.Emit(OpCodes.Dup);
+                        ilGenerator.Emit(OpCodes.Ldc_I4, i);
+                        ilGenerator.Emit(OpCodes.Ldloc, argLocals[i]);
+                        if (types[i].IsValueType)
+                        {
+                            ilGenerator.Emit(OpCodes.Box, types[i]);
+                        }
+                        ilGenerator.Emit(OpCodes.Stelem_Ref);
+                    }
+
+                    ilGenerator.Emit(OpCodes.Call,
+                        typeof(IlValueBridge).GetMethod(nameof(IlValueBridge.InvokeFunctionValue))!);
+                    return typeof(object);
+                }
+
                 // 方法未找到，抛出异常
                 throw new InvalidOperationError(operation, $"方法 '{instance.Id.IdName}' 未找到",
                     $"无法在类型 '{leftType.Name}' 中找到方法 '{instance.Id.IdName}'，参数类型为: {string.Join(", ", types.Select(t => t.Name))}");
@@ -1639,6 +1682,27 @@ public static class DotOperatorILHelper
 
         if (method is null)
         {
+            // 类体内（含泛型类特化）通过 `this.field(args)` 调用函数值字段
+            var field = type.GetField(methodName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+            if (field is not null)
+            {
+                var fieldValue = field.GetValue(receiver);
+                if (fieldValue is Delegate or FuncLangValue or AsyncFuncLangValue)
+                {
+                    return IlValueBridge.InvokeFunctionValue(fieldValue, arguments);
+                }
+            }
+
+            var property = type.GetProperty(methodName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+            if (property?.CanRead == true)
+            {
+                var propValue = property.GetValue(receiver);
+                if (propValue is Delegate or FuncLangValue or AsyncFuncLangValue)
+                {
+                    return IlValueBridge.InvokeFunctionValue(propValue, arguments);
+                }
+            }
+
             throw new MissingMethodException(type.FullName, methodName);
         }
 

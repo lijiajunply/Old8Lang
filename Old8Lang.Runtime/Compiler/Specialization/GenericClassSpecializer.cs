@@ -315,7 +315,9 @@ public static class GenericClassSpecializer
             var parameterTypes = resolver.ResolveParameterTypes(funcValue.Ids!);
 
             // 解析返回类型
-            var returnType = resolver.ResolveReturnType(funcValue.Id?.AssumptionType);
+            var returnType = AST.Statement.IlReturnTypeHelper.Resolve(
+                funcValue.Id,
+                resolver.ResolveReturnType(funcValue.Id?.AssumptionType));
 
             // 创建方法
             var methodBuilder = typeBuilder.DefineMethod(
@@ -359,7 +361,9 @@ public static class GenericClassSpecializer
             }
 
             var parameterTypes = resolver.ResolveParameterTypes(funcValue.Ids!);
-            var returnType = resolver.ResolveReturnType(funcValue.Id?.AssumptionType);
+            var returnType = AST.Statement.IlReturnTypeHelper.Resolve(
+                funcValue.Id,
+                resolver.ResolveReturnType(funcValue.Id?.AssumptionType));
             var methodBuilder = typeBuilder.DefineMethod(
                 memberId.IdName,
                 MethodAttributes.Public | MethodAttributes.Static | MethodAttributes.HideBySig,
@@ -435,6 +439,9 @@ public static class GenericClassSpecializer
         Type returnType,
         bool isStatic = false)
     {
+        methodLocal.ReturnTypeAnnotation = methodLocal.CurrentGenericTypeResolver is not null
+            ? methodLocal.CurrentGenericTypeResolver.ResolveReturnTypeAnnotation(funcValue.Id?.AssumptionType)
+            : funcValue.Id?.AssumptionType?.Trim();
         if (returnType != typeof(void))
         {
             methodLocal.ReturnValueLocal = methodIL.DeclareLocal(returnType);

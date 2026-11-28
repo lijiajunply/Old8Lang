@@ -42,37 +42,10 @@ public class ListInsertMethod : BaseInstanceMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        // 加载列表实例
-        instance.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
-
-        // 加载索引参数
-        parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
-
-        // 加载元素参数
-        parameters[1].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
-
-        // 调用辅助方法
-        var insertHelperMethod = typeof(ListInsertMethod).GetMethod(nameof(InsertHelper),
-            System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);
-        ilGenerator.Emit(OpCodes.Call, insertHelperMethod!);
+        IlNativeCollectionBridge.EmitBridgeCall(this, instance, parameters, ilGenerator, local);
     }
 
-    /// <summary>
-    /// 辅助方法：插入元素
-    /// </summary>
-    public static VoidLangValue InsertHelper(ListLangValue list, LangValueType indexParam, LangValueType element)
-    {
-        if (indexParam is not IntLangValue indexValue)
-        {
-            throw new Exception("Insert 方法的第一个参数必须是整数类型");
-        }
-
-        var insertIndex = Math.Max(0, Math.Min(indexValue.Value, list.Values.Count));
-        list.Values.Insert(insertIndex, element);
-        return new VoidLangValue();
-    }
-
-    protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)
+protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)
     {
         return typeof(VoidLangValue);
     }

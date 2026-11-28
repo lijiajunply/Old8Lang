@@ -44,9 +44,22 @@ public partial class CompilerVisitor
             case FuncLangValue func:
                 EmitFuncSetValueToIl(func, idName);
                 return;
-            case LambdaExpression lambda:
-                EmitFuncSetValueToIl(LambdaExpressionRuntimeFactory.Create(lambda) as FuncLangValue ?? throw new InvalidOperationException("async lambda 不能直接赋值为普通函数值"), idName);
+            case AsyncFuncLangValue asyncFunc:
+                EmitAsyncFuncSetValueToIl(asyncFunc, idName);
                 return;
+            case LambdaExpression lambda:
+            {
+                var created = LambdaExpressionRuntimeFactory.Create(lambda);
+                if (created is AsyncFuncLangValue asyncLambda)
+                {
+                    EmitAsyncFuncSetValueToIl(asyncLambda, idName);
+                }
+                else
+                {
+                    EmitFuncSetValueToIl((FuncLangValue)created, idName);
+                }
+                return;
+            }
             case Operation operation:
                 EmitOperationSetValueToIl(operation, idName);
                 return;
@@ -281,6 +294,25 @@ public partial class CompilerVisitor
         }
     }
 
+    private void EmitAsyncFuncSetValueToIl(AsyncFuncLangValue asyncFunc, string idName)
+    {
+        if (local.TryGetCapturedLocal(idName, out var captured))
+        {
+            ilGenerator.Emit(OpCodes.Ldarg_0);
+            ilGenerator.Emit(OpCodes.Ldc_I4, captured.Index);
+            VisitAsyncFuncLangValue(asyncFunc);
+            ilGenerator.Emit(OpCodes.Stelem_Ref);
+            return;
+        }
+
+        VisitAsyncFuncLangValue(asyncFunc);
+        var lambdaLocal = local.GetOrCreateLocalVar(ilGenerator, idName, typeof(Delegate));
+        ilGenerator.Emit(OpCodes.Stloc, lambdaLocal);
+        local.LocalVarTypes[idName] = typeof(Delegate);
+        local.LocalDelegateReturnTypes[idName] = typeof(Task<object>);
+        local.FuncParameters[idName] = asyncFunc.Ids ?? [];
+    }
+
     private void EmitFuncSetValueToIl(FuncLangValue func, string idName)
     {
         // Lambda 表达式类型注解验证
@@ -385,6 +417,7 @@ public partial class CompilerVisitor
                         else
                         {
                             var defaultValueLocal = methodIl.DeclareLocal(returnType);
+                            methodIl.Emit(OpCodes.Ldloca, defaultValueLocal);
                             methodIl.Emit(OpCodes.Initobj, returnType);
                             methodIl.Emit(OpCodes.Ldloc, defaultValueLocal);
                         }

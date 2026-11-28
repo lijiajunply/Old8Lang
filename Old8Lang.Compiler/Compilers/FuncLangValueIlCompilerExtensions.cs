@@ -117,7 +117,19 @@ internal static class FuncLangValueIlCompilerExtensions
         var capturedValues = GetCapturedLocalValues(local);
         var dynamicMethod = func.BuildLambdaDynamicMethod(local, methodName, capturedValues);
         var templateId = CompiledDelegateRegistry.RegisterClosureTemplate(dynamicMethod);
+        EmitClosureCreation(ilGenerator, local, templateId, capturedValues);
+        return dynamicMethod;
+    }
 
+    /// <summary>
+    /// 发射打包捕获槽位数组并调用 <see cref="CompiledDelegateRegistry.CreateClosure"/> 的 IL 指令（同步/异步 lambda 共用）。
+    /// </summary>
+    internal static void EmitClosureCreation(
+        ILGenerator ilGenerator,
+        LocalManager local,
+        int templateId,
+        IReadOnlyList<CapturedLocalValue> capturedValues)
+    {
         ilGenerator.Emit(OpCodes.Ldc_I4, templateId);
         ilGenerator.Emit(OpCodes.Ldc_I4, capturedValues.Count);
         ilGenerator.Emit(OpCodes.Newarr, typeof(object));
@@ -189,7 +201,6 @@ internal static class FuncLangValueIlCompilerExtensions
 
         ilGenerator.Emit(OpCodes.Call,
             typeof(CompiledDelegateRegistry).GetMethod(nameof(CompiledDelegateRegistry.CreateClosure))!);
-        return dynamicMethod;
     }
 
     /// <summary>
@@ -274,6 +285,7 @@ internal static class FuncLangValueIlCompilerExtensions
             {
                 // 对于其他值类型，初始化并加载默认值
                 var defaultValueLocal = methodIl.DeclareLocal(returnType);
+                methodIl.Emit(OpCodes.Ldloca, defaultValueLocal);
                 methodIl.Emit(OpCodes.Initobj, returnType);
                 methodIl.Emit(OpCodes.Ldloc, defaultValueLocal);
             }

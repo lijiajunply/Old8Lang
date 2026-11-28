@@ -49,12 +49,7 @@ public class ArrayOverlapsMethod : BaseInstanceMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        instance.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
-        parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
-
-        var helperMethod = typeof(ArrayOverlapsMethod).GetMethod(nameof(OverlapsHelper),
-            System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
-        ilGenerator.Emit(OpCodes.Call, helperMethod!);
+        IlNativeCollectionBridge.EmitBridgeCall(this, instance, parameters, ilGenerator, local);
     }
 
     public static bool OverlapsHelper(object?[] array, object?[] other)

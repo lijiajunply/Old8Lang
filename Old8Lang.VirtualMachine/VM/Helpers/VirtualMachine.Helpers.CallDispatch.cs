@@ -1,3 +1,4 @@
+using Old8Lang.AST.Expression.Value;
 using Old8Lang.Bytecode.Closures;
 using Old8Lang.Bytecode.Core;
 using Old8Lang.Bytecode.Generators;
@@ -165,7 +166,9 @@ public partial class VirtualMachine
             if (TryResolveCallableFunction(frame, funcName, functionIndexHint, position, out var function, out var closureEnvironment,
                     out var closureConstantPool))
             {
-                if (function.TryGetPositionalFastCallTypeKinds(argCount, out var fastTypeKinds) &&
+                if (!function.IsAsync &&
+                    !function.IsGenerator &&
+                    function.TryGetPositionalFastCallTypeKinds(argCount, out var fastTypeKinds) &&
                     TryInvokeResolvedFunctionPositionalFastFromStack(
                         function,
                         argCount,
@@ -187,6 +190,18 @@ public partial class VirtualMachine
             }
 
             var fallbackArgs = PopArguments(argCount);
+
+            // import { Vector2 } from "Vector"：导入的原生类按构造调用，每次得到独立对象
+            if (TryGetGlobalValue(funcName, out var nativeClassObj) &&
+                nativeClassObj is Old8Lang.AST.Expression.Intermediates.NativeAnyLangValue nativeClass)
+            {
+                var holder = nativeClass.CreateInstanceHolder();
+                holder.New([.. fallbackArgs.Select(item => item is Old8Lang.AST.Expression.LangValueType langItem
+                    ? Old8Lang.Apis.ListToObjects([langItem]).First()
+                    : item)!]);
+                _stack.PushObject(UnwrapToVmValue(holder));
+                return;
+            }
             if (TryResolveClassByName(funcName, out var classMetadata))
             {
                 var obj = CreateObjectInstance(classMetadata, fallbackArgs);
@@ -246,6 +261,7 @@ public partial class VirtualMachine
             {
                 if (peekFunc.ObjectRef is ClosureValue fastClosure &&
                     !fastClosure.Function.IsGenerator &&
+                    !fastClosure.Function.IsAsync &&
                     CanSkipNormalizeForPositionalCall(fastClosure.Function, argCount))
                 {
                     var funcMeta = fastClosure.Function;
@@ -270,6 +286,7 @@ public partial class VirtualMachine
 
                 if (peekFunc.ObjectRef is FunctionMetadata fastFunc &&
                     !fastFunc.IsGenerator &&
+                    !fastFunc.IsAsync &&
                     CanSkipNormalizeForPositionalCall(fastFunc, argCount))
                 {
                     var locals = RentLocalsBuffer(fastFunc.LocalCount);
@@ -303,26 +320,13 @@ public partial class VirtualMachine
 
         if (funcObj is ClosureValue closure)
         {
-            var funcMeta = closure.Function;
-            if (funcMeta.IsGenerator)
-            {
-                PushGeneratorForFunction(funcMeta, args);
-                return;
-            }
-
-            CallClosureFunction(funcMeta, args, closure.CapturedVariables, closure.ConstantPool);
+            InvokeResolvedFunction(closure.Function, args, closure.CapturedVariables, closure.ConstantPool);
             return;
         }
 
         if (funcObj is FunctionMetadata functionMetadata)
         {
-            if (functionMetadata.IsGenerator)
-            {
-                PushGeneratorForFunction(functionMetadata, args);
-                return;
-            }
-
-            CallFunction(functionMetadata, args);
+            InvokeResolvedFunction(functionMetadata, args, null, null);
             return;
         }
 
@@ -338,6 +342,12 @@ public partial class VirtualMachine
             return;
         }
 
+        if (function.IsAsync)
+        {
+            StartAsyncFunctionTask(function, args, closureEnvironment, closureConstantPool);
+            return;
+        }
+
         if (closureEnvironment != null)
         {
             CallClosureFunction(function, args, closureEnvironment, closureConstantPool);
@@ -346,6 +356,24 @@ public partial class VirtualMachine
         {
             CallFunction(function, args);
         }
+    }
+
+    private void StartAsyncFunctionTask(
+        FunctionMetadata function,
+        object?[] args,
+        ClosureEnvironment? closureEnvironment,
+        ConstantPool? closureConstantPool)
+    {
+        _globalsState.IsConcurrent = true;
+        var task = Task.Run(() =>
+        {
+            var asyncVm = CreateWorkerVirtualMachine();
+            var result = closureEnvironment != null
+                ? asyncVm.ExecuteClosureAndGetResult(function, args, closureEnvironment, closureConstantPool)
+                : asyncVm.ExecuteFunctionAndGetResult(function, args);
+            return asyncVm.ConvertResultToLangValue(result);
+        });
+        _stack.PushRef(new TaskLangValue(task));
     }
 
     private void PushGeneratorForFunction(FunctionMetadata function, object?[] args)

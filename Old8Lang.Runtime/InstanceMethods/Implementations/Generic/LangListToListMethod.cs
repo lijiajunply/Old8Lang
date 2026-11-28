@@ -69,19 +69,12 @@ public class LangListToListMethod : BaseLangListMethod, IIlNativeValueInstanceMe
 
     protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)
     {
-        // 在 VM 模式下，列表表示为 object[]
-        if (instance is object[] arr)
-        {
-            return arr; // 已经是数组形式，直接返回
-        }
-
         if (instance is List<object?> list)
         {
-            return list.ToArray();
+            return list;
         }
 
-        // 使用基类的辅助方法获取元素列表
-        var items = GetItemsForVM(instance);
-        return items.ToArray();
+        // 使用基类的辅助方法获取元素列表（返回新的 List<object?>）
+        return GetItemsForVM(instance);
     }
 }

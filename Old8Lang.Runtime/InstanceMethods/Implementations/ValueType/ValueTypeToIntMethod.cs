@@ -73,6 +73,17 @@ public class ValueTypeToIntMethod : BaseValueTypeMethod
         }
         else
         {
+            if (instanceType is { IsValueType: true })
+            {
+                ilGenerator.Emit(OpCodes.Box, instanceType);
+            }
+
+            if (instanceType is null || !typeof(LangValueType).IsAssignableFrom(instanceType))
+            {
+                ilGenerator.Emit(OpCodes.Call,
+                    typeof(InstanceMethods.Core.IlValueBridge).GetMethod(nameof(InstanceMethods.Core.IlValueBridge.Wrap))!);
+            }
+
             // LangValueType -> IntLangValue
             var helperMethod = typeof(ValueTypeToIntMethod).GetMethod(nameof(ConvertToIntHelper),
                 System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);

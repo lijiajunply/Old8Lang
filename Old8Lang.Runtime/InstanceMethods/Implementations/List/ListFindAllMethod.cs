@@ -65,9 +65,8 @@ public class ListFindAllMethod : BaseInstanceMethod, IIlNativeValueInstanceMetho
         // 接收者：原生集合 -> Old8Lang 值
         IlValueBridge.EmitLoadWrapped(instance, ilGenerator, local);
 
-        // 谓词：编译好的委托 -> 函数值
-        parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
-        ilGenerator.Emit(OpCodes.Call, typeof(IlValueBridge).GetMethod(nameof(IlValueBridge.WrapFunction))!);
+        // 谓词：编译好的委托或 object 包装的函数值 -> LangValueType
+        IlValueBridge.EmitLoadWrapped(parameters[0], ilGenerator, local);
 
         var helperMethod = typeof(ListFindAllMethod).GetMethod(nameof(FindAllHelper),
             System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);

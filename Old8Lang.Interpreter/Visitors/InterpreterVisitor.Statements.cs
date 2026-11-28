@@ -1039,7 +1039,23 @@ public partial class InterpreterVisitor
         }
 
         // 应用装饰器（如果有）
-        var finalFunc = AsyncFuncInitRuntimeExtensions.ApplyDecorators(node.GetAsyncFuncValue(), manager);
+        var originalAsyncFunc = node.GetAsyncFuncValue();
+        var finalFunc = AsyncFuncInitRuntimeExtensions.ApplyDecorators(originalAsyncFunc, manager);
+
+        // 装饰器返回的异步 Lambda 没有函数名，需要重新绑定原函数名并保留其闭包作用域
+        if (originalAsyncFunc.Id is not null && finalFunc.Id?.IdName != originalAsyncFunc.Id.IdName)
+        {
+            finalFunc = new AsyncFuncLangValue(
+                originalAsyncFunc.Id,
+                finalFunc.Ids,
+                finalFunc.BlockStatement,
+                finalFunc.Position)
+            {
+                CapturedScope = finalFunc.CapturedScope,
+                Decorators = originalAsyncFunc.Decorators,
+                DocComment = originalAsyncFunc.DocComment
+            };
+        }
 
         // 添加到导入信息列表
         manager.AddClassAndFunc(finalFunc);

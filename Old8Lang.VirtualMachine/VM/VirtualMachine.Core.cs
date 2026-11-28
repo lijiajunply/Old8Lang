@@ -167,6 +167,8 @@ public partial class VirtualMachine : IVirtualMachine
             initializeRuntimeMetadata: false);
     }
 
+    private readonly Dictionary<(Type TargetType, string MethodName), BytecodeExtensionMethod> _vmExtensionMethods = new();
+
     /// <summary>
     /// 注册扩展方法到实例方法注册表
     /// </summary>
@@ -188,12 +190,48 @@ public partial class VirtualMachine : IVirtualMachine
                 var extensionMethod = new BytecodeExtensionMethod(
                     targetType,
                     method,
-                    this
+                    this,
+                    extension.TargetGenericParameters
                 );
+
+                foreach (var name in extensionMethod.Names)
+                {
+                    _vmExtensionMethods[(targetType, name)] = extensionMethod;
+                }
 
                 InstanceMethodRegistry.Instance.Register(extensionMethod);
             }
         }
+    }
+
+    private BytecodeExtensionMethod? TryGetVmExtensionMethod(Type objType, string methodName)
+    {
+        if (_vmExtensionMethods.Count == 0)
+        {
+            return null;
+        }
+
+        if (_vmExtensionMethods.TryGetValue((objType, methodName), out var direct))
+        {
+            return direct;
+        }
+
+        var equivalentType = VMTypeMapper.GetEquivalentLangType(objType);
+        if (_vmExtensionMethods.TryGetValue((equivalentType, methodName), out var equivalent))
+        {
+            return equivalent;
+        }
+
+        foreach (var ((registeredType, registeredName), method) in _vmExtensionMethods)
+        {
+            if (registeredName == methodName &&
+                (registeredType.IsAssignableFrom(objType) || registeredType.IsAssignableFrom(equivalentType)))
+            {
+                return method;
+            }
+        }
+
+        return null;
     }
 
     /// <summary>
@@ -214,8 +252,8 @@ public partial class VirtualMachine : IVirtualMachine
             "decimal" => typeof(decimal),
             "object" => typeof(object),
             "list" => typeof(ListLangValue),
-            "array" => typeof(Array),
-            "dict" => typeof(DictionaryLangValue),
+            "array" => typeof(ArrayLangValue),
+            "dict" or "dictionary" => typeof(DictionaryLangValue),
             _ => Type.GetType(typeName) // 尝试通过完全限定名解析
         };
     }

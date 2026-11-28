@@ -41,38 +41,10 @@ public class ArraySetMethod : BaseInstanceMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        instance.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
-        parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
-        parameters[1].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
-
-        var helperMethod = typeof(ArraySetMethod).GetMethod(nameof(SetHelper),
-            System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
-        ilGenerator.Emit(OpCodes.Call, helperMethod!);
+        IlNativeCollectionBridge.EmitBridgeCall(this, instance, parameters, ilGenerator, local);
     }
 
-    public static object? SetHelper(object[] array, object indexObj, object? value)
-    {
-        if (indexObj is not int index)
-        {
-            throw new ArgumentException("索引必须是整数类型");
-        }
-
-        // 支持负数索引
-        if (index < 0)
-        {
-            index = array.Length + index;
-        }
-
-        if (index < 0 || index >= array.Length)
-        {
-            throw new IndexOutOfRangeException($"索引 {index} 超出数组范围 [0, {array.Length})");
-        }
-
-        array[index] = value!;
-        return value;
-    }
-
-    protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)
+protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)
     {
         return typeof(object);
     }

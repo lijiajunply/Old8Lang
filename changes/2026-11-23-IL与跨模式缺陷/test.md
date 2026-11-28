@@ -60,3 +60,16 @@
 - 尚未完成复杂查询组合与 VM 排序键语义的全面核对；不关闭 LINQ 待办。
 - 查询作用域变更后执行 `dotnet test Old8Lang.Tests/Old8Lang.Tests.csproj --no-build --filter 'FullyQualifiedName~Old8Lang.Tests.Architecture' --verbosity quiet`：72 通过、1 失败；失败为已有待办 `ScalarLiteralExpressionTests.AsyncStateMachine_FindsAwaitInsideSyntaxCollections`（现有表达式内 await 限制），单项复跑同样失败。
 - 再补充 `let` 与外层同名变量的隔离：解释器修复前把外层值由 99 改为 6，修复后三模式通过；相关套件重跑 591 通过、4 跳过。再次运行 Architecture 为 72 通过、1 失败，仍是上述既有 await 用例。
+
+## 2026-11-28 IL 模式与跨模式缺陷清零验证
+
+针对当前工作区全部改动（含本轮新增的 LINQ 复杂组合与 VM 排序键语义、解释器并发作用域克隆、`TypeChecker` `async_func -> function` 兼容、VM match 多元组解构、三模式函数值字段调用、解释器 `private static` 静态方法内访问、三模式集合注解递归元素校验、以及 `VisitSuperExpression` 基类类型推断修复）执行定向与整组复测：
+
+- 既有工作区新增/修改回归（`AsyncLambdaAndDecoratorTests`、`StandardLibraryCrossModeImportTests`、`MethodChainingRegressionTests`、`NativeCollectionMethodBridgeTests`、`GenericListExtensionRegressionTests`、`ClosureTests`、`ReturnConversionRegressionTests`、`VMNativeSequenceRegressionTests`、`VMDecoratorTests`）：**168 通过、0 失败**。
+- LINQ 全量三模式（`Compiler.Linq | Interpreter.Linq | VirtualMachine.Linq`，含新增多键计算排序、混合数值/序号字符串、`orderby + group by`、多层 `join + let + orderby + group + into` 及 VM 字节码往返）：**165 通过、0 失败**。
+- 解释器异步全组（`Interpreter.Async`，含新增 `VariateManager_ConcurrentCloneAndScopeMutation_DoesNotThrow` 并发克隆压测与 `Await_WithVariableCaptures_CapturesCorrectlyInAsync`）：**144 通过、0 失败、1 跳过**。
+- 跨模式缺陷回归 + 程序集边界（`CrossModeDefectsRegressionTests` + 四个 Architecture 边界测试类）：**31 通过、0 失败**（其中边界测试 27/27 全通过）。
+- `Compiler.Exceptions | Compiler.Classes`（含 `ErrorPropagatesThroughInheritance_CompilesAndExecutesCorrectly`）：**181 通过、0 失败**。
+- `Compiler.Async`：**0 失败**（与 `Architecture` 同跑 210 通过、1 失败、3 跳过，唯一失败仍为既有 `ScalarLiteralExpressionTests.AsyncStateMachine_FindsAwaitInsideSyntaxCollections`）。
+- `VirtualMachine` 全组：**1,164 通过、0 失败、0 跳过**。
+- `Compiler` 11 个主组（`Collections | Types | Expressions | Functions | Statements | Basic | Reflection | EdgeCases | Integration | Linq | Modules`）：**1,639 通过、1 失败、23 跳过**；唯一失败为 `Compiler.Modules.AdvancedImport.ConditionalImportTests.Import_ConditionalWithComplexExpression_ShouldEvaluateExpression`（与 2026-11-23 已修的解释器同名用例相同，仍断言旧的字符串长度比较分支）。

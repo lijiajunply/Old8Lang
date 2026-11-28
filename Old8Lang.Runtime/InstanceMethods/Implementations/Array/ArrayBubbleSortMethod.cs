@@ -13,7 +13,7 @@ namespace Old8Lang.InstanceMethods.Implementations.Array;
 /// <summary>
 /// Array.BubbleSort() - 使用冒泡排序算法对数组进行排序
 /// </summary>
-public class ArrayBubbleSortMethod : BaseInstanceMethod
+public class ArrayBubbleSortMethod : BaseInstanceMethod, IIlNativeValueInstanceMethod
 {
     public override string[] Names => ["BubbleSort", "bubbleSort"];
     public override Type TargetType => typeof(ArrayLangValue);
@@ -34,17 +34,13 @@ public class ArrayBubbleSortMethod : BaseInstanceMethod
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
         instance.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
-        var helperMethod = typeof(ArrayBubbleSortMethod).GetMethod(nameof(BubbleSortHelper),
+        var helperMethod = typeof(ArrayBubbleSortMethod).GetMethod(nameof(BubbleSortNativeHelper),
             System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
         ilGenerator.Emit(OpCodes.Call, helperMethod!);
     }
 
-    public static ArrayLangValue BubbleSortHelper(ArrayLangValue array)
-    {
-        var items = array.GetItems().ToArray();
-        BubbleSortImpl(items);
-        return new ArrayLangValue(items, array.ElementType, array.Position);
-    }
+    public static object?[] BubbleSortNativeHelper(object? instance) =>
+        ArraySortVmSupport.SortAndReturn(instance, BubbleSort);
 
     private static void BubbleSortImpl(LangValueType[] nums)
     {
@@ -66,7 +62,7 @@ public class ArrayBubbleSortMethod : BaseInstanceMethod
 
     protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)
     {
-        return typeof(ArrayLangValue);
+        return typeof(object?[]);
     }
 
     protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)

@@ -38,7 +38,6 @@ public class TypeGetInterfacesMethod : BaseInstanceMethod
 
         // 加载 VariateManager
         ilGenerator.Emit(OpCodes.Call, typeof(RuntimeGlobalWriter).GetProperty(nameof(RuntimeGlobalWriter.CurrentManager))!.GetGetMethod()!);
-        ilGenerator.Emit(OpCodes.Callvirt, typeof(ILangInterpreter).GetProperty("Manager")!.GetMethod!);
 
         // 调用辅助方法
         var helperMethod = typeof(TypeGetInterfacesMethod).GetMethod(nameof(GetInterfacesHelper),

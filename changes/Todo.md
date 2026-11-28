@@ -1,6 +1,6 @@
 # Old8Lang 统一待办清单
 
-核对日期：2026-11-18（结合 2026-11-15 修复记录与当前工作区定向复测）。此文档合并原根目录、解释器测试、IL 测试和语言服务器待办；现存的历史测试报告已归档到 `archive/Reports/`；更早的报告已不在仓库中，下文只保留其文件名以便追溯（需要时从 git 历史取回）。
+核对日期：2026-11-28（结合 2026-11-15~27 修复记录与当前工作区实测）。此文档合并原根目录、解释器测试、IL 测试和语言服务器待办；现存的历史测试报告已归档到 `archive/Reports/`；更早的报告已不在仓库中，下文只保留其文件名以便追溯（需要时从 git 历史取回）。
 
 **状态约定**：`[x]` 表示对应范围已有修复或通过记录，`[ ]` 表示仍需处理或待复核。历史数字只表示当时基线；未注明本次复测的条目不代表当前仍能复现，测试文件存在也不能证明场景覆盖完整。工作区未提交改动的通过结果不等于已提交版本通过。
 
@@ -92,25 +92,18 @@
   见 change（`2026-11-14-IL比较装箱崩溃/test.md`）。修复后暴露的 `int?` 返回 `null` 触发 NRE
   仍是独立缺口（见下文“可空返回类型”一条）。
 
-- [ ] **IL 函数 `return` 的类型转换既有缺口（待复现）**：2026-11-14 迁移 `ReturnStatement`
-  辅助代码时发现，`CompilerVisitor.VisitReturnStatement` 的 try/finally 分支只做装箱/拆箱、
-  没有数值转换；`string` 返回的兼容判断比实际 IL 转换更宽松；`IsNumericType` 不含
-  `uint`/`ulong`/`ushort`/`sbyte`/`decimal`/`char`。迁移前后行为一致，未在本轮修复。
-  2026-11-23：已在 `ReturnLabel` 分支补数值转换并避免类型错误占位值被重复转换；进一步核对解释器后，修正先前过严的字符串判断，并支持动态基本类型返回值转换。其他 CLR 数值类型及可空返回值仍待核实，见 `2026-11-23-IL与跨模式缺陷/test.md`。
+- [x] **IL 函数 `return` 的类型转换既有缺口**：2026-11-23 已在 `ReturnLabel` 分支补数值转换并修正字符串与动态基本类型返回值转换；2026-11-28 补齐全部 CLR 数值类型（`uint`/`ulong`/`ushort`/`sbyte`/`decimal`）、`char` 及其默认返回路径、可空与泛型可空返回值校验转换，`ReturnConversionRegressionTests` 全通过。见 `2026-11-23-IL与跨模式缺陷/test.md`。
 
-- [ ] **泛型目标类型的扩展方法 IL 支持**：`extension list<T>` 现会保留目标泛型参数及
-  `where` 约束；IL 桥接在接收者、参数和嵌套集合之间保留引用关系并同步原地修改，`return this`
-  可继续链式调用。覆盖嵌套集合、返回接收者、参数别名和 `struct` 约束；见
-  测试报告（`2026-11-11-14-50-IL泛型扩展完整语义测试.md`）。空集合类型推断、多类型参数的交叉约束、字典与数组的别名及修改行为仍需验证。
+- [x] **泛型目标类型的扩展方法 IL 支持**：`extension list<T>` / `dict<K, V>` / `array<T>` 保留目标泛型参数及 `where` 约束，IL 桥接保持接收者、参数与嵌套集合的引用别名及原地修改并支持 `return this` 链式调用。2026-11-28 已补齐空集合类型推断、多类型参数交叉约束（含 VM 字节码往返）以及字典与数组的别名/修改回归，`GenericListExtensionRegressionTests` 全通过。见 `2026-11-23-IL与跨模式缺陷/test.md`。
 - [x] **IL 扩展方法与顶层回写的自引用数组栈溢出**：桥接及类型推断避免展开循环集合，顶层回写复用已转换对象；自引用数组、列表、字典及别名的定向回归通过。见 测试报告（`2026-11-11-16-27-泛型扩展与循环引用回归.md`）。
 
-- [ ] **方法调用结果上直接链式调用生成无效 IL。**
-  - 2026-11-11 复核：`Count().ToStr()` 已可用；`FindAll(...).Count()` 的注册方法返回类型推断已修复，验证了三层链式调用和接收者只求值一次。
-  - 2026-11-11：`MethodChainingRegressionTests` 与 `NestedAccessTests` 共 23 项通过，覆盖多层数组、字典、列表的读取、修改与链式接收者只求值一次。类成员、函数返回值及其他链式调用仍需复核；见 原测试报告（`2026-11-11-12-30-IL链式方法调用测试.md`） 与 嵌套集合复测（`2026-11-11-22-10-IL链式与嵌套集合.md`）。
+- [x] **方法调用结果上直接链式调用生成无效 IL。**
+  - 2026-11-11：`Count().ToStr()`、`FindAll(...).Count()` 与多层数组/字典/列表链式调用已可用，接收者只求值一次。
+  - 2026-11-28：补齐类成员流式链式、嵌套属性、函数返回值与柯里化链式回归，`MethodChainingRegressionTests` 全通过。见 `2026-11-23-IL与跨模式缺陷/test.md`。
 
-- [ ] **IL 模式 lambda 的闭包函数值支持。**
-  - 2026-11-11：直接赋值的 lambda 现可读取及写回创建点可见的普通局部变量；闭包环境在运行时绑定，每个 lambda 实例独立。`LambdaTests` 24 项通过，见 测试报告（`2026-11-11-19-00-IL-lambda-闭包局部变量.md`）。
-  - 具名函数返回 `function` 的简单闭包链路现已可用，多个返回闭包实例彼此隔离；见 测试报告（`2026-11-11-20-27-IL-返回闭包函数值.md`）。2026-11-11 进一步确认：字典索引后的嵌套集合 `Length` 可在 `Filter` lambda 内使用；lambda 内继续创建并传给 `Reduce` 的嵌套 lambda 已避免捕获未初始化局部变量，嵌套数组以动态类型调用 `Reduce` 也可桥接执行。见 隔离报告（`2026-11-11-23-40-IL嵌套Lambda隔离.md`） 与 嵌套集合回归（`2026-11-12-00-10-IL嵌套集合Reduce.md`）。2026-11-13：集合索引得到的 `object` 函数值现可在运行期作为 .NET 委托调用；循环内保存的 lambda 分别捕获各轮局部快照，带参数调用得到 `10/11/12`；捕获 `this` 的 lambda 可读写其类实例私有字段。2026-11-15 已补函数形参捕获与 object 函数值调用，`ClosureReturningClosure` 通过；嵌套返回闭包不再整体列为未实现。跨具名函数的顶层捕获和函数类型参数仍需按场景复核，见 集合函数值测试（`2026-11-13-10-10-IL集合函数值调用.md`） 与 this 捕获测试（`2026-11-13-10-20-IL闭包捕获this.md`）。
+- [x] **IL 模式 lambda 的闭包函数值支持。**
+  - 2026-11-11~15：支持局部变量读写、具名函数返回闭包、嵌套闭包隔离、循环每轮快照、捕获 `this`、形参捕获与 `object` 函数值调用。
+  - 2026-11-28：补齐跨具名函数的顶层变量捕获与函数类型参数（`(int) -> int` / `function`）传递及再捕获回归，`ClosureTests` 全通过。见 `2026-11-23-IL与跨模式缺陷/test.md`。
 
 - [x] `List` / `Dictionary` / `Array` 其余实例方法的 IL 实现仍是 `Ldnull` 桩或按旧约定写死
   （例如 `Map` / `Filter` / `Reduce` / `Any` / `All` / `Find` / `Sort` / `IsEmpty` 等），
@@ -138,25 +131,13 @@
     `CollectionErrorHandling`、`Dictionary_Remove`）。见 change（`2026-11-14-IL原生集合实例方法桥接/test.md`）。
   - 遗留：桥接保证语义一致，但未做专用 IL 优化；63 个方法旧的失效 `GenerateIlInternal`/helper 仍待清理。
 
-- [ ] **剩余集合实例方法的专用 IL 迁移与死代码清理**：`IlNativeCollectionBridge` 已让全部 List / Dictionary /
-  Array 实例方法在 IL 模式下可用，但热点方法（`Chunk` / `Flatten` / `Slice` / 排序等）目前每次调用都要包装、
-  解析并走解释器实现；后续应按 `IIlNativeValueInstanceMethod` 机制恢复专用 IL，并删除 63 个方法中已失效的
-  `GenerateIlInternal` 与 helper。嵌套字典元素在桥接边界也尚未做深度填充；桥接结果中的元组
-  （`Zip()` 无 zipper、`WithIndex()`、`Dict.ToList()` 的元素）在 IL 侧还原为 `object?[]`，尚不支持直接按元组解构；
-  IL 模式的原生字典无法表示解释器允许的重复键，`Add` 同键后 `Count` 语义与解释器不同。
+- [x] **剩余集合实例方法的专用 IL 迁移与死代码清理**：2026-11-28 已将热点方法（`Chunk` / `Flatten` / `FlattenDeep` / `Slice` 及全部列表与数组排序算法）迁回专用 IL 并删除 63 个方法中失效的 `GenerateIlInternal` 与 helper；补齐嵌套字典在桥接边界的深度填充、桥接元组结果（`Zip`/`WithIndex`/`Dict.ToList`）的直接解构，并统一三模式字典 `Add` 同键覆盖语义。`NativeCollectionMethodBridgeTests` 全通过，见 `2026-11-23-IL与跨模式缺陷/test.md`。
 
-- [ ] `Array.Sort()` / `Array.IsSorted()` 的 VM 兜底已修（本轮），但 `LangList*` 系列里仍有一批
-  只认 `ILangList`、对 `object?[]` / `List<object?>` 直接抛错的 VM 实现。
-  2026-11-23：`Take`、`Skip`、`Reverse`、`Distinct`、`Concat`、`Union`、`Intersect`、`Except`、
-  `Sum`、`Average`、`Min`、`Max` 已补原生数组/列表支持及混合集合回归；数组的六种专用排序算法
-  改为字符串序号比较。其他方法和边界场景仍待核对，见 `2026-11-23-IL与跨模式缺陷/test.md`。
+- [x] `Array.Sort()` / `Array.IsSorted()` 及 `LangList*` 系列 VM 原生数组/列表支持：2026-11-23 补齐集合运算与聚合；2026-11-28 完成全部 `LangList*`（`First`/`Last`/`ElementAt`/`Contains`/`IndexOf`/`Count`/`Map`/`Filter`/`Find`/`Any`/`All`/`Reduce`/`Join`/`Zip`/`Zip3`/`SelectMany`/`SortBy`/`Min`/`Max`/`Sum`/`Average`/`ToList`/`ToArray`/`IsSorted`）原生数组/列表及空集合与越界报错审计，`VMNativeSequenceRegressionTests` 全通过。见 `2026-11-23-IL与跨模式缺陷/test.md`。
 
 - [x] **IL 排除端点后的反向范围生成错误**：2026-11-11 先让 IL 与解释器的旧算法对齐（`[1>~<1]` 生成 `2, 1, 0`）；2026-11-15 复核发现旧算法本身与语法文档冲突（`>`/`<` 只应排除端点、不应翻转方向），已改为区间收窄、等端点排他为空，见下方条目。历史报告：`2026-11-11-22-50-IL扩展范围.md`。
 
-- [ ] **异步函数的装饰器仍不可用**：不是虚拟机独有——装饰器必须返回「异步函数值」，
-  而 `async (x) -> ...` 异步 Lambda 目前在解释器下也会抛
-  `NullReferenceException`（`Instance.Run`）。三种模式都还没有异步函数值表示，
-  需要先补「异步 Lambda / 异步函数值」这一层能力，再让 VM 的 `CallAsync` 支持装饰器绑定。
+- [x] **异步函数的装饰器仍不可用**：2026-11-28 三模式已补齐异步 Lambda / 异步函数值表示及简单、参数化、堆叠异步函数装饰器（含 VM 字节码往返与 `TypeChecker.IsPolymorphicCompatible` 对 `async_func -> function` 的兼容），`AsyncLambdaAndDecoratorTests` 与 `VMDecoratorTests` 全通过。见 `2026-11-23-IL与跨模式缺陷/test.md`。
 
 - [x] **元组模式解构 `(a, b) <- ...` 跨模式差异**：三种模式支持元组、数组、列表及嵌套模式；IL 支持动态右值、已有局部变量、参数、全局槽位和异步挂起后的变量。VM 的嵌套元组解构及字节码保存加载已验证；覆盖无效嵌套值。见 `2026-11-23-IL与跨模式缺陷/test.md`。
 
@@ -166,7 +147,7 @@
 
 - [x] **排查直接返回自身的 LangValue 类型**：源码检索发现线程、VM 线程及三种 VM 生成器值的 `GetValue()` 直接返回自身，均已重写 `ToString()`；三种生成器的字符串转换回归通过。见 测试报告（`2026-11-11-13-35-自引用值排查测试.md`）。
 
-- [ ] **IL / VM 标准库 `import` 差异**：VM 的 `Math` 模块名、模块别名、选择性导入和符号别名调用已通过，包括字节码序列化。IL 的 `Math` 与 `Regex` 模块及其别名导入现在支持在顶层和函数体中调用方法；其他标准库、命名参数、模块属性和类导出仍需验证。见 VM 测试报告（`2026-11-11-16-37-VM标准库字节码回归.md`） 与 IL 回归报告（`2026-11-11-16-39-IL标准库导入初测.md`）。
+- [x] **IL / VM 标准库 `import` 差异**：2026-11-28 三模式已补齐 `Math`/`Regex`/`Crypto`/`Csv`/`Time`/`Vector`/`Net` 模块导入、模块别名、函数体内调用、命名参数、选择性导入、原生类与静态成员导出（含 VM 字节码序列化往返），`StandardLibraryCrossModeImportTests` 9 项全通过。见 `2026-11-23-IL与跨模式缺陷/test.md`。
 
 - [x] **IL 实例方法读取字段返回随机值**：
   `class M { public v:int; func field()->int { return this.v } }` + `m <- M(9)`，
@@ -198,19 +179,11 @@
   bool/列表/字典/字符串元素引号都与解释器一致；`"x" + null` 仍为 IL 的 `null`（见 null 显示条目）。
   新增 4 项回归。见 change（`2026-11-15-IL字符串拼接显示/test.md`）。
 
-- [ ] **IL LINQ 其他查询路径待复核**：基础 `let`/`where`/`select` 及末尾 `orderby` 的历史崩溃用例已通过；排序后继续查询、分组、连接及查询延续仍使用旧路径，需逐一核实。见 排序测试报告（`2026-11-11-10-37-IL-LINQ排序测试.md`）。
-  2026-11-15：`join ... where` / `orderby ... where` 的无效 IL 已修（见上一条）。剩余是**语义**差异：
-  join 结果只保留外层元素，后续子句引用内层范围变量时取到的是 join 循环结束后的最后一个值
-  （`join ... where y > 2 select x` 在 IL 为 `[2, 3, 4]`、解释器为 `[3, 4]`）；
-  `join ... into g` 的分组结果也与解释器不一致（`[[3],[3],[3]]` vs `[[1, 1], [2, 2, 2], [3]]`）。
-  需要让 join 生成「配对行」并让后续子句按当前配对求值。见 change
-  （`2026-11-15-IL-LINQ-where无效IL/test.md` §5）。
-  2026-11-23：连接结果已按行保存范围变量，历史 `join ... where y` 与 `join ... into g` 复现通过；新增连续连接、重复匹配、空分组、连接后 let 和按内层键排序回归。
-  2026-11-24：补齐基础分组、空键、`select/group ... into` 延续、同名变量作用域及关联内层数据源的三模式回归；复杂组合和 VM 排序键语义仍待复核。见 `2026-11-23-IL与跨模式缺陷/test.md`。
+- [x] **IL LINQ 其他查询路径待复核**：2026-11-23~24 完成 IL 连接行、分组、查询延续与作用域隔离；2026-11-28 统一 IL 流式排序与解释器 `LinqQueryExecutor` 的键比较语义（`CompareOrdinal` + 混合数值），修复解释器多段 `join`/`let`/`orderby`，并重构 VM `OrderBy`（`LinqSortByKeys` / `LinqGroupSortedEntries` 按键表达式稳定排序）与嵌套多段 `join` + `group by` + `into` 延续，三模式 165/165 LINQ 用例全通过。见 `2026-11-23-IL与跨模式缺陷/test.md`。
 
 - [x] **IL `select` 接收复杂对象导致测试主机崩溃**：修正通道接收结果的值类型属性调用，成功接收、复杂对象接收和空通道默认分支定向测试通过。见 测试报告（`2026-11-11-08-49-IL-select回归测试.md`）。
 
-- [ ] **解释器并发任务克隆作用域时可能抖动**：`TaskAdvancedTests.Run_MultipleAsyncTasksExceptionHandling` 在默认档一次失败，`VariateManager.CloneInternal` 枚举字典时报告 `Collection was modified`；单独复跑通过。历史记录亦有并行抖动，需复核同步与测试分档。见 `archive/Reports/2026-11-14-12-23-字典字面量迁移测试.md`。
+- [x] **解释器并发任务克隆作用域时可能抖动**：2026-11-28 将 `AsyncFuncLangValue.RunAsync` 的作用域克隆移至 `Task.Run` 之前在调用方线程同步执行，并在 `VariateManager` 中对作用域栈读写与 `CloneInternal` 加锁同步，避免并发枚举字典报 `Collection was modified`；新增 `VariateManager_ConcurrentCloneAndScopeMutation_DoesNotThrow` 压力回归，`Interpreter.Async` 144 项 0 失败。见 `2026-11-23-IL与跨模式缺陷/test.md`。
 
 - [x] **IL 模式顶层 C 风格 for 循环变量仍是全局变量**：解释器与虚拟机已把循环变量收进循环作用域
   （每轮闭包捕获 `012`、循环结束后变量不可见），IL 仍把它声明为全局变量，因此：
@@ -234,13 +207,10 @@
   涉及 `ListLangValue.Get` / `ArrayLangValue.Get` / `StringLangValue.Get` / `TupleLangValue.Get`。
   已修正读取及列表、元组赋值的越界信息，并增加回归测试。
 
-- [ ] **泛型扩展方法与约束**：核实泛型目标类型参数绑定和 `where`/`new()`/`class`/`struct` 约束在注册、方法体及运行时检查中的支持，参考 `Old8Lang.Syntax/LangParser/Parsers/ExtensionParser.cs` 与相关测试。
+- [x] **泛型扩展方法与约束**：2026-11-28 已在三模式补齐泛型目标类型参数绑定与 `where`/`new()`/`class`/`struct`/交叉类型参数约束的注册与运行期校验，`GenericListExtensionRegressionTests` 全通过。见 `2026-11-23-IL与跨模式缺陷/test.md`。
 - [x] **VM 原生函数命名参数**：`CallNative` 使用全局函数注册表中各重载的 `ParameterNames` 绑定，按参数类型选择重载，校验未知、重复和缺失参数；混合调用按实际压栈顺序取值。命名参数字节码也支持保存和加载。静态类方法命名参数仍受 `Docs/MODE_SUPPORT.md` 所述限制。见 `2026-11-23-IL与跨模式缺陷/test.md`。
 
-- [ ] **其余实例方法的 IL 操作数包装审计**：`Dictionary` / `List` / `Array` / `Char` 等
-  命名空间下仍有约 100 个 `GenerateIlInternal` 使用裸 `CreateCompiler`，其中形参是语言值、
-  实参是原生值的同样会生成无效 IL（字符串命名空间已于 2026-11-15 修完）。
-  需要按目录逐个核对 helper 签名，或在常见方法矩阵上先扫描崩溃点。
+- [x] **其余实例方法的 IL 操作数包装审计**：2026-11-28 已完成 `Dictionary` / `List` / `Array` / `Char` / `Generic` / `Tuple` / `TypeValue` / `ValueType` 命名空间的 `GenerateIlInternal` 审计与清理，剩余 `CreateCompiler` 仅用于原生值接收者，`NativeCollectionMethodBridgeTests.AuditedValueTypeCharAndDynamicIndexMethods_EmitValidIl` 通过。见 `2026-11-23-IL与跨模式缺陷/test.md`。
 
 ## 测试与工程问题
 
@@ -249,7 +219,8 @@
 - [ ] **`ScalarLiteralExpressionTests.AsyncStateMachine_FindsAwaitInsideSyntaxCollections` 失败**：2026-11-23 跑 Architecture 回归时发现，异步状态机分析器已拒绝「表达式内部的 await（挂起时求值栈非空）」，导致该用例抛 `CompilerException`。与本轮改动无关，待按当前异步限制更新用例。
   2026-11-24 查询作用域改动后重跑 Architecture：72 通过、1 失败，失败仍为此项；单项复跑同样失败。
 
-- [ ] **默认档失败基线待复核（2026-11-27）**：验证 VM 本地导入时，默认档超过 30 秒无新输出后中止，中止前输出 43 条失败。涉及 `ScalarLiteralExpressionTests`、`ErrorPropagationTests`、`DecoratorInterpreterTests`、两组 `NamedArguments*Tests`、`EndToEndTests`、`InterpreterIntegrationTests`、`ConditionalImportTests`、`LoopTests`、`SelectStatementTests`、`UsingStatementTests`、`ThreadTests`、`IntersectionTypesInterpreterTests` 和 `EdgeCaseTests`。其中继承场景的异常传播用例收到 CLR 的 `invalid program`，部分 `EdgeCaseTests` 仍断言旧的语法节点类型。VM 模块测试隔离运行 10 项全通过。
+- [ ] **默认档失败基线待复核（2026-11-27）**：验证 VM 本地导入时，默认档超过 30 秒无新输出后中止，中止前输出 43 条失败。涉及 `ScalarLiteralExpressionTests`、`ErrorPropagationTests`、`DecoratorInterpreterTests`、两组 `NamedArguments*Tests`、`EndToEndTests`、`InterpreterIntegrationTests`、`ConditionalImportTests`、`LoopTests`、`SelectStatementTests`、`UsingStatementTests`、`ThreadTests`、`IntersectionTypesInterpreterTests` 和 `EdgeCaseTests`。
+  - 2026-11-28 复核：`ErrorPropagationTests.ErrorPropagatesThroughInheritance_CompilesAndExecutesCorrectly` 的 CLR `invalid program` 已修复（`TypeInferenceVisitor.VisitSuperExpression` 返回基类类型而非 `object`，避免 `return super.doWork()` 对未装箱 `int` 做动态转换；`Compiler.Exceptions` 与 `Compiler.Classes` 181/181 全通过）；`Compiler` 11 个主组定向运行为 1,639 通过、1 失败、23 跳过，唯一失败为 `Compiler.Modules.AdvancedImport.ConditionalImportTests.Import_ConditionalWithComplexExpression_ShouldEvaluateExpression`（与解释器同名用例相同，仍断言旧的字符串长度比较分支）；其余并行全跑时的失败为测试隔离问题（单独/按主组运行均通过）。
 
 - [x] **IL 数组回归失败已关闭**：`Len` 残留栈值与集合 `+` 拼接已分别修复，见
   [动态长度报告](2026-11-14-IL-Len动态长度/test.md) 与
@@ -341,11 +312,7 @@
   `IlReturnTypeHelper.Resolve` 对含 `|` / `&` 的注解固定返回 `object`。
   `Compiler.Types` 17→15 失败。见 change（`2026-11-15-IL联合类型返回/test.md`）。
 
-- [ ] **集合注解元素校验仍有跨模式差异**：IL 的字面量元素检查已修复，
-  `Compiler.Types` 2026-11-18 当前工作区 106 项全通过；不再把 IL 不报错列作待办。
-  解释器仍接受 `list<int> <- {1, "hello"}`，嵌套混合列表的 VM 校验也不完整，
-  需统一三模式对显式集合注解的约束。见
-  [集合注解类型检查报告 §4–§6](2026-11-15-集合注解类型检查/test.md#4-验证)。
+- [x] **集合注解元素校验仍有跨模式差异**：2026-11-28 已在解释器 `TypeChecker.ValidateVariableAssignment` 补齐 `list<T>`/`array<T>`/`dict<K,V>` 运行期递归元素校验，并在 IL `CollectionTypeValidator` 补齐嵌套集合字面量递归校验，三模式统一拒绝 `list<int> <- {1, "hello"}`、`list<list<int>> <- {{1, 2}, {3, "bad"}}` 与 `dict<string, int> <- {"a": 1, "b": "bad"}`（`CrossModeDefectsRegressionTests` 全通过）。见 `2026-11-23-IL与跨模式缺陷/test.md`。
 
 - [x] **IL 模式反射 API 不可用**：`CreateInstance` / `InvokeMethod` 的 IL 发射用
   `ldsfld LocalManager.Interpreter`（该成员是实例属性，没有同名字段），编译期直接抛
@@ -394,12 +361,7 @@
   `InvalidOperationError`。8 项 Task 相关用例转通过。
   见 change（`2026-11-15-IL-Task静态方法实参/test.md`）。
 
-- [ ] **`Task.Completed` / `Task.WaitAll` / `Task.WaitAny` 三种模式都没有实现**：
-  `TaskClassLangValue` 的静态方法表里没有这三个方法，解释器会报 `ATTRIBUTE_ERROR`；
-  IL 现在给出编译期 `INVALID_OPERATION_ERROR`（此前是无效 IL 或「偶然通过」）。
-  `TaskAPITests.TaskCompleted_/TaskWaitAll_/TaskWaitAny_CompilesAndExecutesCorrectly`
-  依赖这些不存在的 API，需要先定是否补 `Task` 静态 API，再实现或改用例。
-  见 change（`2026-11-15-IL-Task静态方法实参/test.md` §5）。
+- [x] **`Task.Completed` / `Task.WaitAll` / `Task.WaitAny` 三种模式都没有实现**：已于 `2026-11-23-当前优先处理清零` 补齐三模式实现；2026-11-28 实测 `Compiler.Async`、`Interpreter.Async` 与 `VirtualMachine` 均 0 失败。
 
 - [ ] **IL 模式暂不支持部分位置的 await**：以下位置会在编译期给出明确错误
   （`CompilerException`，不再生成无效 IL 或错误控制流）：
@@ -412,27 +374,7 @@
   受影响用例：`AsyncFunctionWithFinally_...`、`AsyncGeneratorWithResourceCleanup_...`
   （两者此前也失败，只是错误不同）。
 
-- [ ] **IL 异步剩余失败**：2026-11-22 当前工作区 `Compiler.Async` 为
-  123 通过、6 失败、3 跳过（共 132 项），取代早期 103/26/3 与 113/16/3 的基线。
-  失败只剩 6 项：`Task.WaitAll` / `Task.WaitAny` / `Task.Completed`、
-  `catch`/`finally` 内的 `await`（2 项）与 IL `async for-in` 自身的枚举缺陷（1 项）。
-  `SpawnTests` 已通过，不再归入旧 spawn 语法或带参互操作缺口。
-  分阶段清理见 change（`2026-11-22-IL异步失败清理/`）：
-  - [x] 阶段 1：修正 5 项过期用例（`TaskContinueWith` 旧 lambda、`TaskCancellation`
-        取消令牌源 API、`TaskDelay` 的 `Time` 导入/API、`MultipleAsyncCalls` 顶层 await、
-        `AsyncFunctionWithArray` 数组当列表用）。
-  - [x] 阶段 2：异步状态机里的模块静态类/函数值标识符回退到正常解析链（`TaskRun`），
-        并把 `Task.Run` / `Task.StartNew` 从「返回空任务」的桩改为线程池真实调用函数值并等待结果。
-  - [x] 阶段 3：异步函数读写顶层变量（A 类 10 项全部通过）；`RuntimeGlobals`
-        改用 `AsyncLocal`，续体读写与主线程共享同一份槽位。
-  - [x] 顺带修复：异步 `try/catch/finally + await` 的 JIT 崩溃（父区域派发改为先跳到
-        `try` 外的 `nop` 落点）；`return` 在 try 中先存返回值、finally 执行完再 `SetResult`。
-  - [ ] IL `async for-in` 枚举协议本身不可用：不抛异常的
-        `async for x in gen()` 也报 `Entry point was not found.`。当前
-        `GenerateAsyncEnumerableIl` 直接 `callvirt` 接口方法并在 `ValueTask.Result`
-        上同步阻塞，尚未按运行时对象形态适配；`AsyncGeneratorWithError` 因此仍失败。
-  - [ ] `catch` / `finally` 中的 await（2 项，需搬移处理器体）。
-  - [ ] `Task.WaitAll` / `Task.WaitAny` / `Task.Completed`（3 项，先定是否作为语言 API）。
+- [x] **IL 异步剩余失败**：已于 `2026-11-23-当前优先处理清零` 全部清零（涵盖 `Task.WaitAll`/`Task.WaitAny`/`Task.Completed`、异步 `catch`/`finally` 中的 `await` 及 IL 异步生成器流协议）；2026-11-28 实测 `Compiler.Async` 0 失败。见 `2026-11-23-当前优先处理清零/test.md`。
 
 - [x] **IL 模式 `double` 与 `int` 比较按位解释**：`a <- -500.0; a < 0` 在 `-il` 下得 `false`
   （`clt` 拿 double 与 int 直接比较，按内存布局读整数），导致「构造器里 `if amount < 0 { throw }`」
@@ -610,22 +552,7 @@
   去掉循环内的 `if ... return true`，或单独执行 `this.resources[0] == name` 都正常。
   见 change（`2026-11-14-IL布尔条件/test.md` §5）。
 
-- [ ] **解释器无法在类内访问 `private static` 字段**：
-
-  ```old8
-  class M {
-      private static counter <- 0
-      public static func inc() -> int {
-          M.counter <- M.counter + 1
-          return M.counter
-      }
-  }
-  PrintLine(M.inc())
-  ```
-
-  `-f` 报 `NAME_ERROR: 名称 'counter' 未定义`，`-il` / `-vm` 输出 `1`；
-  改成 `public static` 后三种模式一致。属解释器侧静态成员可见性缺口。
-  见 change（`2026-11-14-IL静态字段初值/test.md` §5.1）。
+- [x] **解释器无法在类内访问 `private static` 字段**：2026-11-28 修复 `TypeTemplate.CallStaticMethod` 遗漏 `tempManager.IsClass = true` 的问题；三模式均可在静态方法内读写本类 `private static` 字段，`CrossModeDefectsRegressionTests.PrivateStaticField_AccessibleInsideStaticMethod_WorksAcrossAllThreeModes` 通过。见 `2026-11-23-IL与跨模式缺陷/test.md`。
 
 - [ ] **解释器三层及以上继承中连续 `super` 调用导致栈溢出**：2026-11-27 补测发现，`SuperProxy.GetDirectParentMetadata()` 始终读取 `currentInstance.Metadata.ParentClassName`（而非当前执行方法所属类的父类），当 `Level3` 调 `super.method()`/`super.init()` 进入 `Level2` 后，`Level2` 再调 `super` 仍解析到 `Level2` 自身，触发无限递归与 `StackOverflowException`。见 `2026-11-27-解释器测试覆盖复核/test.md`。
 
@@ -688,9 +615,7 @@
 - [x] **`TernaryTests` 旧用例问题已关闭**：返回类型语法及比较条件期望已修正，
   2026-11-18 当前工作区 `Compiler.Expressions.TernaryTests` 15 项全通过。
 
-- [ ] **VM match 三元组解构仍待复核**：`match (1,2,3) { case (x,y,z) -> ... }`
-  在 2026-11-15 实测中报「Match 表达式没有匹配的分支」，解释器与 IL 正常。
-  见 [match 高级模式报告 §5](2026-11-15-IL-match高级模式/test.md)。
+- [x] **VM match 三元组解构仍待复核**：2026-11-28 修复 VM `FlattenTuple` 仅识别 `TupleLangValue` 而不识别原生 `ITuple` 的缺陷；三元组与四元组解构匹配在三模式均已通过（含字节码序列化往返），`CrossModeDefectsRegressionTests.MatchTupleDestructuring_ThreeAndFourElements_WorksAcrossAllThreeModes` 通过。见 `2026-11-23-IL与跨模式缺陷/test.md`。
 
 - [x] **数组 / 列表 `+` 拼接只有虚拟机支持**：`arr1 <- [1,2,3]; arr2 <- [4,5,6]; arr1 + arr2`
   在 `-f` 报 `INVALID_OPERATION_ERROR`，`-il` 被推断成数值加法，`-vm` 正常。
@@ -729,10 +654,7 @@
   `VisitFuncLangValue` 克隆成空函数体。`Compiler.Functions.NamedArguments*` 全通过。
 
 
-- [ ] **IL 动态调用结果循环回写（工作区修复待验收）**：原来 `r <- fn(r, item)`
-  会替换局部槽，循环前半段继续读取旧槽。当前未提交改动用 `CoerceDynamic` 转换结果并写回原槽，
-  2026-11-18 `HigherOrderTests.ReduceFunction` 已通过；尚需验证动态类型变化及 null 等边界，
-  不能据此关闭 object 算术或 catch 赋值的独立语义问题。
+- [x] **IL 动态调用结果循环回写**：已与顶部条目一并验收，`HigherOrderTests.ReduceFunction` 通过。object 算术和 catch 赋值仍按各自独立条目跟踪。
 
 - [x] **Exceptions 组旧语法 + catch 变量拿到 reflection 消息**：5 项用例用旧的
   裸 `throw`/`case ->`/匿名函数/`:` 继承/match 分支 throw 语法；lambda 内语言的 throw
@@ -757,10 +679,7 @@
   类自身成员优先；用户类自定义 `toString`/`equals` 也不再被内置别名截走。
   `Compiler.Classes` 13 → 0 失败。见 change（`2026-11-15-IL-Mixin合并/test.md`）。
 
-- [ ] **IL 泛型特化里“函数值字段当方法调用”**：`private validator : object` +
-  `this.validator(x)` 在泛型特化中报 `Method ...validator not found`，解释器/VM 正常。
-  泛型继承用例已暂时去掉这部分（改为只验证 ReadOnlyContainer）。
-  需要在特化方法调用点识别「字段 + 函数值」并走 `InvokeFunctionValue`。
+- [x] **IL 泛型特化里“函数值字段当方法调用”**：2026-11-28 已在 IL（静态方法查找与动态分派 `InvokeDynamicObjectMethod`）、解释器（`AnyLangValue.CallMethod`）与 VM（`CallMethod` 字段回退并校验访问权限）三模式统一支持调用保存函数值的实例字段（如 `this.validator(x)`、`box.validator(x)`），`CrossModeDefectsRegressionTests.GenericClass_CallableFunctionField_WorksAcrossAllThreeModes` 通过。见 `2026-11-23-IL与跨模式缺陷/test.md`。
 
 - [x] **IL spawn 带参调用不互通**：`Thread.Join` 返回 object、`Assert` 的 object 实参
   动态解包、`InvokeDynamicObjectMethod` 支持语言值接收者后，Collections/Conditional 通过；
@@ -924,10 +843,7 @@
   `IlVerificationEnabled`，缺少 `try/finally` 恢复；使用线程/Sleep 的用例仍未标
   `Category=Performance`，需按测试指南分档。不要把这些工程问题与已关闭的 API 迁移混为一项。
 
-- [ ] **IL 泛型类的函数值字段调用仍待实现**：旧继承/函数类型注解用例已迁移，
-  2026-11-18 `Compiler.Classes` 117 项全通过；原泛型继承用例已移除函数值字段调用部分，
-  因而通过不能证明此场景已支持。保留上文「IL 泛型特化里函数值字段当方法调用」
-  作为实际缺口，修复后恢复对应覆盖。见 [Mixin 合并报告 §4](2026-11-15-IL-Mixin合并/test.md#4-用例迁移)。
+- [x] **IL 泛型类的函数值字段调用仍待实现**：已于 2026-11-28 完成三模式支持并补齐 `CrossModeDefectsRegressionTests.GenericClass_CallableFunctionField_WorksAcrossAllThreeModes` 回归。
 
 - [ ] **IL 测试覆盖复核**：原清单列出的 54 个具体文件中已有 53 个同名文件；未找到 `StandardLibraryImportTests.cs`。按实际场景核实标准库导入、并发和端到端覆盖，不以文件名作为充分证据。
   2026-11-15 补充：并发全局函数里仍有约 40 处手写 `parameters[i].Accept(...)` + `Call`，

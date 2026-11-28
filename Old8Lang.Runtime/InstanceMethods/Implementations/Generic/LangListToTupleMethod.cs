@@ -1,3 +1,4 @@
+using Old8Lang.InstanceMethods.Core;
 using System.Reflection.Emit;
 using Old8Lang.AST;
 using Old8Lang.AST.Expression;
@@ -59,44 +60,10 @@ public class LangListToTupleMethod : BaseLangListMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        instance.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
-
-        var helperMethod = typeof(LangListToTupleMethod).GetMethod(nameof(ToTupleHelper),
-            System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
-        ilGenerator.Emit(OpCodes.Call, helperMethod!);
+        IlNativeCollectionBridge.EmitBridgeCall(this, instance, parameters, ilGenerator, local);
     }
 
-    public static TupleLangValue ToTupleHelper(ILangList langList)
-    {
-        if (langList is TupleLangValue tupleValue)
-        {
-            return tupleValue;
-        }
-
-        var items = langList.GetItems().ToList();
-
-        if (items.Count == 0)
-        {
-            return new TupleLangValue(new LangId("null"), new LangId("null"));
-        }
-
-        if (items.Count == 1)
-        {
-            return new TupleLangValue(items[0] as LangExpression ?? new LangId(items[0].ToString() ?? ""), new LangId("null"));
-        }
-
-        // 构建嵌套元组
-        LangExpression current = items[^1] as LangExpression ?? new LangId(items[^1].ToString() ?? "");
-        for (int i = items.Count - 2; i >= 0; i--)
-        {
-            var item = items[i] as LangExpression ?? new LangId(items[i].ToString() ?? "");
-            current = new TupleLangValue(item, current);
-        }
-
-        return (TupleLangValue)current;
-    }
-
-    protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)
+protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)
     {
         return typeof(TupleLangValue);
     }

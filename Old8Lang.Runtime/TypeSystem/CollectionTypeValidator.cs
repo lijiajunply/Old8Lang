@@ -126,6 +126,9 @@ public static class CollectionTypeValidator
                     position
                 );
             }
+
+            ValidateNestedCollectionElementIfApplicable(
+                expectedElementType, element, $"{variableName}[{i}]", position, typeAnnotationManager);
         }
 
         // 应用类型信息到 AST 节点（只有解释器的运行时列表才需要记录元素类型）
@@ -183,6 +186,9 @@ public static class CollectionTypeValidator
                     position
                 );
             }
+
+            ValidateNestedCollectionElementIfApplicable(
+                expectedElementType, element, $"{variableName}[{i}]", position, typeAnnotationManager);
         }
 
         // 应用类型信息到 AST 节点（只有解释器的运行时数组才需要记录元素类型）
@@ -262,6 +268,9 @@ public static class CollectionTypeValidator
                     position
                 );
             }
+
+            ValidateNestedCollectionElementIfApplicable(
+                expectedValueType, tuple.Value, $"{variableName}.value[{i}]", position, typeAnnotationManager);
         }
 
         // 应用类型信息到 AST 节点（只有解释器的运行时字典才需要记录键值类型）
@@ -360,5 +369,22 @@ public static class CollectionTypeValidator
         if (index <= 0) return null;
         var baseName = typeName[..index].Trim().ToLowerInvariant();
         return baseName is "list" or "array" or "dict" or "dictionary" ? baseName : null;
+    }
+
+    private static void ValidateNestedCollectionElementIfApplicable(
+        ParsedTypeAnnotation expectedElementType,
+        LangExpression element,
+        string elementPath,
+        SourcePosition position,
+        TypeAnnotationManager typeAnnotationManager)
+    {
+        if (!expectedElementType.IsGeneric) return;
+        var baseName = expectedElementType.BaseType.ToLowerInvariant();
+        if (baseName is not ("list" or "array" or "dict")) return;
+        if (element is ListLiteralExpression or ArrayLiteralExpression or DictionaryLiteralExpression
+            or ListLangValue or ArrayLangValue or DictionaryLangValue)
+        {
+            ValidateCollectionElements(expectedElementType, element, elementPath, position, typeAnnotationManager);
+        }
     }
 }

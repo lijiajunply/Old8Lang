@@ -535,6 +535,7 @@ public static partial class ClassInitRuntimeExtensions
         var methodIl = methodBuilder.GetILGenerator();
 
         // ReturnStatement 使用此类型校验并转换返回值，包括 object 到值类型的拆箱。
+        methodLocal.ReturnTypeAnnotation = funcValue.Id?.AssumptionType?.Trim();
         if (returnType != typeof(void))
         {
             methodLocal.ReturnValueLocal = methodIl.DeclareLocal(returnType!);

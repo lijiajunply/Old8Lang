@@ -66,45 +66,10 @@ public class ListAggregateMethod : BaseInstanceMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        // 加载列表实例
-        instance.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
-
-        // 加载累加器函数
-        parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
-
-        // 调用辅助方法
-        var helperMethod = typeof(ListAggregateMethod).GetMethod(nameof(AggregateHelper),
-            System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);
-        ilGenerator.Emit(OpCodes.Call, helperMethod!);
+        IlNativeCollectionBridge.EmitBridgeCall(this, instance, parameters, ilGenerator, local);
     }
 
-    /// <summary>
-    /// 辅助方法：聚合操作
-    /// </summary>
-    public static LangValueType AggregateHelper(ListLangValue list, LangValueType accumulatorParam)
-    {
-        if (list.Values.Count == 0)
-        {
-            throw new InvalidOperationException("无法对空列表进行聚合操作");
-        }
-
-        if (accumulatorParam is not FuncLangValue accumulator)
-        {
-            throw new Exception("参数必须是函数类型");
-        }
-
-        var result = list.Values[0];
-
-        for (int i = 1; i < list.Values.Count; i++)
-        {
-            var tempManager = new VariateManager();
-            result = accumulator.Run(tempManager, [result, list.Values[i]]);
-        }
-
-        return result;
-    }
-
-    protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)
+protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)
     {
         return typeof(LangValueType);
     }

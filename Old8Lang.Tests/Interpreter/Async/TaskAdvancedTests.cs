@@ -525,6 +525,37 @@ result <- main()";
         Assert.NotNull(result);
     }
 
+    [Fact]
+    public async Task VariateManager_ConcurrentCloneAndScopeMutation_DoesNotThrow()
+    {
+        var manager = new VariateManager();
+        manager.AddChildren();
+        manager.SetLocal(new LangId("seed"), IntLangValue.Create(1));
+
+        using var cts = new CancellationTokenSource();
+        var writer = Task.Run(() =>
+        {
+            for (int i = 0; i < 500; i++)
+            {
+                manager.SetLocal(new LangId($"k{i % 20}"), IntLangValue.Create(i));
+                manager.AddChildren();
+                manager.SetLocal(new LangId("inner"), IntLangValue.Create(i));
+                manager.RemoveChildren();
+            }
+        });
+
+        var readers = Enumerable.Range(0, 4).Select(_ => Task.Run(() =>
+        {
+            for (int i = 0; i < 300; i++)
+            {
+                var cloned = manager.Clone();
+                Assert.NotNull(cloned.GetValue(new LangId("seed")));
+            }
+        })).ToArray();
+
+        await Task.WhenAll(readers.Append(writer));
+    }
+
     #endregion
 }
 

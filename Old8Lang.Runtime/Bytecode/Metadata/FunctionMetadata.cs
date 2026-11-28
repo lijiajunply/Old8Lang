@@ -344,7 +344,7 @@ public class FunctionMetadata
     {
         typeKinds = Array.Empty<FastParameterTypeKind>();
 
-        if (argCount != Parameters.Count || ParamsParameterIndex >= 0 || IsGenerator || GenericTypeMapping is { Count: > 0 })
+        if (argCount != Parameters.Count || ParamsParameterIndex >= 0 || IsGenerator || IsAsync || GenericTypeMapping is { Count: > 0 })
         {
             return false;
         }

@@ -56,17 +56,18 @@ public partial class BytecodeVisitor
         int iteratorLocal = _compiler.AllocateLocal();
         Emit(OpCode.StoreLocal, iteratorLocal);
 
-        // 检查终止子句类型,决定创建列表还是分组字典
+        // 检查终止子句类型和 OrderBy 子句
         bool isGroupBy = node.TerminationClause is GroupByClause;
+        var orderByClause = node.BodyClauses.OfType<OrderByClause>().LastOrDefault();
 
-        if (isGroupBy)
+        if (isGroupBy && orderByClause == null)
         {
-            // 创建分组字典 (用于 GroupBy)
+            // 创建分组字典 (用于无排序的 GroupBy)
             Emit(OpCode.NewGroupDict);
         }
         else
         {
-            // 创建结果列表 (用于 Select)
+            // 创建结果列表 (用于 Select 或带 OrderBy 的排序行收集)
             Emit(OpCode.NewList, 0);
         }
 
@@ -109,8 +110,15 @@ public partial class BytecodeVisitor
         var skipElementJumps = new List<int>();
         ProcessLinqBodyClauses(node.BodyClauses, letVariables, skipElementJumps);
 
-        // 步骤4: 执行终止子句 (select)
-        ProcessLinqTerminationClause(node.TerminationClause, resultListLocal);
+        // 步骤4: 执行终止子句 (select / group)
+        if (orderByClause != null)
+        {
+            ProcessLinqOrderedTerminationClause(node.TerminationClause, orderByClause, resultListLocal);
+        }
+        else
+        {
+            ProcessLinqTerminationClause(node.TerminationClause, resultListLocal);
+        }
 
         // 跳回循环开始
         int continueJump = GetCurrentPosition();
@@ -125,15 +133,12 @@ public partial class BytecodeVisitor
         // 修补循环结束跳转
         PatchJump(loopEndJump, GetCurrentPosition());
 
-        // 步骤5: 处理 OrderBy (如果有)
-        var orderByClause = node.BodyClauses.OfType<OrderByClause>().FirstOrDefault();
+        // 步骤5: 处理 OrderBy / GroupBy 终结转换
         if (orderByClause != null)
         {
-            ProcessLinqOrderBy(orderByClause, resultListLocal);
+            ProcessLinqOrderBy(orderByClause, isGroupBy, resultListLocal);
         }
-
-        // 步骤6: 如果是 GroupBy,将分组字典转换为分组列表
-        if (isGroupBy)
+        else if (isGroupBy)
         {
             Emit(OpCode.LoadLocal, resultListLocal);
             Emit(OpCode.GroupDictToList);
@@ -172,12 +177,21 @@ public partial class BytecodeVisitor
     }
 
     /// <summary>
-    /// 处理包含 Join 子句的 LINQ 表达式
+    /// 处理包含 Join 子句的 LINQ 表达式（支持多层嵌套连接、组连接、where/let 顺序执行、OrderBy 与 GroupBy）
     /// </summary>
     private Instruction? VisitLinqExpressionWithJoin(LinqExpression node)
     {
-        // 创建结果列表
-        Emit(OpCode.NewList, 0);
+        bool isGroupBy = node.TerminationClause is GroupByClause;
+        var orderByClause = node.BodyClauses.OfType<OrderByClause>().LastOrDefault();
+
+        if (isGroupBy && orderByClause == null)
+        {
+            Emit(OpCode.NewGroupDict);
+        }
+        else
+        {
+            Emit(OpCode.NewList, 0);
+        }
         int resultListLocal = _compiler.AllocateLocal();
         Emit(OpCode.StoreLocal, resultListLocal);
 
@@ -188,10 +202,9 @@ public partial class BytecodeVisitor
         var letVariables = new Dictionary<string, int>();
         foreach (var clause in node.BodyClauses)
         {
-            if (clause is LetClause letClause)
+            if (clause is LetClause letClause && !letVariables.ContainsKey(letClause.Variable))
             {
-                int letVarLocal = _compiler.AllocateLocal(letClause.Variable);
-                letVariables[letClause.Variable] = letVarLocal;
+                letVariables[letClause.Variable] = _compiler.AllocateLocal(letClause.Variable);
             }
         }
 
@@ -217,164 +230,14 @@ public partial class BytecodeVisitor
         Emit(OpCode.IteratorCurrent);
         Emit(OpCode.StoreLocal, outerRangeVarLocal);
 
-        // 处理 Join 子句
-        var joinClauses = node.BodyClauses.OfType<JoinClause>().ToList();
-        var innerIteratorLocals = new List<int>();
-        var innerRangeVarLocals = new Dictionary<string, int>();
-        var groupVarLocals = new Dictionary<string, int>();
-        var innerLoopEndJumps = new List<int>();
-        var innerLoopStartPositions = new List<int>();
+        // 按子句声明顺序递归生成连接、过滤、let 与终止子句
+        var outerSkipJumps = new List<int>();
+        EmitJoinBodyClauses(node, 0, letVariables, orderByClause, resultListLocal, outerSkipJumps);
 
-        foreach (var joinClause in joinClauses)
+        int outerContinuePos = GetCurrentPosition();
+        foreach (var skipJump in outerSkipJumps)
         {
-            // 在声明内层变量之前求值数据源，允许 `join y in y` 引用外层 y。
-            joinClause.InnerDataSource.Accept(this);
-            Emit(OpCode.GetIterator);
-            int innerIteratorLocal = _compiler.AllocateLocal();
-            Emit(OpCode.StoreLocal, innerIteratorLocal);
-            innerIteratorLocals.Add(innerIteratorLocal);
-
-            if (joinClause.IsGroupJoin && joinClause.GroupVariable != null)
-            {
-                // Group Join: 创建一个列表来收集匹配的内部元素
-                Emit(OpCode.NewList, 0);
-                int groupListLocal = _compiler.AllocateLocal(joinClause.GroupVariable);
-                Emit(OpCode.StoreLocal, groupListLocal);
-                groupVarLocals[joinClause.GroupVariable] = groupListLocal;
-            }
-
-            // 为内部范围变量分配局部变量槽
-            int innerRangeVarLocal = _compiler.AllocateLocal(joinClause.RangeVariable);
-            innerRangeVarLocals[joinClause.RangeVariable] = innerRangeVarLocal;
-
-            // 内部循环开始
-            int innerLoopStartPos = GetCurrentPosition();
-            innerLoopStartPositions.Add(innerLoopStartPos);
-
-            // 检查内部迭代器是否有下一个元素
-            Emit(OpCode.LoadLocal, innerIteratorLocal);
-            Emit(OpCode.IteratorMoveNext);
-
-            // 如果没有下一个元素,跳出内部循环
-            int innerLoopEndJump = GetCurrentPosition();
-            Emit(OpCode.JumpIfFalse, -1);
-            innerLoopEndJumps.Add(innerLoopEndJump);
-
-            // 获取内部当前元素
-            Emit(OpCode.LoadLocal, innerIteratorLocal);
-            Emit(OpCode.IteratorCurrent);
-            Emit(OpCode.StoreLocal, innerRangeVarLocal);
-
-            // 计算外部键
-            joinClause.OuterKeyExpression.Accept(this);
-            int outerKeyLocal = _compiler.AllocateLocal();
-            Emit(OpCode.StoreLocal, outerKeyLocal);
-
-            // 计算内部键
-            joinClause.InnerKeyExpression.Accept(this);
-            int innerKeyLocal = _compiler.AllocateLocal();
-            Emit(OpCode.StoreLocal, innerKeyLocal);
-
-            // 比较键是否相等
-            Emit(OpCode.LoadLocal, outerKeyLocal);
-            Emit(OpCode.LoadLocal, innerKeyLocal);
-            Emit(OpCode.Equal);
-
-            // 如果键不相等,跳过当前内部元素
-            int skipInnerJump = GetCurrentPosition();
-            Emit(OpCode.JumpIfFalse, -1);
-
-            if (joinClause.IsGroupJoin && joinClause.GroupVariable != null)
-            {
-                // Group Join: 将匹配的内部元素添加到分组列表
-                Emit(OpCode.LoadLocal, groupVarLocals[joinClause.GroupVariable]);
-                Emit(OpCode.LoadLocal, innerRangeVarLocal);
-                Emit(OpCode.CallMethod, new object[] { 2, "Add" });
-                Emit(OpCode.Pop);
-
-                // 跳转到内部循环继续
-                PatchJump(skipInnerJump, innerLoopStartPos);
-            }
-            else
-            {
-                // Inner Join: 处理 where 子句和 select
-                var skipElementJumps = new List<int>();
-
-                // 处理非 Join 的 body 子句 (where, let)
-                foreach (var clause in node.BodyClauses)
-                {
-                    if (clause is WhereClause whereClause)
-                    {
-                        whereClause.Condition.Accept(this);
-                        int skipJump = GetCurrentPosition();
-                        Emit(OpCode.JumpIfFalse, -1);
-                        skipElementJumps.Add(skipJump);
-                    }
-                    else if (clause is LetClause letClause)
-                    {
-                        letClause.Expression.Accept(this);
-                        Emit(OpCode.StoreLocal, letVariables[letClause.Variable]);
-                    }
-                }
-
-                // 执行 select
-                ProcessLinqTerminationClause(node.TerminationClause, resultListLocal);
-
-                // 修补跳过元素的跳转
-                int continueInnerPos = GetCurrentPosition();
-                foreach (var skipJump in skipElementJumps)
-                {
-                    PatchJump(skipJump, continueInnerPos);
-                }
-
-                // 修补键不相等时的跳转
-                PatchJump(skipInnerJump, continueInnerPos);
-            }
-
-            // 跳回内部循环开始
-            Emit(OpCode.Jump, innerLoopStartPos);
-
-            // 修补内部循环结束跳转
-            PatchJump(innerLoopEndJump, GetCurrentPosition());
-
-            // 释放临时变量
-            _compiler.FreeLocal(outerKeyLocal);
-            _compiler.FreeLocal(innerKeyLocal);
-        }
-
-        // 对于 Group Join，在内部循环结束后执行 select
-        foreach (var joinClause in joinClauses)
-        {
-            if (joinClause.IsGroupJoin && joinClause.GroupVariable != null)
-            {
-                // 处理 where 子句
-                var skipElementJumps = new List<int>();
-                foreach (var clause in node.BodyClauses)
-                {
-                    if (clause is WhereClause whereClause)
-                    {
-                        whereClause.Condition.Accept(this);
-                        int skipJump = GetCurrentPosition();
-                        Emit(OpCode.JumpIfFalse, -1);
-                        skipElementJumps.Add(skipJump);
-                    }
-                    else if (clause is LetClause letClause)
-                    {
-                        letClause.Expression.Accept(this);
-                        Emit(OpCode.StoreLocal, letVariables[letClause.Variable]);
-                    }
-                }
-
-                // 执行 select
-                ProcessLinqTerminationClause(node.TerminationClause, resultListLocal);
-
-                // 修补跳过元素的跳转
-                int continuePos = GetCurrentPosition();
-                foreach (var skipJump in skipElementJumps)
-                {
-                    PatchJump(skipJump, continuePos);
-                }
-            }
+            PatchJump(skipJump, outerContinuePos);
         }
 
         // 跳回外部循环开始
@@ -383,11 +246,16 @@ public partial class BytecodeVisitor
         // 修补外部循环结束跳转
         PatchJump(outerLoopEndJump, GetCurrentPosition());
 
-        // 处理 OrderBy (如果有)
-        var orderByClause = node.BodyClauses.OfType<OrderByClause>().FirstOrDefault();
+        // 处理 OrderBy / GroupBy 终结转换
         if (orderByClause != null)
         {
-            ProcessLinqOrderBy(orderByClause, resultListLocal);
+            ProcessLinqOrderBy(orderByClause, isGroupBy, resultListLocal);
+        }
+        else if (isGroupBy)
+        {
+            Emit(OpCode.LoadLocal, resultListLocal);
+            Emit(OpCode.GroupDictToList);
+            Emit(OpCode.StoreLocal, resultListLocal);
         }
 
         // 加载结果列表到栈
@@ -397,18 +265,6 @@ public partial class BytecodeVisitor
         _compiler.FreeLocal(resultListLocal);
         _compiler.FreeLocal(outerRangeVarLocal);
         _compiler.FreeLocal(outerIteratorLocal);
-        foreach (var local in innerIteratorLocals)
-        {
-            _compiler.FreeLocal(local);
-        }
-        foreach (var local in innerRangeVarLocals.Values)
-        {
-            _compiler.FreeLocal(local);
-        }
-        foreach (var local in groupVarLocals.Values)
-        {
-            _compiler.FreeLocal(local);
-        }
         foreach (var local in letVariables.Values)
         {
             _compiler.FreeLocal(local);
@@ -417,6 +273,137 @@ public partial class BytecodeVisitor
         EmitLinqContinuation(node);
 
         return null;
+    }
+
+    private void EmitJoinBodyClauses(
+        LinqExpression node,
+        int clauseIndex,
+        Dictionary<string, int> letVariables,
+        OrderByClause? orderByClause,
+        int resultListLocal,
+        List<int> skipJumps)
+    {
+        if (clauseIndex >= node.BodyClauses.Count)
+        {
+            if (orderByClause != null)
+            {
+                ProcessLinqOrderedTerminationClause(node.TerminationClause, orderByClause, resultListLocal);
+            }
+            else
+            {
+                ProcessLinqTerminationClause(node.TerminationClause, resultListLocal);
+            }
+            return;
+        }
+
+        var clause = node.BodyClauses[clauseIndex];
+        if (clause is WhereClause whereClause)
+        {
+            whereClause.Condition.Accept(this);
+            int skipJump = GetCurrentPosition();
+            Emit(OpCode.JumpIfFalse, -1);
+            skipJumps.Add(skipJump);
+            EmitJoinBodyClauses(node, clauseIndex + 1, letVariables, orderByClause, resultListLocal, skipJumps);
+        }
+        else if (clause is LetClause letClause)
+        {
+            letClause.Expression.Accept(this);
+            Emit(OpCode.StoreLocal, letVariables[letClause.Variable]);
+            EmitJoinBodyClauses(node, clauseIndex + 1, letVariables, orderByClause, resultListLocal, skipJumps);
+        }
+        else if (clause is OrderByClause)
+        {
+            // OrderBy 键在终止阶段按每行收集，循环结束后统一稳定排序
+            EmitJoinBodyClauses(node, clauseIndex + 1, letVariables, orderByClause, resultListLocal, skipJumps);
+        }
+        else if (clause is JoinClause joinClause)
+        {
+            // 在声明内层变量之前求值数据源，允许 `join y in y` 引用外层 y。
+            joinClause.InnerDataSource.Accept(this);
+            Emit(OpCode.GetIterator);
+            int innerIteratorLocal = _compiler.AllocateLocal();
+            Emit(OpCode.StoreLocal, innerIteratorLocal);
+
+            // 计算外部键（每个外层元素只求值一次）
+            joinClause.OuterKeyExpression.Accept(this);
+            int outerKeyLocal = _compiler.AllocateLocal();
+            Emit(OpCode.StoreLocal, outerKeyLocal);
+
+            int groupListLocal = -1;
+            if (joinClause.IsGroupJoin && joinClause.GroupVariable != null)
+            {
+                Emit(OpCode.NewList, 0);
+                groupListLocal = _compiler.AllocateLocal(joinClause.GroupVariable);
+                Emit(OpCode.StoreLocal, groupListLocal);
+            }
+
+            int innerRangeVarLocal = _compiler.AllocateLocal(joinClause.RangeVariable);
+            int innerKeyLocal = _compiler.AllocateLocal();
+
+            int innerLoopStartPos = GetCurrentPosition();
+            Emit(OpCode.LoadLocal, innerIteratorLocal);
+            Emit(OpCode.IteratorMoveNext);
+            int innerLoopEndJump = GetCurrentPosition();
+            Emit(OpCode.JumpIfFalse, -1);
+
+            Emit(OpCode.LoadLocal, innerIteratorLocal);
+            Emit(OpCode.IteratorCurrent);
+            Emit(OpCode.StoreLocal, innerRangeVarLocal);
+
+            joinClause.InnerKeyExpression.Accept(this);
+            Emit(OpCode.StoreLocal, innerKeyLocal);
+
+            Emit(OpCode.LoadLocal, outerKeyLocal);
+            Emit(OpCode.LoadLocal, innerKeyLocal);
+            Emit(OpCode.Equal);
+            int skipInnerJump = GetCurrentPosition();
+            Emit(OpCode.JumpIfFalse, -1);
+
+            if (joinClause.IsGroupJoin && joinClause.GroupVariable != null)
+            {
+                Emit(OpCode.LoadLocal, groupListLocal);
+                Emit(OpCode.LoadLocal, innerRangeVarLocal);
+                Emit(OpCode.CallMethod, new object[] { 2, "Add" });
+                Emit(OpCode.Pop);
+
+                PatchJump(skipInnerJump, innerLoopStartPos);
+                Emit(OpCode.Jump, innerLoopStartPos);
+                PatchJump(innerLoopEndJump, GetCurrentPosition());
+
+                _compiler.FreeLocal(innerKeyLocal);
+                _compiler.FreeLocal(innerRangeVarLocal);
+                _compiler.FreeLocal(outerKeyLocal);
+                _compiler.FreeLocal(innerIteratorLocal);
+
+                // Group Join 收集完分组后继续后续子句
+                EmitJoinBodyClauses(node, clauseIndex + 1, letVariables, orderByClause, resultListLocal, skipJumps);
+                _compiler.FreeLocal(groupListLocal);
+            }
+            else
+            {
+                var innerSkipJumps = new List<int>();
+                EmitJoinBodyClauses(node, clauseIndex + 1, letVariables, orderByClause, resultListLocal, innerSkipJumps);
+
+                int continueInnerPos = GetCurrentPosition();
+                foreach (var sj in innerSkipJumps)
+                {
+                    PatchJump(sj, continueInnerPos);
+                }
+                PatchJump(skipInnerJump, continueInnerPos);
+
+                Emit(OpCode.Jump, innerLoopStartPos);
+                PatchJump(innerLoopEndJump, GetCurrentPosition());
+
+                _compiler.FreeLocal(innerKeyLocal);
+                _compiler.FreeLocal(innerRangeVarLocal);
+                _compiler.FreeLocal(outerKeyLocal);
+                _compiler.FreeLocal(innerIteratorLocal);
+            }
+        }
+        else
+        {
+            EmitJoinBodyClauses(node, clauseIndex + 1, letVariables, orderByClause, resultListLocal, skipJumps);
+        }
     }
 
     // ===== 泛型处理辅助方法 =====

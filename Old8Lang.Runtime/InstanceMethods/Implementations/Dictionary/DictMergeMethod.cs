@@ -66,30 +66,10 @@ public class DictMergeMethod : BaseInstanceMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        instance.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
-        parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
-
-        var helperMethod = typeof(DictMergeMethod).GetMethod(nameof(MergeHelper),
-            System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);
-        ilGenerator.Emit(OpCodes.Call, helperMethod!);
+        IlNativeCollectionBridge.EmitBridgeCall(this, instance, parameters, ilGenerator, local);
     }
 
-    public static Dictionary<object, object> MergeHelper(Dictionary<object, object> dict, Dictionary<object, object> otherDict)
-    {
-        var newDict = new Dictionary<object, object>(dict);
-
-        foreach (var (key, value) in otherDict)
-        {
-            if (!newDict.ContainsKey(key))
-            {
-                newDict[key] = value;
-            }
-        }
-
-        return newDict;
-    }
-
-    protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)
+protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)
     {
         return typeof(Dictionary<object, object>);
     }

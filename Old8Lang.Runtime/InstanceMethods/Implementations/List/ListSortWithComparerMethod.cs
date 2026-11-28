@@ -97,34 +97,10 @@ public class ListSortWithComparerMethod : BaseInstanceMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        // 加载列表实例
-        instance.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
-
-        // 加载比较器函数
-        parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
-
-        // 调用辅助方法
-        var helperMethod = typeof(ListSortWithComparerMethod).GetMethod(nameof(SortWithComparerHelper),
-            System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);
-        ilGenerator.Emit(OpCodes.Call, helperMethod!);
+        IlNativeCollectionBridge.EmitBridgeCall(this, instance, parameters, ilGenerator, local);
     }
 
-    /// <summary>
-    /// 辅助方法：使用比较器排序
-    /// </summary>
-    public static ListLangValue SortWithComparerHelper(ListLangValue list, LangValueType comparerParam)
-    {
-        if (comparerParam is not FuncLangValue comparer)
-        {
-            throw new Exception("SortWith 方法的参数必须是函数类型");
-        }
-
-        var sorted = new List<LangValueType>(list.Values);
-        QuickSortWithComparer(sorted, 0, sorted.Count - 1, comparer);
-        return new ListLangValue(sorted);
-    }
-
-    protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)
+protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)
     {
         return typeof(ListLangValue);
     }

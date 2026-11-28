@@ -13,7 +13,7 @@ namespace Old8Lang.InstanceMethods.Implementations.Array;
 /// <summary>
 /// Array.InsertionSort() - 使用插入排序算法对数组进行排序
 /// </summary>
-public class ArrayInsertionSortMethod : BaseInstanceMethod
+public class ArrayInsertionSortMethod : BaseInstanceMethod, IIlNativeValueInstanceMethod
 {
     public override string[] Names => ["InsertionSort", "insertionSort"];
     public override Type TargetType => typeof(ArrayLangValue);
@@ -34,17 +34,13 @@ public class ArrayInsertionSortMethod : BaseInstanceMethod
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
         instance.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
-        var helperMethod = typeof(ArrayInsertionSortMethod).GetMethod(nameof(InsertionSortHelper),
+        var helperMethod = typeof(ArrayInsertionSortMethod).GetMethod(nameof(InsertionSortNativeHelper),
             System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
         ilGenerator.Emit(OpCodes.Call, helperMethod!);
     }
 
-    public static ArrayLangValue InsertionSortHelper(ArrayLangValue array)
-    {
-        var items = array.GetItems().ToArray();
-        InsertionSortImpl(items);
-        return new ArrayLangValue(items, array.ElementType, array.Position);
-    }
+    public static object?[] InsertionSortNativeHelper(object? instance) =>
+        ArraySortVmSupport.SortAndReturn(instance, InsertionSort);
 
     private static void InsertionSortImpl(LangValueType[] nums)
     {
@@ -65,7 +61,7 @@ public class ArrayInsertionSortMethod : BaseInstanceMethod
 
     protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)
     {
-        return typeof(ArrayLangValue);
+        return typeof(object?[]);
     }
 
     protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)

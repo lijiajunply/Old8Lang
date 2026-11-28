@@ -37,7 +37,33 @@ public partial class VirtualMachine
     /// <summary>
     /// 辅助方法：调用实例方法
     /// </summary>
-    private object? InvokeTypeMethod(object obj, string methodName, object?[] args)
+    private static InstanceMethods.Core.IInstanceMethod? ResolveVmInstanceMethod(
+        InstanceMethods.Core.InstanceMethodRegistry registry,
+        Type objectType,
+        string methodName,
+        int argCount)
+    {
+        var group = registry.GetOverloadGroup(objectType, methodName);
+        if (group == null)
+        {
+            var equivalentType = VMTypeMapper.GetEquivalentLangType(objectType);
+            group = registry.GetOverloadGroup(equivalentType, methodName);
+        }
+
+        if (group == null)
+        {
+            return null;
+        }
+
+        var overloads = group.GetAllOverloads();
+        return overloads.FirstOrDefault(m =>
+                   argCount >= m.MinParameterCount &&
+                   (m.MaxParameterCount == -1 || argCount <= m.MaxParameterCount))
+               ?? overloads.FirstOrDefault();
+    }
+
+    private object? InvokeTypeMethod(object obj, string methodName, object?[] args,
+        string[]? namedArgNames = null, object?[]? namedArgValues = null)
     {
         if (obj == null)
         {
@@ -78,8 +104,17 @@ public partial class VirtualMachine
             var manager = new Old8Lang.Interpreter.VariateManager();
             var arguments = args.Select(value => (Old8Lang.AST.LangExpression)
                 (value as Old8Lang.AST.Expression.LangValueType ?? Old8Lang.AST.Expression.LangValueType.ObjToValue(value))).ToList();
+            var named = new List<Old8Lang.AST.Expression.NamedArgument>();
+            for (var i = 0; namedArgNames is not null && namedArgValues is not null && i < namedArgNames.Length; i++)
+            {
+                var namedValue = namedArgValues[i];
+                named.Add(new Old8Lang.AST.Expression.NamedArgument(namedArgNames[i],
+                    (Old8Lang.AST.LangExpression)(namedValue as Old8Lang.AST.Expression.LangValueType ??
+                                                  Old8Lang.AST.Expression.LangValueType.ObjToValue(namedValue))));
+            }
+
             var call = new Old8Lang.AST.Expression.Value.Instance(
-                new Old8Lang.AST.Expression.LangId(methodName), arguments, []);
+                new Old8Lang.AST.Expression.LangId(methodName), arguments, named);
             return UnwrapToVmValue(module.Dot(call, manager));
         }
 
@@ -94,18 +129,17 @@ public partial class VirtualMachine
             }
         }
 
-        // 首先尝试使用实例方法系统（支持类型等价）
+        // 优先匹配当前 VM 自身注册的扩展方法，避免与同进程其他模式残留的全局扩展包装器冲突
+        var vmExtensionMethod = TryGetVmExtensionMethod(obj.GetType(), methodName);
+        if (vmExtensionMethod != null)
+        {
+            return vmExtensionMethod.ExecuteInVM(obj, args);
+        }
+
+        // 首先尝试使用实例方法系统（支持类型等价和按参数个数匹配重载）
         var registry = InstanceMethods.Core.InstanceMethodRegistry.Instance;
 
-        // 尝试查找实例方法
-        var instanceMethod = registry.TryGetMethod(obj.GetType(), methodName);
-
-        // 如果没找到，尝试查找等价类型的方法
-        if (instanceMethod == null)
-        {
-            var equivalentType = VMTypeMapper.GetEquivalentLangType(obj.GetType());
-            instanceMethod = registry.TryGetMethod(equivalentType, methodName);
-        }
+        var instanceMethod = ResolveVmInstanceMethod(registry, obj.GetType(), methodName, args.Length);
 
         if (instanceMethod != null)
         {

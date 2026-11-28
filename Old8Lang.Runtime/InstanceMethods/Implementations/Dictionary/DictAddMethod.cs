@@ -28,6 +28,16 @@ public class DictAddMethod : BaseInstanceMethod
         var key = parameters[0].Accept(RuntimeVisitors.CreateInterpreter(manager));
         var value = parameters[1].Accept(RuntimeVisitors.CreateInterpreter(manager));
 
+        // 若键已存在则原地更新，与 IL/VM 原生字典及 dict[k] <- v 语义保持一致
+        for (var i = 0; i < dict.Value.Count; i++)
+        {
+            if (dict.Value[i].Key.Equal(key))
+            {
+                dict.Value[i] = (key, value);
+                return new TupleLangValue(key, value);
+            }
+        }
+
         dict.Value.Add((key, value));
         return new TupleLangValue(key, value);
     }
@@ -35,24 +45,10 @@ public class DictAddMethod : BaseInstanceMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        instance.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
-        parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
-        parameters[1].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
-
-        var helperMethod = typeof(DictAddMethod).GetMethod(nameof(AddHelper),
-            System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);
-        ilGenerator.Emit(OpCodes.Call, helperMethod!);
+        IlNativeCollectionBridge.EmitBridgeCall(this, instance, parameters, ilGenerator, local);
     }
 
-    public static TupleLangValue AddHelper(Dictionary<object, object> dict, object key, object value)
-    {
-        dict[key] = value;
-        // 解释器的 ExecuteInternal 返回 (key, value) 元组；IL 侧保持一致，
-        // 不能声明 object[] 却返回元组（桥接会 cast 失败）。
-        return new TupleLangValue(IlValueBridge.Wrap(key), IlValueBridge.Wrap(value));
-    }
-
-    protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)
+protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)
     {
         return typeof(TupleLangValue);
     }

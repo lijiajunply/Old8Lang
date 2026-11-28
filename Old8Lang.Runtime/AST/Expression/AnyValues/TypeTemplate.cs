@@ -296,6 +296,8 @@ public partial class TypeTemplate(
                 // 关键修复：使用全局 manager 而不是调用者的 manager，这样可以确保访问到全局注册的类型
                 // 并且能够正确处理静态变量的赋值操作
                 var tempManager = manager.Interpreter?.Manager?.NewManger() ?? manager.NewManger();
+                // 静态方法属于当前类内部，允许访问本类的 private static 成员
+                tempManager.IsClass = true;
 
                 // 将当前类添加到临时管理器中，这样静态方法内部就能访问到类（用于 ClassName.staticField 形式的赋值）
                 tempManager.AddClassAndFunc(this);

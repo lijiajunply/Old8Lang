@@ -13,7 +13,7 @@ namespace Old8Lang.InstanceMethods.Implementations.List;
 /// <summary>
 /// List.FlattenDeep() - 深度扁平化嵌套列表（递归扁平化所有层级）
 /// </summary>
-public class ListFlattenDeepMethod : BaseInstanceMethod
+public class ListFlattenDeepMethod : BaseInstanceMethod, IIlNativeValueInstanceMethod
 {
     public override string[] Names => ["FlattenDeep", "flattenDeep"];
     public override Type TargetType => typeof(ListLangValue);
@@ -50,9 +50,18 @@ public class ListFlattenDeepMethod : BaseInstanceMethod
     {
         instance.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
-        var helperMethod = typeof(ListFlattenDeepMethod).GetMethod(nameof(FlattenDeepHelper),
+        var helperMethod = typeof(ListFlattenDeepMethod).GetMethod(nameof(FlattenDeepNativeHelper),
             System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
         ilGenerator.Emit(OpCodes.Call, helperMethod!);
+    }
+
+    public static List<object?> FlattenDeepNativeHelper(object? listObj)
+    {
+        if (listObj is List<object?> typed)
+            return FlattenDeepHelper(typed);
+        if (listObj is System.Collections.IList ilist)
+            return FlattenDeepHelper(ilist.Cast<object?>().ToList());
+        throw new ArgumentException($"实例必须是列表类型，实际是 {listObj?.GetType().Name ?? "null"}");
     }
 
     public static List<object?> FlattenDeepHelper(List<object?> list)
@@ -62,11 +71,11 @@ public class ListFlattenDeepMethod : BaseInstanceMethod
         return result;
     }
 
-    private static void FlattenRecursiveHelper(List<object?> source, List<object?> result)
+    private static void FlattenRecursiveHelper(System.Collections.IList source, List<object?> result)
     {
         foreach (var item in source)
         {
-            if (item is List<object?> innerList)
+            if (item is System.Collections.IList innerList && item is not System.Array)
             {
                 FlattenRecursiveHelper(innerList, result);
             }

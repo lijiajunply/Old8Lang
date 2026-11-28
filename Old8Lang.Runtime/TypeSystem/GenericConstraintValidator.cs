@@ -107,7 +107,7 @@ public static class GenericConstraintValidator
             GenericConstraintKind.Class => ValidateClassConstraint(actualType, genericParamName),
             GenericConstraintKind.Struct => ValidateStructConstraint(actualType, genericParamName),
             GenericConstraintKind.TypeName => ValidateTypeNameConstraint(constraint, actualType, manager, genericParamName),
-            GenericConstraintKind.TypeParameter => ValidateTypeParameterConstraint(constraint, actualType, typeArgumentMapping, genericParamName),
+            GenericConstraintKind.TypeParameter => ValidateTypeParameterConstraint(constraint, actualType, typeArgumentMapping, manager, genericParamName),
             _ => ConstraintValidationResult.Success()
         };
     }
@@ -332,6 +332,7 @@ public static class GenericConstraintValidator
         GenericConstraint constraint,
         ITypeInfo actualType,
         Dictionary<string, ITypeInfo>? typeArgumentMapping,
+        VariateManager? manager,
         string genericParamName)
     {
         var constraintTypeParamName = constraint.TypeName!;
@@ -347,6 +348,17 @@ public static class GenericConstraintValidator
 
         // 检查 actualType 是否兼容 constraintActualType
         if (actualType.IsCompatibleWith(constraintActualType))
+        {
+            return ConstraintValidationResult.Success();
+        }
+
+        // 支持 Old8Lang 继承链/接口与 .NET 类型的跨类型参数约束（例如 where T: U）
+        var typeNameCheck = ValidateTypeNameConstraint(
+            GenericConstraint.CreateTypeName(constraintActualType.Name),
+            actualType,
+            manager,
+            genericParamName);
+        if (typeNameCheck.IsValid)
         {
             return ConstraintValidationResult.Success();
         }

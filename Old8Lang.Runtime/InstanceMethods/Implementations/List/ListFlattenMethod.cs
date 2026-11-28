@@ -13,7 +13,7 @@ namespace Old8Lang.InstanceMethods.Implementations.List;
 /// <summary>
 /// List.Flatten() - 扁平化嵌套列表（一层）
 /// </summary>
-public class ListFlattenMethod : BaseInstanceMethod
+public class ListFlattenMethod : BaseInstanceMethod, IIlNativeValueInstanceMethod
 {
     public override string[] Names => ["Flatten", "flatten"];
     public override Type TargetType => typeof(ListLangValue);
@@ -47,9 +47,18 @@ public class ListFlattenMethod : BaseInstanceMethod
     {
         instance.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
-        var helperMethod = typeof(ListFlattenMethod).GetMethod(nameof(FlattenHelper),
+        var helperMethod = typeof(ListFlattenMethod).GetMethod(nameof(FlattenNativeHelper),
             System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
         ilGenerator.Emit(OpCodes.Call, helperMethod!);
+    }
+
+    public static List<object?> FlattenNativeHelper(object? listObj)
+    {
+        if (listObj is List<object?> typed)
+            return FlattenHelper(typed);
+        if (listObj is System.Collections.IList ilist)
+            return FlattenHelper(ilist.Cast<object?>().ToList());
+        throw new ArgumentException($"实例必须是列表类型，实际是 {listObj?.GetType().Name ?? "null"}");
     }
 
     public static List<object?> FlattenHelper(List<object?> list)
@@ -61,6 +70,13 @@ public class ListFlattenMethod : BaseInstanceMethod
             if (item is List<object?> innerList)
             {
                 result.AddRange(innerList);
+            }
+            else if (item is System.Collections.IList innerIList && item is not System.Array)
+            {
+                foreach (var sub in innerIList)
+                {
+                    result.Add(sub);
+                }
             }
             else
             {

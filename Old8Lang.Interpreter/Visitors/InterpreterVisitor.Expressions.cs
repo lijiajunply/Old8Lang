@@ -628,7 +628,15 @@ public partial class InterpreterVisitor
             functionValue = node.FunctionExpression.Accept(this);
         }
 
-        // 2. 检查获取到的是否为函数
+        // 2. 检查获取到的是否为函数（含异步函数值 / 异步 Lambda）
+        if (functionValue is AsyncFuncLangValue asyncFunc)
+        {
+            var callableAsync = asyncFunc.CapturedScope is not null && !asyncFunc.IsAsyncGenerator
+                ? asyncFunc
+                : (AsyncFuncLangValue)asyncFunc.Accept(this);
+            return callableAsync.RunAsync(manager, node.Arguments);
+        }
+
         if (functionValue is not FuncLangValue func)
         {
             throw new InvalidOperationError(node, $"表达式 '{node.FunctionExpression}' 的结果不是函数，无法调用");

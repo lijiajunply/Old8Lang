@@ -14,7 +14,7 @@ namespace Old8Lang.InstanceMethods.Implementations.List;
 /// <summary>
 /// List.Slice(start, end) - 获取列表的切片
 /// </summary>
-public class ListSliceMethod : BaseInstanceMethod
+public class ListSliceMethod : BaseInstanceMethod, IIlNativeValueInstanceMethod
 {
     public override string[] Names => ["Slice", "slice"];
     public override Type TargetType => typeof(ListLangValue);
@@ -59,12 +59,21 @@ public class ListSliceMethod : BaseInstanceMethod
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
         instance.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
-        parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
-        parameters[1].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        IlNativeCollectionBridge.EmitIntArgument(parameters[0], ilGenerator, local);
+        IlNativeCollectionBridge.EmitIntArgument(parameters[1], ilGenerator, local);
 
-        var helperMethod = typeof(ListSliceMethod).GetMethod(nameof(SliceHelper),
+        var helperMethod = typeof(ListSliceMethod).GetMethod(nameof(SliceNativeHelper),
             System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
         ilGenerator.Emit(OpCodes.Call, helperMethod!);
+    }
+
+    public static List<object?> SliceNativeHelper(object? listObj, int start, int end)
+    {
+        if (listObj is List<object?> typed)
+            return SliceHelper(typed, start, end);
+        if (listObj is System.Collections.IList ilist)
+            return SliceHelper(ilist.Cast<object?>().ToList(), start, end);
+        throw new ArgumentException($"实例必须是列表类型，实际是 {listObj?.GetType().Name ?? "null"}");
     }
 
     public static List<object?> SliceHelper(List<object?> list, int start, int end)

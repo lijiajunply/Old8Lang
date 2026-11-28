@@ -102,6 +102,9 @@ public class VariateManager
     /// </remarks>
     internal List<Dictionary<string, LangValueType>> Scopes { get; } = [new()];
 
+    /// <summary>保护作用域栈及导出表并发克隆与修改的同步锁。</summary>
+    private readonly object _scopeLock = new();
+
     /// <summary>
     /// 与作用域栈一一对应的作用域令牌（仅用于闭包判断“外层帧是否仍然存活”）。
     /// </summary>
@@ -605,6 +608,14 @@ public class VariateManager
     /// </remarks>
     public void Set(LangId id, LangValueType langValueType)
     {
+        lock (_scopeLock)
+        {
+            SetCore(id, langValueType);
+        }
+    }
+
+    private void SetCore(LangId id, LangValueType langValueType)
+    {
         var currentScopeIndex = Scopes.Count - 1;
 
         // 1. 首先检查当前作用域是否已存在此变量
@@ -699,16 +710,19 @@ public class VariateManager
     /// <param name="langValueType">参数值</param>
     public void SetParameter(LangId id, LangValueType langValueType)
     {
-        var currentScopeIndex = Scopes.Count - 1;
+        lock (_scopeLock)
+        {
+            var currentScopeIndex = Scopes.Count - 1;
 
-        // 函数参数总是在当前作用域中创建或更新变量，不向上查找
-        // 这确保了递归函数调用中参数的独立性
-        EnsureScopeNotShared(currentScopeIndex); // COW: 确保作用域未共享
-        Scopes[currentScopeIndex][id.IdName] = langValueType;
+            // 函数参数总是在当前作用域中创建或更新变量，不向上查找
+            // 这确保了递归函数调用中参数的独立性
+            EnsureScopeNotShared(currentScopeIndex); // COW: 确保作用域未共享
+            Scopes[currentScopeIndex][id.IdName] = langValueType;
 
-        // 更新缓存
-        _lookupCache ??= new Dictionary<string, (int scopeIndex, LangValueType value)>();
-        _lookupCache[id.IdName] = (currentScopeIndex, langValueType);
+            // 更新缓存
+            _lookupCache ??= new Dictionary<string, (int scopeIndex, LangValueType value)>();
+            _lookupCache[id.IdName] = (currentScopeIndex, langValueType);
+        }
     }
 
     /// <summary>
@@ -719,18 +733,21 @@ public class VariateManager
     /// <param name="langValueType">变量值</param>
     public void SetLocal(LangId id, LangValueType langValueType)
     {
-        var currentScopeIndex = Scopes.Count - 1;
-
-        EnsureScopeNotShared(currentScopeIndex);
-        Scopes[currentScopeIndex][id.IdName] = langValueType;
-
-        _lookupCache ??= new Dictionary<string, (int scopeIndex, LangValueType value)>();
-        _lookupCache[id.IdName] = (currentScopeIndex, langValueType);
-        _variableCache?.Set(id.IdName, langValueType, currentScopeIndex);
-
-        if (currentScopeIndex == 0 && _globalVariableCache != null)
+        lock (_scopeLock)
         {
-            _globalVariableCache[id.IdName] = langValueType;
+            var currentScopeIndex = Scopes.Count - 1;
+
+            EnsureScopeNotShared(currentScopeIndex);
+            Scopes[currentScopeIndex][id.IdName] = langValueType;
+
+            _lookupCache ??= new Dictionary<string, (int scopeIndex, LangValueType value)>();
+            _lookupCache[id.IdName] = (currentScopeIndex, langValueType);
+            _variableCache?.Set(id.IdName, langValueType, currentScopeIndex);
+
+            if (currentScopeIndex == 0 && _globalVariableCache != null)
+            {
+                _globalVariableCache[id.IdName] = langValueType;
+            }
         }
     }
 
@@ -739,30 +756,33 @@ public class VariateManager
     /// </summary>
     public void AddChildren()
     {
-        var cache = ScopeCache.Value!;
-
-        // 优化：从缓存池获取作用域字典，减少内存分配
-        if (cache.Count > 0)
+        lock (_scopeLock)
         {
-            var cachedScope = cache.Pop();
-            // 确保缓存的作用域是空的
-            cachedScope.Clear();
-            Scopes.Add(cachedScope);
+            var cache = ScopeCache.Value!;
+
+            // 优化：从缓存池获取作用域字典，减少内存分配
+            if (cache.Count > 0)
+            {
+                var cachedScope = cache.Pop();
+                // 确保缓存的作用域是空的
+                cachedScope.Clear();
+                Scopes.Add(cachedScope);
+            }
+            else
+            {
+                // 缓存池为空时创建新的作用域
+                Scopes.Add(new Dictionary<string, LangValueType>());
+            }
+
+            // COW: 添加对应的共享标记（新作用域默认未共享）
+            ScopeSharedFlags.Add(false);
+
+            // 新的作用域令牌，供闭包判断该帧是否仍然存活
+            ScopeTokens.Add(new object());
+
+            // 作用域变化，清理查找缓存
+            _lookupCache?.Clear();
         }
-        else
-        {
-            // 缓存池为空时创建新的作用域
-            Scopes.Add(new Dictionary<string, LangValueType>());
-        }
-
-        // COW: 添加对应的共享标记（新作用域默认未共享）
-        ScopeSharedFlags.Add(false);
-
-        // 新的作用域令牌，供闭包判断该帧是否仍然存活
-        ScopeTokens.Add(new object());
-
-        // 作用域变化，清理查找缓存
-        _lookupCache?.Clear();
     }
 
     /// <summary>
@@ -773,42 +793,45 @@ public class VariateManager
     /// </remarks>
     public void RemoveChildren()
     {
-        // 移除当前作用域
-        if (Scopes.Count > 1)
+        lock (_scopeLock)
         {
-            var scopeToRemove = Scopes[^1];
-            Scopes.RemoveAt(Scopes.Count - 1);
-
-            // COW: 同步移除共享标记
-            if (ScopeSharedFlags.Count > 0)
+            // 移除当前作用域
+            if (Scopes.Count > 1)
             {
-                ScopeSharedFlags.RemoveAt(ScopeSharedFlags.Count - 1);
+                var scopeToRemove = Scopes[^1];
+                Scopes.RemoveAt(Scopes.Count - 1);
+
+                // COW: 同步移除共享标记
+                if (ScopeSharedFlags.Count > 0)
+                {
+                    ScopeSharedFlags.RemoveAt(ScopeSharedFlags.Count - 1);
+                }
+
+                // 同步移除作用域令牌
+                if (ScopeTokens.Count > 1)
+                {
+                    ScopeTokens.RemoveAt(ScopeTokens.Count - 1);
+                }
+
+                // 优化：清空作用域并将其归还到缓存池，以便复用
+                scopeToRemove.Clear();
+                var cache = ScopeCache.Value!;
+                if (cache.Count < MaxScopeCacheSize)
+                {
+                    cache.Push(scopeToRemove);
+                }
+
+                // 作用域变化，清理查找缓存
+                _lookupCache?.Clear();
+
+                // 清理增强缓存中的当前作用域变量
+                _variableCache?.ClearScope(Scopes.Count);
+
+                // 清理被移除的作用域中的只读变量
+                // 移除的是当前最后一个作用域（索引为Scopes.Count）
+                // 注意：此时作用域已经被移除，所以当前Scopes.Count已经减1
+                ClearReadonlyInScope(Scopes.Count);
             }
-
-            // 同步移除作用域令牌
-            if (ScopeTokens.Count > 1)
-            {
-                ScopeTokens.RemoveAt(ScopeTokens.Count - 1);
-            }
-
-            // 优化：清空作用域并将其归还到缓存池，以便复用
-            scopeToRemove.Clear();
-            var cache = ScopeCache.Value!;
-            if (cache.Count < MaxScopeCacheSize)
-            {
-                cache.Push(scopeToRemove);
-            }
-
-            // 作用域变化，清理查找缓存
-            _lookupCache?.Clear();
-
-            // 清理增强缓存中的当前作用域变量
-            _variableCache?.ClearScope(Scopes.Count);
-
-            // 清理被移除的作用域中的只读变量
-            // 移除的是当前最后一个作用域（索引为Scopes.Count）
-            // 注意：此时作用域已经被移除，所以当前Scopes.Count已经减1
-            ClearReadonlyInScope(Scopes.Count);
         }
     }
 
@@ -1100,46 +1123,45 @@ public class VariateManager
         }
 
         // 克隆作用域栈：全局作用域（第一个）共享引用，其他作用域深拷贝
-        // 这样闭包可以修改全局变量，但局部变量保持独立
-        newManager.Scopes.Clear(); // 清除构造函数创建的初始作用域
-        for (int i = 0; i < Scopes.Count; i++)
+        // 加锁保护，避免并发异步任务克隆与宿主线程修改作用域栈发生竞态
+        lock (_scopeLock)
         {
-            var scope = Scopes[i];
+            newManager.Scopes.Clear(); // 清除构造函数创建的初始作用域
+            newManager.ScopeTokens.Clear();
+            for (int i = 0; i < Scopes.Count; i++)
+            {
+                var scope = Scopes[i];
 
-            if (i == 0)
-            {
-                // 全局作用域：直接共享引用，使闭包可以修改全局变量
-                newManager.Scopes.Add(scope);
-            }
-            else
-            {
-                // 其他作用域：深拷贝，保持局部变量独立
-                // 使用拷贝构造函数预分配正确容量，提升性能
-                var newScope = new Dictionary<string, LangValueType>(scope);
-                newManager.Scopes.Add(newScope);
-                // 注册锁定变量（共享引用）
-                foreach (var (varName, varValue) in scope)
+                if (i == 0)
                 {
-                    if (varValue is LockedVariableLangValue lockedVar)
+                    // 全局作用域：直接共享引用，使闭包可以修改全局变量
+                    newManager.Scopes.Add(scope);
+                }
+                else
+                {
+                    // 其他作用域：深拷贝，保持局部变量独立
+                    var newScope = new Dictionary<string, LangValueType>(scope);
+                    newManager.Scopes.Add(newScope);
+                    // 注册锁定变量（共享引用）
+                    foreach (var (varName, varValue) in newScope)
                     {
-                        newManager.LockedVariables[varName] = lockedVar;
+                        if (varValue is LockedVariableLangValue lockedVar)
+                        {
+                            newManager.LockedVariables[varName] = lockedVar;
+                        }
                     }
                 }
+
+                // 克隆出来的作用域是独立帧，令牌也必须是新的，
+                // 否则闭包会把自己创建时捕获的旧帧误判为仍然存活
+                newManager.ScopeTokens.Add(new object());
             }
-        }
 
-        // 克隆出来的作用域是独立帧，令牌也必须是新的，
-        // 否则闭包会把自己创建时捕获的旧帧误判为仍然存活
-        newManager.ScopeTokens.Clear();
-        for (int i = 0; i < Scopes.Count; i++)
-        {
-            newManager.ScopeTokens.Add(new object());
-        }
-
-        // 模块导出表随管理器一起可见（模块只需执行一次）
-        foreach (var (modulePath, exports) in LoadedModuleExports)
-        {
-            newManager.LoadedModuleExports[modulePath] = exports;
+            // 模块导出表随管理器一起可见（模块只需执行一次）
+            foreach (var (modulePath, exports) in LoadedModuleExports)
+            {
+                newManager.LoadedModuleExports[modulePath] = exports;
+            }
         }
 
         // 复制导入信息（线程安全）

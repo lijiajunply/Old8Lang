@@ -225,7 +225,9 @@ public static class GenericMethodSpecializer
         var parameterTypes = resolver.ResolveParameterTypes(funcValue.Ids!);
 
         // 解析返回类型
-        var returnType = resolver.ResolveReturnType(funcValue.Id?.AssumptionType);
+        var returnType = AST.Statement.IlReturnTypeHelper.Resolve(
+            funcValue.Id,
+            resolver.ResolveReturnType(funcValue.Id?.AssumptionType));
 
         // 创建特化方法
         var dynamicMethod = new DynamicMethod(
@@ -292,6 +294,7 @@ public static class GenericMethodSpecializer
         funcLocal.ReturnLabel = endLabel;
 
         // 声明返回值局部变量（如果需要）
+        funcLocal.ReturnTypeAnnotation = resolver.ResolveReturnTypeAnnotation(funcValue.Id?.AssumptionType);
         if (returnType != typeof(void))
         {
             funcLocal.ReturnValueLocal = methodIl.DeclareLocal(returnType);
@@ -383,6 +386,7 @@ public static class GenericMethodSpecializer
         {
             // 对于其他值类型，初始化并加载默认值
             var defaultLocal = methodIl.DeclareLocal(type);
+            methodIl.Emit(OpCodes.Ldloca, defaultLocal);
             methodIl.Emit(OpCodes.Initobj, type);
             methodIl.Emit(OpCodes.Ldloc, defaultLocal);
         }

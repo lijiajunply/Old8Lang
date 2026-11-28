@@ -179,6 +179,8 @@ public class LangListMinWithSelectorMethod : BaseLangListMethod, IIlNativeValueI
         {
             (IntLangValue ia, IntLangValue ib) => ia.Value.CompareTo(ib.Value),
             (DoubleLangValue da, DoubleLangValue db) => da.Value.CompareTo(db.Value),
+            (IntLangValue ia, DoubleLangValue db) => ((double)ia.Value).CompareTo(db.Value),
+            (DoubleLangValue da, IntLangValue ib) => da.Value.CompareTo((double)ib.Value),
             (StringLangValue sa, StringLangValue sb) => string.Compare(sa.Value, sb.Value, StringComparison.Ordinal),
             (BoolLangValue ba, BoolLangValue bb) => ba.Value.CompareTo(bb.Value),
             (CharLangValue ca, CharLangValue cb) => ca.Value.CompareTo(cb.Value),
@@ -189,19 +191,5 @@ public class LangListMinWithSelectorMethod : BaseLangListMethod, IIlNativeValueI
     /// <summary>
     /// 比较两个值的大小（VM 模式）
     /// </summary>
-    private static int CompareValuesVM(object? a, object? b)
-    {
-        return (a, b) switch
-        {
-            (int ia, int ib) => ia.CompareTo(ib),
-            (double da, double db) => da.CompareTo(db),
-            (string sa, string sb) => string.Compare(sa, sb, StringComparison.Ordinal),
-            (bool ba, bool bb) => ba.CompareTo(bb),
-            (char ca, char cb) => ca.CompareTo(cb),
-            (null, null) => 0,
-            (null, _) => -1,
-            (_, null) => 1,
-            _ => string.Compare(a.ToString(), b.ToString(), StringComparison.Ordinal)
-        };
-    }
+    private static int CompareValuesVM(object? a, object? b) => Array.ArraySortVmSupport.Compare(a, b);
 }

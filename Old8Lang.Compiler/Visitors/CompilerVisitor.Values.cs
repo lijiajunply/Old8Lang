@@ -155,24 +155,17 @@ public partial class CompilerVisitor
 
     public object? VisitAsyncFuncLangValue(AsyncFuncLangValue node)
     {
+        var capturedValues = FuncLangValueIlCompilerExtensions.GetCapturedLocalValues(local);
+        var hasCaptures = capturedValues.Count > 0;
 
-        // 1. 确定参数类型和返回类型
-        var parameterTypes = node.Ids!.Select(item => item.Accept(new TypeInferenceVisitor(local))).ToArray();
-        var returnType = typeof(Task<object>);
-
-        // 2. 创建 DynamicMethod
-        var dynamicMethod = new DynamicMethod(
-            node.Id?.IdName ?? "AnonymousAsync",
-            returnType,
-            parameterTypes!,
-            true
-        );
-
-        // 3. 生成方法体
-        var methodIl = dynamicMethod.GetILGenerator();
-
-        // 创建新的LocalManager实例，专门用于函数体的IL生成
-        var funcLocal = new LocalManager() { FilePath = local.FilePath, Interpreter = local.Interpreter };
+        // 1. 创建新的 LocalManager 实例，继承全局与捕获信息
+        var funcLocal = new LocalManager()
+        {
+            FilePath = local.FilePath,
+            Interpreter = local.Interpreter,
+            Globals = local.Globals,
+            InClassEnv = local.InClassEnv
+        };
 
         foreach (var (key, value) in local.DelegateVar)
         {
@@ -199,7 +192,70 @@ public partial class CompilerVisitor
             funcLocal.GenericFunctions[key] = value;
         }
 
-        // 处理参数
+        foreach (var (key, value) in local.FieldVar)
+        {
+            funcLocal.FieldVar[key] = value;
+        }
+
+        foreach (var (key, value) in local.LocalDelegateReturnTypes)
+        {
+            funcLocal.LocalDelegateReturnTypes[key] = value;
+        }
+
+        // 2. 确定参数类型和返回类型（统一采用 object[] 闭包模板，避免对 DynamicMethod 发射非法的 ldftn）
+        var parameterTypes = node.Ids!.Select(item => item.Accept(new TypeInferenceVisitor(funcLocal))).ToArray();
+        var returnType = typeof(Task<object>);
+        var methodParameterTypes = new Type[1 + parameterTypes.Length];
+        methodParameterTypes[0] = typeof(object[]);
+        for (var i = 0; i < parameterTypes.Length; i++)
+        {
+            methodParameterTypes[i + 1] = parameterTypes[i]!;
+        }
+
+        // 3. 创建 DynamicMethod
+        var dynamicMethod = new DynamicMethod(
+            node.Id?.IdName ?? "AnonymousAsync",
+            returnType,
+            methodParameterTypes,
+            true
+        );
+
+        // 4. 生成方法体
+        var methodIl = dynamicMethod.GetILGenerator();
+
+        // 有捕获时先在入口把闭包 object[] 解包为普通局部槽，再交给异步状态机一并提升为状态机字段
+        // （状态机 MoveNext 里的 arg 0 是状态机 struct，不能直接用 Ldarg_0 读 object[]）
+        var paramNameSet = new HashSet<string>(node.Ids!.Select(id => id.IdName), StringComparer.Ordinal);
+        if (hasCaptures)
+        {
+            for (var i = 0; i < capturedValues.Count; i++)
+            {
+                var captured = capturedValues[i];
+                if (paramNameSet.Contains(captured.Name))
+                {
+                    continue;
+                }
+
+                var capturedLocal = methodIl.DeclareLocal(captured.Type);
+                methodIl.Emit(OpCodes.Ldarg_0);
+                methodIl.Emit(OpCodes.Ldc_I4, i);
+                methodIl.Emit(OpCodes.Ldelem_Ref);
+                if (captured.Type.IsValueType)
+                {
+                    methodIl.Emit(OpCodes.Unbox_Any, captured.Type);
+                }
+                else if (captured.Type != typeof(object))
+                {
+                    methodIl.Emit(OpCodes.Castclass, captured.Type);
+                }
+
+                methodIl.Emit(OpCodes.Stloc, capturedLocal);
+                funcLocal.AddLocalVar(captured.Name, capturedLocal);
+                funcLocal.LocalVarTypes[captured.Name] = captured.Type;
+            }
+        }
+
+        // 处理参数（arg 0 恒为闭包 object[]，实参从 arg 1 开始）
         for (var i = 0; i < node.Ids!.Count; i++)
         {
             var id = node.Ids![i];
@@ -208,22 +264,17 @@ public partial class CompilerVisitor
             funcLocal.AddLocalVar(id.IdName, localVar);
             funcLocal.LocalVarTypes[id.IdName] = paramType;
 
-            methodIl.Emit(OpCodes.Ldarg, i);
+            methodIl.Emit(OpCodes.Ldarg, i + 1);
             methodIl.Emit(OpCodes.Stloc, localVar);
         }
 
         node.GenerateMethodBody(methodIl, funcLocal);
 
-        // 4. 创建委托并加载到栈上
-        var delegateType = System.Linq.Expressions.Expression.GetDelegateType(
-            parameterTypes!.Cast<Type>().Concat([returnType]).ToArray());
-
-        ilGenerator.Emit(OpCodes.Ldnull); // target (null for static method)
-        ilGenerator.Emit(OpCodes.Ldftn, dynamicMethod);
-        ilGenerator.Emit(OpCodes.Newobj, delegateType.GetConstructors()[0]);
+        // 5. 创建委托并加载到栈上
+        var templateId = CompiledDelegateRegistry.RegisterClosureTemplate(dynamicMethod);
+        FuncLangValueIlCompilerExtensions.EmitClosureCreation(ilGenerator, local, templateId, capturedValues);
 
         return null;
-    
     }
 
     public object? VisitNativeAnyLangValue(NativeAnyLangValue node)

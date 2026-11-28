@@ -189,7 +189,7 @@ public class LinqQueryExecutor(VariateManager manager)
     {
         var result = new List<object?>();
         var groups = new List<(LangValueType Key, List<LangValueType> Values)>();
-        var rangeLangId = new LangId(linqExpr.FromClause.RangeVariable);
+        var allRows = new List<Dictionary<string, object?>>();
 
         // 将数据源转换为列表以便多次遍历
         var sourceList = dataSource.Cast<object?>().ToList();
@@ -197,94 +197,75 @@ public class LinqQueryExecutor(VariateManager manager)
         // 处理每个外部元素
         foreach (var outerItem in sourceList)
         {
-            // 设置外部范围变量
             manager.AddChildren();
-            manager.SetLocal(rangeLangId, ConvertToLangValue(outerItem));
-
             try
             {
-                // 处理所有子句
                 var currentItems = new List<Dictionary<string, object?>>
                 {
                     new() { [linqExpr.FromClause.RangeVariable] = outerItem }
                 };
 
-                var shouldInclude = true;
-                var letVariables = new Dictionary<string, LangValueType>();
-
                 foreach (var clause in linqExpr.BodyClauses)
                 {
+                    if (currentItems.Count == 0)
+                        break;
+
                     if (clause is JoinClause joinClause)
                     {
-                        // 执行 Join
                         var newItems = new List<Dictionary<string, object?>>();
                         var innerRangeLangId = new LangId(joinClause.RangeVariable);
 
-                        // 获取内部数据源
-                        var innerSourceValue = joinClause.InnerDataSource.Accept(RuntimeVisitors.CreateInterpreter(manager));
-                        var innerSource = ConvertToEnumerable(innerSourceValue).Cast<object?>().ToList();
-
-                        // 计算外部键
-                        var outerKeyValue = joinClause.OuterKeyExpression.Accept(RuntimeVisitors.CreateInterpreter(manager));
-                        var outerKey = ConvertFromLangValue(outerKeyValue);
-
-                        if (joinClause.IsGroupJoin && joinClause.GroupVariable is not null)
+                        foreach (var currentItem in currentItems)
                         {
-                            // Group Join: 收集所有匹配的内部元素
-                            var matchingInnerItems = new List<LangValueType>();
+                            BindRowVariables(currentItem);
 
-                            foreach (var innerItem in innerSource)
+                            // 获取内部数据源与外部键（按当前行求值，支持前置 let 和多层链式 join）
+                            var innerSourceValue = joinClause.InnerDataSource.Accept(RuntimeVisitors.CreateInterpreter(manager));
+                            var innerSource = ConvertToEnumerable(innerSourceValue).Cast<object?>().ToList();
+                            var outerKeyValue = joinClause.OuterKeyExpression.Accept(RuntimeVisitors.CreateInterpreter(manager));
+                            var outerKey = ConvertFromLangValue(outerKeyValue);
+
+                            if (joinClause.IsGroupJoin && joinClause.GroupVariable is not null)
                             {
-                                var oldInnerValue = manager.GetValue(innerRangeLangId);
-                                manager.SetLocal(innerRangeLangId, ConvertToLangValue(innerItem));
+                                var matchingInnerItems = new List<LangValueType>();
 
-                                try
+                                foreach (var innerItem in innerSource)
                                 {
-                                    var innerKeyValue = joinClause.InnerKeyExpression.Accept(RuntimeVisitors.CreateInterpreter(manager));
-                                    var innerKey = ConvertFromLangValue(innerKeyValue);
-
-                                    if (KeysEqual(outerKey, innerKey))
+                                    var oldInnerValue = manager.GetValue(innerRangeLangId);
+                                    manager.SetLocal(innerRangeLangId, ConvertToLangValue(innerItem));
+                                    try
                                     {
-                                        matchingInnerItems.Add(ConvertToLangValue(innerItem));
+                                        var innerKeyValue = joinClause.InnerKeyExpression.Accept(RuntimeVisitors.CreateInterpreter(manager));
+                                        var innerKey = ConvertFromLangValue(innerKeyValue);
+                                        if (KeysEqual(outerKey, innerKey))
+                                        {
+                                            matchingInnerItems.Add(ConvertToLangValue(innerItem));
+                                        }
+                                    }
+                                    finally
+                                    {
+                                        if (oldInnerValue is not null)
+                                            manager.SetLocal(innerRangeLangId, oldInnerValue);
                                     }
                                 }
-                                finally
-                                {
-                                    if (oldInnerValue is not null)
-                                        manager.Set(innerRangeLangId, oldInnerValue);
-                                }
-                            }
 
-                            // 设置分组变量
-                            var groupLangId = new LangId(joinClause.GroupVariable);
-                            manager.SetLocal(groupLangId, new ListLangValue(matchingInnerItems));
-
-                            // 保留当前项（分组变量已设置）
-                            foreach (var currentItem in currentItems)
-                            {
                                 var newItem = new Dictionary<string, object?>(currentItem)
                                 {
                                     [joinClause.GroupVariable] = matchingInnerItems
                                 };
                                 newItems.Add(newItem);
                             }
-                        }
-                        else
-                        {
-                            // Inner Join: 为每个匹配创建新项
-                            foreach (var innerItem in innerSource)
+                            else
                             {
-                                var oldInnerValue = manager.GetValue(innerRangeLangId);
-                                manager.SetLocal(innerRangeLangId, ConvertToLangValue(innerItem));
-
-                                try
+                                foreach (var innerItem in innerSource)
                                 {
-                                    var innerKeyValue = joinClause.InnerKeyExpression.Accept(RuntimeVisitors.CreateInterpreter(manager));
-                                    var innerKey = ConvertFromLangValue(innerKeyValue);
-
-                                    if (KeysEqual(outerKey, innerKey))
+                                    var oldInnerValue = manager.GetValue(innerRangeLangId);
+                                    manager.SetLocal(innerRangeLangId, ConvertToLangValue(innerItem));
+                                    try
                                     {
-                                        foreach (var currentItem in currentItems)
+                                        var innerKeyValue = joinClause.InnerKeyExpression.Accept(RuntimeVisitors.CreateInterpreter(manager));
+                                        var innerKey = ConvertFromLangValue(innerKeyValue);
+                                        if (KeysEqual(outerKey, innerKey))
                                         {
                                             var newItem = new Dictionary<string, object?>(currentItem)
                                             {
@@ -293,99 +274,106 @@ public class LinqQueryExecutor(VariateManager manager)
                                             newItems.Add(newItem);
                                         }
                                     }
-                                }
-                                finally
-                                {
-                                    if (oldInnerValue is not null)
-                                        manager.Set(innerRangeLangId, oldInnerValue);
+                                    finally
+                                    {
+                                        if (oldInnerValue is not null)
+                                            manager.SetLocal(innerRangeLangId, oldInnerValue);
+                                    }
                                 }
                             }
                         }
 
                         currentItems = newItems;
-
-                        // 如果没有匹配项，跳过此外部元素
-                        if (currentItems.Count == 0)
-                        {
-                            shouldInclude = false;
-                            break;
-                        }
                     }
                     else if (clause is LetClause letClause)
                     {
-                        var letValue = letClause.Expression.Accept(RuntimeVisitors.CreateInterpreter(manager));
-                        var letId = new LangId(letClause.Variable);
-                        manager.SetLocal(letId, letValue);
-                        letVariables[letClause.Variable] = letValue;
+                        foreach (var currentItem in currentItems)
+                        {
+                            BindRowVariables(currentItem);
+                            var letValue = letClause.Expression.Accept(RuntimeVisitors.CreateInterpreter(manager));
+                            currentItem[letClause.Variable] = letValue;
+                        }
                     }
                     else if (clause is WhereClause whereClause)
                     {
-                        // 对每个当前项检查 where 条件
                         var filteredItems = new List<Dictionary<string, object?>>();
-
                         foreach (var currentItem in currentItems)
                         {
-                            // 设置所有变量
-                            foreach (var (varName, varValue) in currentItem)
-                            {
-                                if (varValue is not null)
-                                    manager.SetLocal(new LangId(varName), ConvertToLangValue(varValue));
-                            }
-
+                            BindRowVariables(currentItem);
                             var conditionResult = whereClause.Condition.Accept(RuntimeVisitors.CreateInterpreter(manager));
                             if (IsTruthy(conditionResult))
                             {
                                 filteredItems.Add(currentItem);
                             }
                         }
-
                         currentItems = filteredItems;
-
-                        if (currentItems.Count == 0)
-                        {
-                            shouldInclude = false;
-                            break;
-                        }
                     }
                 }
 
-                // 如果通过了所有条件，执行 select
-                if (shouldInclude && currentItems.Count > 0)
+                allRows.AddRange(currentItems);
+            }
+            finally
+            {
+                manager.RemoveChildren();
+            }
+        }
+
+        // 处理 OrderBy 子句（如果有）
+        var orderByClause = linqExpr.BodyClauses.OfType<OrderByClause>().LastOrDefault();
+        if (orderByClause is not null && orderByClause.Orderings.Count > 0 && allRows.Count > 1)
+        {
+            var keyed = new List<(Dictionary<string, object?> Row, object?[] Keys, int Index)>(allRows.Count);
+            manager.AddChildren();
+            try
+            {
+                for (int idx = 0; idx < allRows.Count; idx++)
                 {
-                    foreach (var currentItem in currentItems)
+                    var row = allRows[idx];
+                    BindRowVariables(row);
+                    var keys = new object?[orderByClause.Orderings.Count];
+                    for (int k = 0; k < orderByClause.Orderings.Count; k++)
                     {
-                        // 设置所有变量
-                        foreach (var (varName, varValue) in currentItem)
-                        {
-                            if (varValue is not null)
-                            {
-                                // 特殊处理 List<LangValueType>（group join 的分组变量）
-                                if (varValue is List<LangValueType> listValue)
-                                {
-                                    manager.SetLocal(new LangId(varName), new ListLangValue(listValue));
-                                }
-                                else
-                                {
-                                    manager.SetLocal(new LangId(varName), ConvertToLangValue(varValue));
-                                }
-                            }
-                        }
+                        var keyVal = orderByClause.Orderings[k].KeyExpression.Accept(RuntimeVisitors.CreateInterpreter(manager));
+                        keys[k] = ConvertFromLangValue(keyVal);
+                    }
+                    keyed.Add((row, keys, idx));
+                }
+            }
+            finally
+            {
+                manager.RemoveChildren();
+            }
 
-                        // 恢复 let 变量
-                        foreach (var (varName, varValue) in letVariables)
-                        {
-                            manager.Set(new LangId(varName), varValue);
-                        }
+            keyed.Sort((left, right) =>
+            {
+                for (int k = 0; k < orderByClause.Orderings.Count; k++)
+                {
+                    int cmp = CompareSortKeys(left.Keys[k], right.Keys[k]);
+                    if (cmp != 0)
+                        return orderByClause.Orderings[k].IsAscending ? cmp : -cmp;
+                }
+                return left.Index.CompareTo(right.Index);
+            });
+            allRows = keyed.Select(entry => entry.Row).ToList();
+        }
 
-                        if (linqExpr.TerminationClause is SelectClause selectClause)
-                        {
-                            var projectedValue = selectClause.Projection.Accept(RuntimeVisitors.CreateInterpreter(manager));
-                            result.Add(ConvertFromLangValue(projectedValue));
-                        }
-                        else if (linqExpr.TerminationClause is GroupByClause groupBy)
-                        {
-                            AddGroupValue(groups, groupBy);
-                        }
+        // 执行终止子句（select / group by）
+        if (allRows.Count > 0)
+        {
+            manager.AddChildren();
+            try
+            {
+                foreach (var row in allRows)
+                {
+                    BindRowVariables(row);
+                    if (linqExpr.TerminationClause is SelectClause selectClause)
+                    {
+                        var projectedValue = selectClause.Projection.Accept(RuntimeVisitors.CreateInterpreter(manager));
+                        result.Add(ConvertFromLangValue(projectedValue));
+                    }
+                    else if (linqExpr.TerminationClause is GroupByClause groupBy)
+                    {
+                        AddGroupValue(groups, groupBy);
                     }
                 }
             }
@@ -405,6 +393,51 @@ public class LinqQueryExecutor(VariateManager manager)
         }
 
         return ConvertToLangList(result);
+    }
+
+    private void BindRowVariables(Dictionary<string, object?> row)
+    {
+        foreach (var (varName, varValue) in row)
+        {
+            if (varValue is List<LangValueType> listValue)
+            {
+                manager.SetLocal(new LangId(varName), new ListLangValue(listValue));
+            }
+            else
+            {
+                manager.SetLocal(new LangId(varName), ConvertToLangValue(varValue));
+            }
+        }
+    }
+
+    private static readonly IComparer<object?> SortKeyComparer = Comparer<object?>.Create(CompareSortKeys);
+
+    private static int CompareSortKeys(object? a, object? b)
+    {
+        if (a == null && b == null) return 0;
+        if (a == null) return -1;
+        if (b == null) return 1;
+
+        if (a is string leftStr && b is string rightStr)
+            return string.CompareOrdinal(leftStr, rightStr);
+
+        if (a is int or long or double or float or decimal &&
+            b is int or long or double or float or decimal)
+            return Convert.ToDouble(a).CompareTo(Convert.ToDouble(b));
+
+        if (a is IComparable comparableA)
+        {
+            try
+            {
+                return comparableA.CompareTo(b);
+            }
+            catch
+            {
+                // 回退到字符串序比较
+            }
+        }
+
+        return string.Compare(a.ToString(), b.ToString(), StringComparison.Ordinal);
     }
 
     private void AddGroupValue(List<(LangValueType Key, List<LangValueType> Values)> groups, GroupByClause clause)
@@ -449,115 +482,42 @@ public class LinqQueryExecutor(VariateManager manager)
         if (orderByClause.Orderings.Count == 0)
             return intermediateResults;
 
+        object? EvalKey((object? item, Dictionary<string, LangValueType> letVariables) entry, OrderingItem ordering)
+        {
+            var (item, letVariables) = entry;
+            var oldValue = manager.GetValue(rangeLangId);
+            manager.SetLocal(rangeLangId, ConvertToLangValue(item));
+            try
+            {
+                foreach (var (varName, varValue) in letVariables)
+                {
+                    manager.SetLocal(new LangId(varName), varValue);
+                }
+
+                var keyValue = ordering.KeyExpression.Accept(RuntimeVisitors.CreateInterpreter(manager));
+                return ConvertFromLangValue(keyValue);
+            }
+            finally
+            {
+                if (oldValue is not null)
+                    manager.SetLocal(rangeLangId, oldValue);
+            }
+        }
+
         // 第一个排序键
         var firstOrdering = orderByClause.Orderings[0];
-        IOrderedEnumerable<(object? item, Dictionary<string, LangValueType> letVariables)> orderedList;
-
-        if (firstOrdering.IsAscending)
-        {
-            orderedList = intermediateResults.OrderBy(entry =>
-            {
-                var (item, letVariables) = entry;
-                var oldValue = manager.GetValue(rangeLangId);
-                manager.Set(rangeLangId, ConvertToLangValue(item));
-                try
-                {
-                    // 恢复 let 变量
-                    foreach (var (varName, varValue) in letVariables)
-                    {
-                        manager.SetLocal(new LangId(varName), varValue);
-                    }
-
-                    var keyValue = firstOrdering.KeyExpression.Accept(RuntimeVisitors.CreateInterpreter(manager));
-                    return ConvertFromLangValue(keyValue);
-                }
-                finally
-                {
-                    if (oldValue is not null)
-                        manager.Set(rangeLangId, oldValue);
-                }
-            });
-        }
-        else
-        {
-            orderedList = intermediateResults.OrderByDescending(entry =>
-            {
-                var (item, letVariables) = entry;
-                var oldValue = manager.GetValue(rangeLangId);
-                manager.Set(rangeLangId, ConvertToLangValue(item));
-                try
-                {
-                    // 恢复 let 变量
-                    foreach (var (varName, varValue) in letVariables)
-                    {
-                        manager.Set(new LangId(varName), varValue);
-                    }
-
-                    var keyValue = firstOrdering.KeyExpression.Accept(RuntimeVisitors.CreateInterpreter(manager));
-                    return ConvertFromLangValue(keyValue);
-                }
-                finally
-                {
-                    if (oldValue is not null)
-                        manager.Set(rangeLangId, oldValue);
-                }
-            });
-        }
+        IOrderedEnumerable<(object? item, Dictionary<string, LangValueType> letVariables)> orderedList =
+            firstOrdering.IsAscending
+                ? intermediateResults.OrderBy(entry => EvalKey(entry, firstOrdering), SortKeyComparer)
+                : intermediateResults.OrderByDescending(entry => EvalKey(entry, firstOrdering), SortKeyComparer);
 
         // 后续排序键
         for (int i = 1; i < orderByClause.Orderings.Count; i++)
         {
             var ordering = orderByClause.Orderings[i];
-            if (ordering.IsAscending)
-            {
-                orderedList = orderedList.ThenBy(entry =>
-                {
-                    var (item, letVariables) = entry;
-                    var oldValue = manager.GetValue(rangeLangId);
-                    manager.Set(rangeLangId, ConvertToLangValue(item));
-                    try
-                    {
-                        // 恢复 let 变量
-                        foreach (var (varName, varValue) in letVariables)
-                        {
-                            manager.Set(new LangId(varName), varValue);
-                        }
-
-                        var keyValue = ordering.KeyExpression.Accept(RuntimeVisitors.CreateInterpreter(manager));
-                        return ConvertFromLangValue(keyValue);
-                    }
-                    finally
-                    {
-                        if (oldValue is not null)
-                            manager.Set(rangeLangId, oldValue);
-                    }
-                });
-            }
-            else
-            {
-                orderedList = orderedList.ThenByDescending(entry =>
-                {
-                    var (item, letVariables) = entry;
-                    var oldValue = manager.GetValue(rangeLangId);
-                    manager.Set(rangeLangId, ConvertToLangValue(item));
-                    try
-                    {
-                        // 恢复 let 变量
-                        foreach (var (varName, varValue) in letVariables)
-                        {
-                            manager.Set(new LangId(varName), varValue);
-                        }
-
-                        var keyValue = ordering.KeyExpression.Accept(RuntimeVisitors.CreateInterpreter(manager));
-                        return ConvertFromLangValue(keyValue);
-                    }
-                    finally
-                    {
-                        if (oldValue is not null)
-                            manager.Set(rangeLangId, oldValue);
-                    }
-                });
-            }
+            orderedList = ordering.IsAscending
+                ? orderedList.ThenBy(entry => EvalKey(entry, ordering), SortKeyComparer)
+                : orderedList.ThenByDescending(entry => EvalKey(entry, ordering), SortKeyComparer);
         }
 
         return orderedList.ToList();

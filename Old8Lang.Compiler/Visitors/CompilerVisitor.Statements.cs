@@ -1354,6 +1354,9 @@ public partial class CompilerVisitor
     /// </summary>
     private void EmitReturnConversion(Type expected, Type actual)
     {
+        var expectedUnderlying = Nullable.GetUnderlyingType(expected);
+        var actualUnderlying = Nullable.GetUnderlyingType(actual);
+
         if (ReturnStatementRuntimeExtensions.NeedsRuntimeConversion(expected, actual))
         {
             if (actual.IsValueType) ilGenerator.Emit(OpCodes.Box, actual);
@@ -1362,14 +1365,53 @@ public partial class CompilerVisitor
             ilGenerator.Emit(OpCodes.Call, typeof(IlTypeErrors).GetMethod(nameof(IlTypeErrors.ConvertReturn))!);
             ilGenerator.Emit(expected.IsValueType ? OpCodes.Unbox_Any : OpCodes.Castclass, expected);
         }
+        else if (expectedUnderlying is not null && actualUnderlying is null)
+        {
+            if (actual == typeof(object))
+            {
+                ilGenerator.Emit(OpCodes.Unbox_Any, expected);
+            }
+            else
+            {
+                if (actual != expectedUnderlying &&
+                    ReturnStatementRuntimeExtensions.IsNumericType(expectedUnderlying) &&
+                    ReturnStatementRuntimeExtensions.IsNumericType(actual))
+                {
+                    ReturnStatementRuntimeExtensions.EmitNumericConversion(ilGenerator, actual, expectedUnderlying);
+                }
+
+                ilGenerator.Emit(OpCodes.Newobj, expected.GetConstructor([expectedUnderlying])!);
+            }
+        }
         else if (expected.IsValueType && actual == typeof(object))
             ilGenerator.Emit(OpCodes.Unbox_Any, expected);
         else if (!expected.IsValueType && actual.IsValueType)
             ilGenerator.Emit(OpCodes.Box, actual);
         else if (ReturnStatementRuntimeExtensions.IsNumericType(expected) && ReturnStatementRuntimeExtensions.IsNumericType(actual))
-            ReturnStatementRuntimeExtensions.EmitNumericConversion(ilGenerator, expected);
+            ReturnStatementRuntimeExtensions.EmitNumericConversion(ilGenerator, actual, expected);
         else if (!expected.IsValueType && !actual.IsValueType)
             ilGenerator.Emit(OpCodes.Castclass, expected);
+    }
+
+    private static bool ShouldValidateErasedNullableAnnotation(Type expectedReturnType, string? annotation)
+    {
+        if (expectedReturnType != typeof(object) || string.IsNullOrWhiteSpace(annotation))
+            return false;
+
+        var trimmed = annotation.Trim();
+        return trimmed.EndsWith('?') && !trimmed.Contains('|') && !trimmed.Contains('&');
+    }
+
+    private void EmitAnnotatedNullableReturnValidation(Type? actualType, string annotation)
+    {
+        if (actualType is { IsValueType: true })
+        {
+            ilGenerator.Emit(OpCodes.Box, actualType);
+        }
+
+        ilGenerator.Emit(OpCodes.Ldstr, annotation.Trim());
+        ilGenerator.Emit(OpCodes.Call,
+            typeof(IlTypeErrors).GetMethod(nameof(IlTypeErrors.ConvertAnnotatedReturn))!);
     }
 
     public object? VisitReturnStatement(ReturnStatement node)
@@ -1458,7 +1500,11 @@ public partial class CompilerVisitor
                 var returnValueType = local.ReturnValueLocal.LocalType;
 
                 // 如果返回表达式的类型与返回值局部变量的类型不匹配，进行类型转换
-                if (!runtimeTypeErrorEmitted && returnType != null && returnType != returnValueType)
+                if (!runtimeTypeErrorEmitted && ShouldValidateErasedNullableAnnotation(returnValueType, local.ReturnTypeAnnotation))
+                {
+                    EmitAnnotatedNullableReturnValidation(returnType, local.ReturnTypeAnnotation!);
+                }
+                else if (!runtimeTypeErrorEmitted && returnType != null && returnType != returnValueType)
                 {
                     EmitReturnConversion(returnValueType, returnType);
                 }
@@ -1483,7 +1529,11 @@ public partial class CompilerVisitor
             if (local.ReturnValueLocal is not null)
             {
                 var expectedReturnType = local.ReturnValueLocal.LocalType;
-                if (!runtimeTypeErrorEmitted && returnType != null && returnType != expectedReturnType)
+                if (!runtimeTypeErrorEmitted && ShouldValidateErasedNullableAnnotation(expectedReturnType, local.ReturnTypeAnnotation))
+                {
+                    EmitAnnotatedNullableReturnValidation(returnType, local.ReturnTypeAnnotation!);
+                }
+                else if (!runtimeTypeErrorEmitted && returnType != null && returnType != expectedReturnType)
                 {
                     EmitReturnConversion(expectedReturnType, returnType);
                 }

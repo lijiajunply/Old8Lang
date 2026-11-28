@@ -40,37 +40,10 @@ public class ListAddListMethod : BaseInstanceMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        // 加载列表实例
-        instance.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
-
-        // 获取 Values 字段
-        var valuesField = typeof(ListLangValue).GetField("Values");
-        ilGenerator.Emit(OpCodes.Ldfld, valuesField!);
-
-        // 加载另一个列表参数
-        parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
-
-        // 调用辅助方法
-        var addListHelperMethod = typeof(ListAddListMethod).GetMethod(nameof(AddListHelper),
-            System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);
-        ilGenerator.Emit(OpCodes.Call, addListHelperMethod!);
+        IlNativeCollectionBridge.EmitBridgeCall(this, instance, parameters, ilGenerator, local);
     }
 
-    /// <summary>
-    /// 辅助方法：添加另一个列表的所有元素
-    /// </summary>
-    public static VoidLangValue AddListHelper(List<LangValueType> list, LangValueType otherParam)
-    {
-        if (otherParam is not ListLangValue otherList)
-        {
-            throw new Exception("AddList 方法的参数必须是列表类型");
-        }
-
-        list.AddRange(otherList.Values);
-        return new VoidLangValue();
-    }
-
-    protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)
+protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)
     {
         return typeof(VoidLangValue);
     }

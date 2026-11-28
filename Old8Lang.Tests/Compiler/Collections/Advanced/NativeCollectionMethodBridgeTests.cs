@@ -412,6 +412,124 @@ public class NativeCollectionMethodBridgeTests
         ");
     }
 
+    [Fact]
+    public void HotspotNativeIlMethods_ChunkFlattenSliceAndAllSorts_WorkWithoutBridge()
+    {
+        RunInIlMode(@"
+            chunks <- {1, 2, 3, 4, 5}.Chunk(2)
+            Assert.Equal(3, chunks.Count())
+            Assert.Equal({1, 2}, chunks[0])
+            Assert.Equal({5}, chunks[2])
+
+            flat <- {{1, 2}, {3}, 4}.Flatten()
+            Assert.Equal({1, 2, 3, 4}, flat)
+
+            deep <- {1, {2, {3, {4}}}}.FlattenDeep()
+            Assert.Equal({1, 2, 3, 4}, deep)
+
+            ls <- {10, 20, 30, 40}.Slice(1, 3)
+            Assert.Equal({20, 30}, ls)
+
+            aslice <- [10, 20, 30, 40, 50].Slice(1, 5, 2)
+            Assert.Equal([20, 40], aslice)
+
+            words <- {""z"", ""aa"", ""b""}
+            Assert.Equal({""aa"", ""b"", ""z""}, words.QuickSort())
+            Assert.Equal({""aa"", ""b"", ""z""}, words.MergeSort())
+            Assert.Equal({""aa"", ""b"", ""z""}, words.HeapSort())
+            Assert.Equal({""aa"", ""b"", ""z""}, words.InsertionSort())
+            Assert.Equal({""aa"", ""b"", ""z""}, words.SelectionSort())
+            Assert.Equal({""aa"", ""b"", ""z""}, words.BubbleSort())
+
+            arrWords <- [""z"", ""aa"", ""b""]
+            Assert.Equal([""aa"", ""b"", ""z""], arrWords.QuickSort())
+            Assert.Equal([""aa"", ""b"", ""z""], arrWords.MergeSort())
+            Assert.Equal([""aa"", ""b"", ""z""], arrWords.HeapSort())
+            Assert.Equal([""aa"", ""b"", ""z""], arrWords.InsertionSort())
+            Assert.Equal([""aa"", ""b"", ""z""], arrWords.SelectionSort())
+            Assert.Equal([""aa"", ""b"", ""z""], arrWords.BubbleSort())
+        ");
+    }
+
+    [Fact]
+    public void NestedDictionaryBridge_AndTupleDestructuring_WorkInIl()
+    {
+        RunInIlMode(@"
+            // 嵌套字典经桥接边界深度填充
+            nested <- {""outer"": {""a"": 1, ""b"": 2}}
+            cloned <- nested.Clone()
+            Assert.Equal(1, cloned[""outer""][""a""])
+            Assert.Equal(2, cloned[""outer""][""b""])
+
+            listOfDicts <- {{""k"": 10}, {""k"": 20}}
+            chunks <- listOfDicts.Chunk(1)
+            Assert.Equal(10, chunks[0][0][""k""])
+            Assert.Equal(20, chunks[1][0][""k""])
+
+            // 桥接结果中的元组可直接解构
+            zipped <- {1, 2}.Zip({10, 20})
+            (za, zb) <- zipped[0]
+            Assert.Equal(1, za)
+            Assert.Equal(10, zb)
+
+            indexed <- {""x"", ""y""}.WithIndex()
+            (idx, val) <- indexed[1]
+            Assert.Equal(1, idx)
+            Assert.Equal(""y"", val)
+
+            d <- {""only"": 42}
+            rows <- d.ToList()
+            (dk, dv) <- rows[0]
+            Assert.Equal(""only"", dk)
+            Assert.Equal(42, dv)
+        ");
+    }
+
+    [Fact]
+    public void DictionaryAddDuplicateKey_ConsistentAcrossAllThreeModes()
+    {
+        const string code = @"
+            d <- {""a"": 1}
+            d.Add(""a"", 99)
+            cnt <- d.Count()
+            val <- d[""a""]
+        ";
+        // Interpreter
+        var interp = new LangInterpreter();
+        interp.Build(code).Run(interp.Manager);
+        Assert.Equal(1, ((Old8Lang.AST.Expression.Value.IntLangValue)interp.Manager.GetValue(new Old8Lang.AST.Expression.LangId("cnt"))!).Value);
+        Assert.Equal(99, ((Old8Lang.AST.Expression.Value.IntLangValue)interp.Manager.GetValue(new Old8Lang.AST.Expression.LangId("val"))!).Value);
+
+        // IL
+        RunInIlMode(code + "\nAssert.Equal(1, cnt)\nAssert.Equal(99, val)");
+
+        // VM
+        var vm = new Old8Lang.Bytecode.VM.VirtualMachine(VirtualMachine.CompileHelper.CompileToBytecode(code));
+        vm.Execute();
+        Assert.Equal(1, vm.GetGlobalVariable("cnt"));
+        Assert.Equal(99, vm.GetGlobalVariable("val"));
+    }
+
+    [Fact]
+    public void AuditedValueTypeCharAndDynamicIndexMethods_EmitValidIl()
+    {
+        RunInIlMode(@"
+            h <- (42).ToHash()
+            Assert.True(h == (42).ToHash())
+            Assert.True((42).Equal(42))
+            Assert.True(!(42).Equal(43))
+            t <- (42).ToType()
+            Assert.Equal(""Int"", t.ToStr())
+
+            Assert.True('5'.IsDigit())
+            Assert.True('a'.CompareTo('b') < 0)
+
+            indices <- {1}
+            idx <- indices[0]
+            Assert.Equal(20, {10, 20, 30}.ElementAt(idx))
+        ");
+    }
+
     #endregion
 
     #region 解释器对照

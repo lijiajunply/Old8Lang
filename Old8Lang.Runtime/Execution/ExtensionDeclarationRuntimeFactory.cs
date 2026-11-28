@@ -33,8 +33,8 @@ public static class ExtensionDeclarationRuntimeExtensions
             "decimal" => typeof(decimal),
             "object" => typeof(object),
             "list" => typeof(ListLangValue),
-            "array" => typeof(Array),
-            "dict" => typeof(DictionaryLangValue),
+            "array" => typeof(ArrayLangValue),
+            "dict" or "dictionary" => typeof(DictionaryLangValue),
             _ => Type.GetType(typeName) // 尝试通过完全限定名解析
         };
     }

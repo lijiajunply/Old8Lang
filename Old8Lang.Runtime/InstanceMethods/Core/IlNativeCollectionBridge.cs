@@ -1,9 +1,11 @@
 using System.Collections;
 using System.Collections.Concurrent;
+using System.Reflection.Emit;
 using Old8Lang.AST;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.AST.Visitor;
+using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Interpreter;
 
 namespace Old8Lang.InstanceMethods.Core;
@@ -48,6 +50,72 @@ public static class IlNativeCollectionBridge
     /// 也避免仅凭参数个数在重载组里选错（例如 <c>First(predicate)</c> 与无参 <c>First()</c>）。
     /// </summary>
     private static readonly ConcurrentDictionary<Type, IInstanceMethod> MethodCache = new();
+
+    /// <summary>
+    /// 为非专用 IL 的集合实例方法发射统一运行期桥接调用（避免各方法维护失效的裸 IL 桩代码）。
+    /// </summary>
+    public static void EmitBridgeCall(
+        IInstanceMethod method,
+        LangExpression instance,
+        List<LangExpression> parameters,
+        ILGenerator ilGenerator,
+        LocalManager local)
+    {
+        instance.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        var receiverType = instance.Accept(new TypeInferenceVisitor(local));
+        if (receiverType is { IsValueType: true })
+        {
+            ilGenerator.Emit(OpCodes.Box, receiverType);
+        }
+
+        var canonicalName = method.Names.Length > 0 ? method.Names[0] : string.Empty;
+        ilGenerator.Emit(OpCodes.Ldstr, canonicalName);
+
+        ilGenerator.Emit(OpCodes.Ldc_I4, parameters.Count);
+        ilGenerator.Emit(OpCodes.Newarr, typeof(object));
+        for (var i = 0; i < parameters.Count; i++)
+        {
+            ilGenerator.Emit(OpCodes.Dup);
+            ilGenerator.Emit(OpCodes.Ldc_I4, i);
+            IlValueBridge.EmitLoadWrapped(parameters[i], ilGenerator, local);
+            ilGenerator.Emit(OpCodes.Stelem_Ref);
+        }
+
+        ilGenerator.Emit(OpCodes.Ldtoken, method.GetType());
+        ilGenerator.Emit(OpCodes.Call, typeof(Type).GetMethod(nameof(Type.GetTypeFromHandle))!);
+        ilGenerator.Emit(OpCodes.Call, typeof(IlNativeCollectionBridge).GetMethod(nameof(Invoke))!);
+
+        var expectedReturnType = method.GetReturnType(receiverType ?? typeof(object), parameters, local);
+        if (expectedReturnType == typeof(void))
+        {
+            ilGenerator.Emit(OpCodes.Pop);
+        }
+        else if (expectedReturnType.IsValueType)
+        {
+            ilGenerator.Emit(OpCodes.Unbox_Any, expectedReturnType);
+        }
+        else if (expectedReturnType != typeof(object) && !typeof(LangValueType).IsAssignableFrom(expectedReturnType))
+        {
+            ilGenerator.Emit(OpCodes.Castclass, expectedReturnType);
+        }
+    }
+
+    /// <summary>
+    /// 发射将参数表达式转为原生 <see cref="int"/> 的 IL 指令（兼容 object 与其他数值类型）。
+    /// </summary>
+    internal static void EmitIntArgument(LangExpression expression, ILGenerator ilGenerator, LocalManager local)
+    {
+        expression.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        var argType = expression.Accept(new TypeInferenceVisitor(local));
+        if (argType == typeof(object))
+        {
+            ilGenerator.Emit(OpCodes.Call, typeof(Convert).GetMethod(nameof(Convert.ToInt32), [typeof(object)])!);
+        }
+        else if (argType is not null && argType != typeof(int) && argType.IsValueType)
+        {
+            ilGenerator.Emit(OpCodes.Conv_I4);
+        }
+    }
 
     /// <summary>
     /// 执行一次桥接调用；方法不存在时抛出参数错误，供编译期保证可解析的调用点使用。

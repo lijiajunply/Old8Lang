@@ -23,10 +23,12 @@ internal static class AwaitExpressionCompilerExtensions
         // 1. 获取 Awaiter
         // 栈上已有 Task 对象
 
-        // 如果类型是 object，尝试转换为 Task<object>
-        if (exprType == typeof(object))
+        // 如果类型是 object 或未携带静态 GetAwaiter，则运行期规范化为 Task<object>
+        if (exprType == typeof(object) || exprType.GetMethod("GetAwaiter") is null)
         {
-            il.Emit(OpCodes.Castclass, typeof(Task<object>));
+            il.Emit(OpCodes.Call,
+                typeof(Old8Lang.InstanceMethods.Core.IlRuntimeFunctions)
+                    .GetMethod(nameof(Old8Lang.InstanceMethods.Core.IlRuntimeFunctions.ToAwaitableTask))!);
             exprType = typeof(Task<object>);
         }
 

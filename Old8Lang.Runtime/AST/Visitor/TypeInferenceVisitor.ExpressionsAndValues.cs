@@ -340,6 +340,10 @@ public partial class TypeInferenceVisitor
 
             // 检查是否是自定义类类型（使用原始的 AssumptionType，因为类名是大小写敏感的）
             var originalTypeName = node.AssumptionType.Trim();
+            if (originalTypeName.EndsWith('?'))
+            {
+                originalTypeName = originalTypeName[..^1].Trim();
+            }
             if (local.ClassVar.TryGetValue(originalTypeName, out var customClassType))
             {
                 return customClassType;
@@ -415,6 +419,8 @@ public partial class TypeInferenceVisitor
         if (!isThisField && OperationTypeCache.Get(node) is { } cachedType) return cachedType;
         if (node.Opera == LangTokenType.Dot && StandardLibraryILHelper.TryResolve(node.Left, right, local, out var library, out var libraryCall))
             return StandardLibraryILHelper.GetReturnType(library, libraryCall);
+        if (node.Opera == LangTokenType.Dot && StandardLibraryILHelper.TryResolveStaticMember(node.Left, right, local, out _, out _))
+            return typeof(object);
         if (node.Opera == LangTokenType.Dot && node.Left is LangId { IdName: "Thread" } &&
             (right is LangId { IdName: "CurrentThread" } ||
              right is Instance { Id.IdName: "CurrentThread", Ids.Count: 0 }))
@@ -693,11 +699,12 @@ public partial class TypeInferenceVisitor
 
     public Type VisitSuperExpression(SuperExpression node)
     {
+        if (local.InClassEnv?.BaseType is { } baseType && baseType != typeof(object))
+        {
+            return baseType;
+        }
 
-        // super 表达式返回父类实例，类型为 object
         return typeof(object);
-    
-    
     }
 
     public Type VisitThisExpression(ThisExpression node)
@@ -845,6 +852,9 @@ return typeof(object);
 
     public Type VisitInstance(Instance node)
     {
+        if (StandardLibraryILHelper.TryResolveFunction(node, local, out var importedFunction, out _))
+            return StandardLibraryILHelper.GetFunctionReturnType(importedFunction);
+
 
         // 首先尝试通过全局函数注册器获取返回类型
         var globalFuncReturnType = node.TryGetGlobalFunctionReturnType(local);

@@ -42,7 +42,6 @@ public class TypeGetMethodNamesMethod : BaseInstanceMethod
 
         // 加载 VariateManager（需要从 LocalManager 获取）
         ilGenerator.Emit(OpCodes.Call, typeof(RuntimeGlobalWriter).GetProperty(nameof(RuntimeGlobalWriter.CurrentManager))!.GetGetMethod()!);
-        ilGenerator.Emit(OpCodes.Callvirt, typeof(ILangInterpreter).GetProperty("Manager")!.GetMethod!);
 
         // 调用辅助方法
         var helperMethod = typeof(TypeGetMethodNamesMethod).GetMethod(nameof(GetMethodNamesHelper),

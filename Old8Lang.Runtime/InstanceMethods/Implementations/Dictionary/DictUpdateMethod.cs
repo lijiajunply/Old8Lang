@@ -90,39 +90,10 @@ public class DictUpdateMethod : BaseInstanceMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        instance.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
-
-        if (parameters.Count == 1)
-        {
-            parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
-            var helperMethod = typeof(DictUpdateMethod).GetMethod(nameof(UpdateDictHelper),
-                System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);
-            ilGenerator.Emit(OpCodes.Call, helperMethod!);
-        }
-        else
-        {
-            parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
-            parameters[1].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
-            var helperMethod = typeof(DictUpdateMethod).GetMethod(nameof(UpdateKeyValueHelper),
-                System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);
-            ilGenerator.Emit(OpCodes.Call, helperMethod!);
-        }
+        IlNativeCollectionBridge.EmitBridgeCall(this, instance, parameters, ilGenerator, local);
     }
 
-    public static void UpdateDictHelper(Dictionary<object, object> dict, Dictionary<object, object> otherDict)
-    {
-        foreach (var (key, value) in otherDict)
-        {
-            dict[key] = value;
-        }
-    }
-
-    public static void UpdateKeyValueHelper(Dictionary<object, object> dict, object key, object value)
-    {
-        dict[key] = value;
-    }
-
-    protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)
+protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)
     {
         return typeof(void);
     }

@@ -312,6 +312,94 @@ public class LinqJoinWhereTests
         CompileAndRun(code);
     }
 
+    [Fact]
+    public void OrderBy_MultiKeyComputedAndMixedNumericAndOrdinalString_ConsistentAcrossAllModes()
+    {
+        const string code = @"
+            items <- {
+                {""k"": 2, ""name"": ""b"", ""id"": 1},
+                {""k"": 1, ""name"": ""z"", ""id"": 2},
+                {""k"": 2, ""name"": ""a"", ""id"": 3},
+                {""k"": 2, ""name"": ""a"", ""id"": 4}
+            }
+            names <- from x in items orderby x[""k""] descending, x[""name""] ascending select x[""id""]
+            Assert.Equal(""[3, 4, 1, 2]"", names.ToStr())
+
+            mixed <- {10, 2.5, 3, 1.5}
+            sortedMixed <- from n in mixed orderby n ascending select n
+            Assert.Equal(""[1.5, 2.5, 3, 10]"", sortedMixed.ToStr())
+
+            words <- {""z"", ""aa"", ""b""}
+            sortedWords <- from w in words orderby w ascending select w
+            Assert.Equal(""[\""aa\"", \""b\"", \""z\""]"", sortedWords.ToStr())
+        ";
+        RunAllThreeModes(code);
+    }
+
+    [Fact]
+    public void OrderBy_BeforeGroupBy_PreservesOrderedElementsPerGroupAcrossAllModes()
+    {
+        const string code = @"
+            items <- {
+                {""g"": ""a"", ""v"": 1},
+                {""g"": ""b"", ""v"": 2},
+                {""g"": ""a"", ""v"": 3},
+                {""g"": ""b"", ""v"": 4}
+            }
+            grouped <- from x in items orderby x[""v""] descending group x[""v""] by x[""g""] into grp select grp[""Values""]
+            Assert.Equal(""[[4, 2], [3, 1]]"", grouped.ToStr())
+        ";
+        RunAllThreeModes(code);
+    }
+
+    [Fact]
+    public void ComplexJoinOrderByGroupContinuation_ConsistentAcrossAllModes()
+    {
+        const string code = @"
+            left <- {1, 2, 3}
+            middle <- {2, 4, 6}
+            right <- {
+                {""id"": 2, ""tag"": ""x"", ""score"": 20},
+                {""id"": 4, ""tag"": ""y"", ""score"": 10},
+                {""id"": 6, ""tag"": ""x"", ""score"": 30}
+            }
+            res1 <- from a in left
+                    let doubled <- a * 2
+                    where doubled >= 2
+                    join b in middle on doubled == b
+                    join c in right on b == c[""id""]
+                    orderby c[""score""] descending
+                    select c[""id""]
+            Assert.Equal(""[6, 2, 4]"", res1.ToStr())
+
+            res2 <- from a in left
+                    let doubled <- a * 2
+                    join c in right on doubled == c[""id""]
+                    orderby c[""score""] descending
+                    group c[""id""] by c[""tag""] into grp
+                    select grp[""Values""]
+            Assert.Equal(""[[6, 2], [4]]"", res2.ToStr())
+        ";
+        RunAllThreeModes(code);
+    }
+
+    private static void RunAllThreeModes(string code)
+    {
+        var interpreter = new LangInterpreter();
+        interpreter.Build(code).Run(interpreter.Manager);
+
+        CompileAndRun(code);
+
+        var bytecode = new Old8Lang.Bytecode.BytecodeCompiler().Compile(new LangInterpreter().Build(code));
+        using var ms = new MemoryStream();
+        using (var writer = new BinaryWriter(ms, System.Text.Encoding.UTF8, leaveOpen: true))
+            bytecode.WriteTo(writer);
+        ms.Position = 0;
+        using var reader = new BinaryReader(ms);
+        var reloaded = Old8Lang.Bytecode.BytecodeFile.ReadFrom(reader);
+        new Old8Lang.Bytecode.VM.VirtualMachine(reloaded).Execute();
+    }
+
     private static void CompileAndRun(string code)
     {
         var interpreter = new LangInterpreter();

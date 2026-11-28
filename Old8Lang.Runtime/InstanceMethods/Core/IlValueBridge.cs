@@ -32,9 +32,11 @@ namespace Old8Lang.InstanceMethods.Core;
 public static class IlValueBridge
 {
     /// <summary>
-    /// 把 IL 模式下的原生值转换为 Old8Lang 值，集合会递归转换元素。
+    /// 把 IL 模式下的原生值转换为 Old8Lang 值，集合会递归转换元素并保持嵌套字典深度填充与循环引用安全。
     /// </summary>
-    public static LangValueType Wrap(object? value)
+    public static LangValueType Wrap(object? value) => WrapCore(value, visited: null);
+
+    private static LangValueType WrapCore(object? value, Dictionary<object, LangValueType>? visited)
     {
         switch (value)
         {
@@ -70,55 +72,81 @@ public static class IlValueBridge
                 return ToTaskLangValue(task);
             case IDictionary dictionary:
             {
-                var pairs = new List<KeyValuePair<LangExpression, LangExpression>>();
-                foreach (DictionaryEntry entry in dictionary)
+                visited ??= new Dictionary<object, LangValueType>(ReferenceEqualityComparer.Instance);
+                if (visited.TryGetValue(dictionary, out var existing))
                 {
-                    pairs.Add(new KeyValuePair<LangExpression, LangExpression>(
-                        Wrap(entry.Key), Wrap(entry.Value)));
+                    return existing;
                 }
 
-                var dictionaryValue = new DictionaryLangValue(pairs);
-                // 构造只填 Tuples；语言层操作（ToStr / 索引 / 遍历）读的是 Value，
-                // 不先解释器访问一次会得到 {(), ()} 或把已有键当缺失。
-                dictionaryValue.Accept(RuntimeVisitors.CreateInterpreter(new VariateManager()));
+                // 同时填充 Value 与 Tuples（不走解释器二次求值，避免嵌套字典重复条目或自引用栈溢出）
+                var dictionaryValue = new DictionaryLangValue();
+                visited[dictionary] = dictionaryValue;
+                foreach (DictionaryEntry entry in dictionary)
+                {
+                    var wrappedKey = WrapCore(entry.Key, visited);
+                    var wrappedVal = WrapCore(entry.Value, visited);
+                    dictionaryValue.Value.Add((wrappedKey, wrappedVal));
+                    var tuple = new TupleLangValue(wrappedKey, wrappedVal);
+                    tuple.ItemValues.Add(wrappedKey);
+                    tuple.ItemValues.Add(wrappedVal);
+                    dictionaryValue.Tuples.Add(tuple);
+                }
+
                 return dictionaryValue;
             }
             case Array array:
             {
-                // 数组包成 ArrayLangValue（而不是 ListLangValue）：解释器里两者是不同的值类型，
-                // 例如 FlatMap 只扁平化列表、不扁平化数组，包错会导致跨模式语义分歧。
-                var elements = new List<LangValueType>();
-                foreach (var element in array)
+                visited ??= new Dictionary<object, LangValueType>(ReferenceEqualityComparer.Instance);
+                if (visited.TryGetValue(array, out var existing))
                 {
-                    elements.Add(Wrap(element));
+                    return existing;
                 }
 
-                return new ArrayLangValue(elements);
+                // 数组包成 ArrayLangValue（而不是 ListLangValue）：解释器里两者是不同的值类型，
+                // 例如 FlatMap 只扁平化列表、不扁平化数组，包错会导致跨模式语义分歧。
+                var wrappedArray = new ArrayLangValue(new LangValueType[array.Length]);
+                visited[array] = wrappedArray;
+                var idx = 0;
+                foreach (var element in array)
+                {
+                    wrappedArray.RunResult[idx++] = WrapCore(element, visited);
+                }
+
+                return wrappedArray;
             }
             case System.Runtime.CompilerServices.ITuple nativeTuple:
             {
                 // IL 里的元组是 ValueTuple / Tuple，直接包成 NativeAny 会让
                 // 「元组解构 match」「元组实例方法」这些语言层逻辑认不出来。
                 var tupleElements = new List<LangExpression>();
+                var itemValues = new List<LangValueType>();
                 for (var index = 0; index < nativeTuple.Length; index++)
                 {
-                    tupleElements.Add(Wrap(nativeTuple[index]));
+                    var wrappedItem = WrapCore(nativeTuple[index], visited);
+                    tupleElements.Add(wrappedItem);
+                    itemValues.Add(wrappedItem);
                 }
 
                 var tupleValue = new TupleLangValue(tupleElements);
-                // 语言层的 TupleLangValue 需要解释器访问一次来填充 ItemValues
-                tupleValue.Accept(RuntimeVisitors.CreateInterpreter(new VariateManager()));
+                tupleValue.ItemValues.AddRange(itemValues);
                 return tupleValue;
             }
             case IEnumerable enumerable:
             {
-                var items = new List<LangValueType>();
-                foreach (var item in enumerable)
+                visited ??= new Dictionary<object, LangValueType>(ReferenceEqualityComparer.Instance);
+                if (visited.TryGetValue(enumerable, out var existing))
                 {
-                    items.Add(Wrap(item));
+                    return existing;
                 }
 
-                return new ListLangValue(items);
+                var wrappedList = new ListLangValue(new List<LangValueType>());
+                visited[enumerable] = wrappedList;
+                foreach (var item in enumerable)
+                {
+                    wrappedList.Values.Add(WrapCore(item, visited));
+                }
+
+                return wrappedList;
             }
             default:
                 // 已特化的 Old8Lang 类与宿主 CLR 对象都可能作为集合元素流经

@@ -187,6 +187,27 @@ public partial class AnyLangValue : LangValueType
         var methods = Metadata.MethodTable.LookupMethod(methodName);
         if (methods is null || methods.Count == 0)
         {
+            // 若无同名方法，检查是否为存储函数值的字段（如 `this.validator(x)` / `obj.callback(x)`）
+            var callableField = Metadata.FieldTable.LookupField(methodName);
+            if (callableField is not null)
+            {
+                if (!callableField.IsAccessibleFrom(isInternalAccess))
+                {
+                    throw new AttributeError(this, methodName, ClassId.IdName);
+                }
+
+                var fieldValue = InstanceScope?.GetValue(new LangId(methodName));
+                if (fieldValue is FuncLangValue funcField)
+                {
+                    return funcField.Run(manager, instance.Ids, instance.NamedArgs, instance.Position);
+                }
+
+                if (fieldValue is AsyncFuncLangValue asyncFuncField)
+                {
+                    return asyncFuncField.RunAsync(manager, instance.Ids);
+                }
+            }
+
             // 如果找不到方法，检查是否是嵌套类的实例化
             // 这支持 Level1().Level2() 这样的语法
             var nestedClassInstance = TryInstantiateNestedClass(instance, manager);

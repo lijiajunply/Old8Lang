@@ -1,3 +1,4 @@
+using Old8Lang.InstanceMethods.Core;
 using System.Reflection.Emit;
 using Old8Lang.AST;
 using Old8Lang.AST.Expression;
@@ -71,41 +72,10 @@ public class LangListZipMethod : BaseLangListMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        if (parameters.Count == 1)
-        {
-            instance.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
-            parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
-
-            var helperMethod = typeof(LangListZipMethod).GetMethod(nameof(ZipHelper),
-                System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
-            ilGenerator.Emit(OpCodes.Call, helperMethod!);
-        }
-        else
-        {
-            // IL 模式暂不支持带 zipper 函数的版本
-            ilGenerator.Emit(OpCodes.Ldnull);
-        }
+        IlNativeCollectionBridge.EmitBridgeCall(this, instance, parameters, ilGenerator, local);
     }
 
-    public static ListLangValue ZipHelper(ILangList langList, ILangList other)
-    {
-        var items = langList.GetItems().ToList();
-        var otherItems = other.GetItems().ToList();
-        var zippedItems = new List<LangValueType>();
-
-        int minLength = Math.Min(items.Count, otherItems.Count);
-        for (int i = 0; i < minLength; i++)
-        {
-            var tuple = new TupleLangValue(new List<LangExpression> { items[i], otherItems[i] });
-            tuple.ItemValues.Add(items[i]);
-            tuple.ItemValues.Add(otherItems[i]);
-            zippedItems.Add(tuple);
-        }
-
-        return new ListLangValue(zippedItems);
-    }
-
-    protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)
+protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)
     {
         return typeof(ListLangValue);
     }

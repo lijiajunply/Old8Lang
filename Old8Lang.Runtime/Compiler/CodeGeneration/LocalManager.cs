@@ -234,6 +234,12 @@ public class LocalManager
     public LocalBuilder? ReturnValueLocal { get; set; }
 
     /// <summary>
+    /// 当前函数或方法声明的语言层返回类型注解（如 <c>int?</c>），
+    /// 用于在 CLR 返回类型被擦除为 <c>object</c> 时保留运行期返回校验。
+    /// </summary>
+    public string? ReturnTypeAnnotation { get; set; }
+
+    /// <summary>
     /// 函数结束标签（用于defer支持）
     /// </summary>
     /// <remarks>

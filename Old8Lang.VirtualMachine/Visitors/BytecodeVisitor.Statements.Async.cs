@@ -39,67 +39,72 @@ public partial class BytecodeVisitor
         var funcValue = node.GetAsyncFuncValue();
         var funcName = funcValue.Id?.IdName ?? "<async_lambda>";
 
-        // 异步函数的装饰器尚未实现。这里必须显式报错：异步函数不走
-        // MakeFunction/StoreGlobal 这条绑定路径，若放任不管，装饰器会被静默丢弃，
-        // 用户只会看到“装饰器没生效”，拿不到任何提示。
-        if (funcValue.Decorators is { Count: > 0 })
-        {
-            throw new VmUnsupportedError(node, "异步函数（async func）的装饰器");
-        }
+        var alreadyCompiled = _compiler.GetFunctionIndex(funcName) >= 0;
 
-        // 检查函数是否已经被编译过（避免重复编译）
-        if (_compiler.GetFunctionIndex(funcName) >= 0)
+        if (!alreadyCompiled)
         {
-            // 函数已经在预处理阶段被编译过，跳过
-            return null;
-        }
+            var paramNames = funcValue.Ids?.Select(id => id.IdName).ToList() ?? [];
+            var paramTypes = funcValue.Ids?.Select(id => id.AssumptionType ?? "").ToList() ?? [];
 
-        var paramNames = funcValue.Ids?.Select(id => id.IdName).ToList() ?? [];
-        var paramTypes = funcValue.Ids?.Select(id => id.AssumptionType ?? "").ToList() ?? [];
-
-        // 提取默认参数值和params参数索引
-        var defaultValues = new List<object?>();
-        int paramsIndex = -1;
-        if (funcValue.Ids != null)
-        {
-            for (int i = 0; i < funcValue.Ids.Count; i++)
+            // 提取默认参数值和params参数索引
+            var defaultValues = new List<object?>();
+            int paramsIndex = -1;
+            if (funcValue.Ids != null)
             {
-                var param = funcValue.Ids[i];
+                for (int i = 0; i < funcValue.Ids.Count; i++)
+                {
+                    var param = funcValue.Ids[i];
 
-                // 检查是否是params参数
-                if (param.IsParams)
-                {
-                    paramsIndex = i;
-                }
+                    // 检查是否是params参数
+                    if (param.IsParams)
+                    {
+                        paramsIndex = i;
+                    }
 
-                if (param.DefaultValue != null)
-                {
-                    var defaultValue = EvaluateConstantExpression(param.DefaultValue);
-                    defaultValues.Add(defaultValue);
+                    if (param.DefaultValue != null)
+                    {
+                        var defaultValue = EvaluateConstantExpression(param.DefaultValue);
+                        defaultValues.Add(defaultValue);
+                    }
+                    else
+                    {
+                        defaultValues.Add(null);
+                    }
                 }
-                else
-                {
-                    defaultValues.Add(null);
-                }
+            }
+
+            // 检测函数体是否包含 yield 语句
+            bool containsYield = _compiler.ContainsYieldStatement(funcValue.BlockStatement);
+
+            // 获取返回类型
+            var returnType = funcValue.Id?.AssumptionType ?? "";
+
+            // 根据是否包含 yield 调用不同的编译方法
+            if (containsYield)
+            {
+                // 异步生成器函数
+                _compiler.CompileAsyncGeneratorFunction(funcName, paramNames, paramTypes, defaultValues, funcValue.BlockStatement, paramsIndex, returnType);
+            }
+            else
+            {
+                // 普通异步函数
+                _compiler.CompileAsyncFunction(funcName, paramNames, paramTypes, defaultValues, funcValue.BlockStatement, paramsIndex, returnType);
             }
         }
 
-        // 检测函数体是否包含 yield 语句
-        bool containsYield = _compiler.ContainsYieldStatement(funcValue.BlockStatement);
-
-        // 获取返回类型
-        var returnType = funcValue.Id?.AssumptionType ?? "";
-
-        // 根据是否包含 yield 调用不同的编译方法
-        if (containsYield)
+        if (funcValue.Decorators is { Count: > 0 })
         {
-            // 异步生成器函数
-            _compiler.CompileAsyncGeneratorFunction(funcName, paramNames, paramTypes, defaultValues, funcValue.BlockStatement, paramsIndex, returnType);
+            _compiler.MarkFunctionDecorated(funcName);
+            ApplyDecorators(funcName, funcValue.Decorators);
         }
         else
         {
-            // 普通异步函数
-            _compiler.CompileAsyncFunction(funcName, paramNames, paramTypes, defaultValues, funcValue.BlockStatement, paramsIndex, returnType);
+            int funcIndex = _compiler.GetFunctionIndex(funcName);
+            if (funcIndex >= 0)
+            {
+                Emit(OpCode.MakeFunction, funcIndex);
+                Emit(OpCode.StoreGlobal, funcName);
+            }
         }
 
         return null;

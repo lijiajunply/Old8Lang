@@ -72,50 +72,10 @@ public class ListLastWithPredicateMethod : BaseInstanceMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        // 加载列表实例
-        instance.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
-
-        // 加载谓词函数
-        parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
-
-        // 调用辅助方法
-        var helperMethod = typeof(ListLastWithPredicateMethod).GetMethod(nameof(LastWithPredicateHelper),
-            System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);
-        ilGenerator.Emit(OpCodes.Call, helperMethod!);
+        IlNativeCollectionBridge.EmitBridgeCall(this, instance, parameters, ilGenerator, local);
     }
 
-    /// <summary>
-    /// 辅助方法：查找最后一个满足条件的元素
-    /// </summary>
-    public static LangValueType LastWithPredicateHelper(ListLangValue list, LangValueType predicateParam)
-    {
-        if (list.Values.Count == 0)
-        {
-            throw new InvalidOperationException("列表为空，无法获取最后一个元素");
-        }
-
-        if (predicateParam is not FuncLangValue predicate)
-        {
-            throw new Exception("参数必须是函数类型");
-        }
-
-        // 从后往前查找
-        for (int i = list.Values.Count - 1; i >= 0; i--)
-        {
-            var item = list.Values[i];
-            var tempManager = new VariateManager();
-            var result = predicate.Run(tempManager, [item]);
-
-            if (result is BoolLangValue { Value: true })
-            {
-                return item;
-            }
-        }
-
-        throw new InvalidOperationException("列表中没有满足条件的元素");
-    }
-
-    protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)
+protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)
     {
         return typeof(LangValueType);
     }

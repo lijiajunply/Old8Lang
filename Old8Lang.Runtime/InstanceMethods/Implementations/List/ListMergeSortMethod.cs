@@ -13,7 +13,7 @@ namespace Old8Lang.InstanceMethods.Implementations.List;
 /// <summary>
 /// List.MergeSort 方法 - 归并排序算法
 /// </summary>
-public class ListMergeSortMethod : BaseInstanceMethod
+public class ListMergeSortMethod : BaseInstanceMethod, IIlNativeValueInstanceMethod
 {
     public override string[] Names => ["MergeSort", "mergeSort"];
     public override Type TargetType => typeof(ListLangValue);
@@ -127,39 +127,23 @@ public class ListMergeSortMethod : BaseInstanceMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        // 加载列表实例
         instance.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
 
-        // 调用辅助方法
-        var helperMethod = typeof(ListMergeSortMethod).GetMethod(nameof(MergeSortHelper),
+        var helperMethod = typeof(ListMergeSortMethod).GetMethod(nameof(MergeSortNativeHelper),
             System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);
         ilGenerator.Emit(OpCodes.Call, helperMethod!);
     }
 
-    /// <summary>
-    /// 辅助方法：归并排序
-    /// </summary>
-    public static ListLangValue MergeSortHelper(ListLangValue list)
-    {
-        var sorted = new List<LangValueType>(list.Values);
-        MergeSort(sorted, 0, sorted.Count - 1);
-        return new ListLangValue(sorted);
-    }
+    public static List<object?> MergeSortNativeHelper(object? list) =>
+        Array.ArraySortVmSupport.SortToListDefault(list);
 
     protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)
     {
-        return typeof(ListLangValue);
+        return typeof(List<object?>);
     }
 
     protected override object ExecuteInVMInternal(object? instance, object?[] arguments)
     {
-        if (instance is List<object?> list)
-        {
-            var sorted = new List<object?>(list);
-            sorted.Sort();
-            return sorted;
-        }
-
-        throw new ArgumentException("实例必须是 List<object?> 类型");
+        return Array.ArraySortVmSupport.SortToListDefault(instance);
     }
 }

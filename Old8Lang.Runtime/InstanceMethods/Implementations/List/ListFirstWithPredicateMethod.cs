@@ -70,48 +70,10 @@ public class ListFirstWithPredicateMethod : BaseInstanceMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        // 加载列表实例
-        instance.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
-
-        // 加载谓词函数
-        parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
-
-        // 调用辅助方法
-        var helperMethod = typeof(ListFirstWithPredicateMethod).GetMethod(nameof(FirstWithPredicateHelper),
-            System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);
-        ilGenerator.Emit(OpCodes.Call, helperMethod!);
+        IlNativeCollectionBridge.EmitBridgeCall(this, instance, parameters, ilGenerator, local);
     }
 
-    /// <summary>
-    /// 辅助方法：查找第一个满足条件的元素
-    /// </summary>
-    public static LangValueType FirstWithPredicateHelper(ListLangValue list, LangValueType predicateParam)
-    {
-        if (list.Values.Count == 0)
-        {
-            throw new InvalidOperationException("列表为空，无法获取第一个元素");
-        }
-
-        if (predicateParam is not FuncLangValue predicate)
-        {
-            throw new Exception("参数必须是函数类型");
-        }
-
-        foreach (var item in list.Values)
-        {
-            var tempManager = new VariateManager();
-            var result = predicate.Run(tempManager, [item]);
-
-            if (result is BoolLangValue { Value: true })
-            {
-                return item;
-            }
-        }
-
-        throw new InvalidOperationException("列表中没有满足条件的元素");
-    }
-
-    protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)
+protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)
     {
         return typeof(LangValueType);
     }

@@ -79,9 +79,79 @@ public partial class NativeAnyLangValue : ImportInfo
     }
 
 
+    /// <summary>
+    /// 创建一个共享类型信息、但拥有独立实例槽位的新持有者（模块导出的类每次实例化都需要独立对象）。
+    /// </summary>
+    internal NativeAnyLangValue CreateInstanceHolder() =>
+        new(_dllName ?? string.Empty, ClassName, _path ?? string.Empty, RegisterName)
+        {
+            ClassType = ClassType,
+            Constructor = Constructor
+        };
+
     public void New(object[] pa)
     {
-        InstanceObj = Constructor is not null ? Constructor.Invoke(pa) : Activator.CreateInstance(ClassType!)!;
+        var constructor = SelectConstructor(pa, out var converted) ?? Constructor;
+        InstanceObj = constructor is not null
+            ? constructor.Invoke(converted ?? pa)
+            : Activator.CreateInstance(ClassType!)!;
+    }
+
+    /// <summary>
+    /// 按实参个数与可转换性选择构造函数（构造函数在初始化时只固定了一个，带参构造需要重新匹配）。
+    /// </summary>
+    private System.Reflection.ConstructorInfo? SelectConstructor(object[] args, out object?[]? converted)
+    {
+        converted = null;
+        if (Constructor is { } fixedCtor && fixedCtor.GetParameters().Length == args.Length)
+            return fixedCtor;
+        if (ClassType is null)
+            return null;
+
+        foreach (var candidate in ClassType.GetConstructors())
+        {
+            var parameters = candidate.GetParameters();
+            if (parameters.Length != args.Length)
+                continue;
+
+            var values = new object?[args.Length];
+            var matched = true;
+            for (var index = 0; index < args.Length && matched; index++)
+            {
+                var type = parameters[index].ParameterType;
+                var value = args[index];
+                if (value is null)
+                {
+                    matched = !type.IsValueType;
+                    continue;
+                }
+
+                if (type.IsInstanceOfType(value))
+                {
+                    values[index] = value;
+                    continue;
+                }
+
+                try
+                {
+                    values[index] = value is IConvertible && typeof(IConvertible).IsAssignableFrom(type)
+                        ? Convert.ChangeType(value, type, System.Globalization.CultureInfo.InvariantCulture)
+                        : throw new InvalidCastException();
+                }
+                catch (Exception)
+                {
+                    matched = false;
+                }
+            }
+
+            if (!matched)
+                continue;
+
+            converted = values;
+            return candidate;
+        }
+
+        return null;
     }
 
     /// <summary>

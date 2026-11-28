@@ -265,6 +265,49 @@ public partial class CompilerVisitor
         var isAsyncGenerator = ContainsYieldStatement(asyncFuncValue.BlockStatement);
         var returnType = isAsyncGenerator ? typeof(IAsyncEnumerable<object>) : typeof(Task<object>);
 
+        // 带装饰器的异步函数：由解释器预执行完成装饰器包装，IL 侧生成转发委托调用 InvokeAsyncByName。
+        if (asyncFuncValue.Decorators is { Count: > 0 })
+        {
+            var forwarder = new DynamicMethod(
+                methodName,
+                typeof(Task<object>),
+                parameterTypes!,
+                true);
+            var forwarderIl = forwarder.GetILGenerator();
+            forwarderIl.Emit(OpCodes.Ldstr, methodName);
+            forwarderIl.Emit(OpCodes.Ldc_I4, parameterTypes!.Length);
+            forwarderIl.Emit(OpCodes.Newarr, typeof(object));
+            for (var index = 0; index < parameterTypes.Length; index++)
+            {
+                forwarderIl.Emit(OpCodes.Dup);
+                forwarderIl.Emit(OpCodes.Ldc_I4, index);
+                forwarderIl.Emit(OpCodes.Ldarg, index);
+                if (parameterTypes[index]!.IsValueType)
+                {
+                    forwarderIl.Emit(OpCodes.Box, parameterTypes[index]!);
+                }
+                forwarderIl.Emit(OpCodes.Stelem_Ref);
+            }
+
+            forwarderIl.Emit(OpCodes.Call,
+                typeof(IlRuntimeFunctions).GetMethod(nameof(IlRuntimeFunctions.InvokeAsyncByName))!);
+            forwarderIl.Emit(OpCodes.Ret);
+
+            var fParamTypeNames = string.Join("_", parameterTypes.Select(t => t!.Name));
+            var forwarderKey = $"{methodName}${fParamTypeNames}";
+            local.DelegateVar.TryAdd(forwarderKey, forwarder);
+            if (Old8Lang.Compiler.Compiler.EnableAsyncStateMachineAwait)
+            {
+                CompiledDelegateRegistry.Register(forwarderKey, forwarder);
+            }
+            if (asyncFuncValue.Ids is not null)
+            {
+                local.FuncParameters.TryAdd(forwarderKey, asyncFuncValue.Ids);
+            }
+
+            return null;
+        }
+
         // 定义新的动态方法
         var dynamicMethod = new DynamicMethod(
             methodName,
@@ -1512,6 +1555,7 @@ public partial class CompilerVisitor
 
         // 为支持defer，使用try-finally包装函数体
         // 声明返回值局部变量（如果需要）
+        funcLocal.ReturnTypeAnnotation = funcToCompile.Id?.AssumptionType?.Trim();
         if (returnType != typeof(void))
         {
             funcLocal.ReturnValueLocal = methodIl.DeclareLocal(returnType);
@@ -1556,6 +1600,7 @@ public partial class CompilerVisitor
                     else
                     {
                         var defaultLocal = methodIl.DeclareLocal(returnType);
+                        methodIl.Emit(OpCodes.Ldloca, defaultLocal);
                         methodIl.Emit(OpCodes.Initobj, returnType);
                         methodIl.Emit(OpCodes.Ldloc, defaultLocal);
                     }
@@ -1701,6 +1746,19 @@ public partial class CompilerVisitor
             if (!node.FromClause && StandardLibraryLoader.TryLoadStandardLibrary(
                     moduleName, new VariateManager { StandardLibraries = standardLibraries }, out var standardModule))
                 local.GlobalStaticClasses[node.ModuleAlias ?? moduleName] = standardModule;
+            else if (node.FromClause && StandardLibraryLoader.TryLoadStandardLibrary(
+                         moduleName, new VariateManager { StandardLibraries = standardLibraries },
+                         out var fromModule) && fromModule is UnifiedModule fromLibrary)
+            {
+                // import { F as G } from "Module"：把函数符号以别名登记，调用点按标准库函数发射
+                foreach (var specifier in node.Specifiers)
+                {
+                    var symbol = fromLibrary.GetSymbol(specifier.Name)
+                                 ?? throw new ImportError(node.Position, moduleName,
+                                     $"模块 '{moduleName}' 中未找到符号 '{specifier.Name}'");
+                    local.GlobalStaticClasses[specifier.Alias] = symbol;
+                }
+            }
 
             return null;
         }

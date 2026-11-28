@@ -23,13 +23,13 @@ public class ValueTypeToHashMethod : BaseValueTypeMethod
     protected override LangValueType ExecuteInternal(LangValueType instance, List<LangExpression> parameters,
         VariateManager manager, SourcePosition position)
     {
-        return new IntLangValue(instance.GetHashCode());
+        return new IntLangValue(GetHashCodeHelper(instance));
     }
 
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        instance.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        InstanceMethods.Core.IlValueBridge.EmitLoadWrapped(instance, ilGenerator, local);
 
         var helperMethod = typeof(ValueTypeToHashMethod).GetMethod(nameof(GetHashCodeHelper),
             System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
@@ -38,7 +38,16 @@ public class ValueTypeToHashMethod : BaseValueTypeMethod
 
     public static int GetHashCodeHelper(LangValueType type)
     {
-        return type.GetHashCode();
+        return type switch
+        {
+            IntLangValue i => i.Value.GetHashCode(),
+            DoubleLangValue d => d.Value.GetHashCode(),
+            StringLangValue s => s.Value.GetHashCode(),
+            BoolLangValue b => b.Value.GetHashCode(),
+            CharLangValue c => c.Value.GetHashCode(),
+            NullLangValue => 0,
+            _ => type.GetHashCode()
+        };
     }
 
     protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)

@@ -419,4 +419,81 @@ public class ClosureTests(ITestOutputHelper output)
         var exception = Record.Exception(() => compiledAction());
         Assert.Null(exception);
     }
+
+    [Fact]
+    public void CrossNamedFunctionTopLevelCapture_ReadAndWriteThroughClosure()
+    {
+        var code = @"
+            total <- 10
+
+            func readTotal() -> int {
+                return total
+            }
+
+            func makeUpdater(step:int) -> function {
+                return (times:int) -> {
+                    total <- total + step * times
+                    return total
+                }
+            }
+
+            func makeNestedReader() -> function {
+                return () -> (delta:int) -> total + delta
+            }
+
+            inc2 <- makeUpdater(2)
+            Assert.Equal(16, inc2(3))
+            Assert.Equal(16, readTotal())
+            total <- 100
+            reader <- makeNestedReader()()
+            Assert.Equal(105, reader(5))
+            Assert.Equal(104, inc2(2))
+            Assert.Equal(104, readTotal())
+        ";
+        var interpreter = new LangInterpreter();
+        var ast = interpreter.Build(code);
+        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+        var exception = Record.Exception(() => compiledAction());
+        Assert.Null(exception);
+    }
+
+    [Fact]
+    public void FunctionTypeParameter_AcceptsClosureAndNamedFunctionAndCanBeCaptured()
+    {
+        var code = @"
+            scale <- 3
+
+            func namedScale(x:int) -> int {
+                return x * scale
+            }
+
+            func applyTyped(f:(int) -> int, x:int) -> int {
+                return f(x)
+            }
+
+            func wrapTyped(f:(int) -> int, bias:int) -> function {
+                return (x:int) -> f(x) + bias
+            }
+
+            func wrapUntyped(f:function, bias:int) -> function {
+                return (x:int) -> f(x) + bias
+            }
+
+            offset <- 4
+            addOffset <- (x:int) -> x + offset
+
+            Assert.Equal(14, applyTyped(addOffset, 10))
+            Assert.Equal(30, applyTyped(namedScale, 10))
+
+            wrapped1 <- wrapTyped(addOffset, 1)
+            wrapped2 <- wrapUntyped(namedScale, 2)
+            Assert.Equal(15, wrapped1(10))
+            Assert.Equal(32, wrapped2(10))
+        ";
+        var interpreter = new LangInterpreter();
+        var ast = interpreter.Build(code);
+        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+        var exception = Record.Exception(() => compiledAction());
+        Assert.Null(exception);
+    }
 }

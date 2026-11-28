@@ -14,7 +14,7 @@ namespace Old8Lang.InstanceMethods.Implementations.Array;
 /// <summary>
 /// Array.Slice(start, end, step=1) - 数组切片
 /// </summary>
-public class ArraySliceMethod : BaseInstanceMethod
+public class ArraySliceMethod : BaseInstanceMethod, IIlNativeValueInstanceMethod
 {
     public override string[] Names => ["Slice", "slice"];
     public override Type TargetType => typeof(ArrayLangValue);
@@ -57,12 +57,12 @@ public class ArraySliceMethod : BaseInstanceMethod
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
         instance.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
-        parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
-        parameters[1].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        IlNativeCollectionBridge.EmitIntArgument(parameters[0], ilGenerator, local);
+        IlNativeCollectionBridge.EmitIntArgument(parameters[1], ilGenerator, local);
 
         if (parameters.Count == 3)
         {
-            parameters[2].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+            IlNativeCollectionBridge.EmitIntArgument(parameters[2], ilGenerator, local);
         }
         else
         {
@@ -70,9 +70,22 @@ public class ArraySliceMethod : BaseInstanceMethod
             ilGenerator.Emit(OpCodes.Ldc_I4_1);
         }
 
-        var helperMethod = typeof(ArraySliceMethod).GetMethod(nameof(SliceHelper),
+        var helperMethod = typeof(ArraySliceMethod).GetMethod(nameof(SliceNativeHelper),
             System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
         ilGenerator.Emit(OpCodes.Call, helperMethod!);
+    }
+
+    public static object[] SliceNativeHelper(object? arrayObj, int start, int end, int step)
+    {
+        if (arrayObj is object[] typed)
+            return SliceHelper(typed, start, end, step);
+        if (arrayObj is System.Array rawArray)
+        {
+            var copy = new object[rawArray.Length];
+            for (var i = 0; i < rawArray.Length; i++) copy[i] = rawArray.GetValue(i)!;
+            return SliceHelper(copy, start, end, step);
+        }
+        throw new ArgumentException($"实例必须是数组类型，实际是 {arrayObj?.GetType().Name ?? "null"}");
     }
 
     public static object[] SliceHelper(object[] array, object startObj, object endObj, object stepObj)

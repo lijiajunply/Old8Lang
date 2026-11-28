@@ -255,13 +255,14 @@ public static class LinqStreamingHelper
     /// <returns>按排序键排列的查询行。</returns>
     public static List<LinqOrderedRow> SortRows(List<LinqOrderedRow> rows, bool[] ascending)
     {
+        var comparer = Comparer<object?>.Create(LinqCompilerHelper.CompareObjects);
         IOrderedEnumerable<LinqOrderedRow>? sorted = null;
         for (var i = 0; i < ascending.Length; i++)
         {
             var key = i;
             sorted = sorted is null
-                ? ascending[i] ? rows.OrderBy(row => row.Keys[key]) : rows.OrderByDescending(row => row.Keys[key])
-                : ascending[i] ? sorted.ThenBy(row => row.Keys[key]) : sorted.ThenByDescending(row => row.Keys[key]);
+                ? ascending[i] ? rows.OrderBy(row => row.Keys[key], comparer) : rows.OrderByDescending(row => row.Keys[key], comparer)
+                : ascending[i] ? sorted.ThenBy(row => row.Keys[key], comparer) : sorted.ThenByDescending(row => row.Keys[key], comparer);
         }
         return sorted?.ToList() ?? rows;
     }

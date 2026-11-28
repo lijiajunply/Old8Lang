@@ -1,5 +1,6 @@
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Value;
+using Old8Lang.Bytecode.Closures;
 using Old8Lang.Bytecode.Core;
 using Old8Lang.Bytecode.Generators;
 using Old8Lang.Bytecode.Metadata;
@@ -146,6 +147,30 @@ public partial class VirtualMachine
                     throw new MethodNotFoundError(GetPosition(instruction), funcName);
                 }
 
+                // 带装饰器的异步函数：调用点必须走运行期全局绑定（包装器可能是异步闭包或同步包装器）
+                if (function.IsDecorated &&
+                    _globals.TryGetValue(funcName, out var decoratedSlot) &&
+                    decoratedSlot.Value != null)
+                {
+                    var decoratedObj = decoratedSlot.Value;
+                    if (decoratedObj is ClosureValue decoratedClosure)
+                    {
+                        var decoratedArgs = NormalizeArguments(decoratedClosure.Function, args, GetPosition(instruction));
+                        ValidateParameterTypes(decoratedClosure.Function, decoratedArgs, instruction);
+                        InvokeResolvedFunction(decoratedClosure.Function, decoratedArgs,
+                            decoratedClosure.CapturedVariables, decoratedClosure.ConstantPool);
+                        break;
+                    }
+
+                    if (decoratedObj is FunctionMetadata decoratedMeta)
+                    {
+                        var decoratedArgs = NormalizeArguments(decoratedMeta, args, GetPosition(instruction));
+                        ValidateParameterTypes(decoratedMeta, decoratedArgs, instruction);
+                        InvokeResolvedFunction(decoratedMeta, decoratedArgs, null, null);
+                        break;
+                    }
+                }
+
                 if (!argsAlreadyNormalizedAndValidated)
                 {
                     args = NormalizeArguments(function, args, GetPosition(instruction));
@@ -153,16 +178,7 @@ public partial class VirtualMachine
                 }
 
                 // 创建并启动任务前开启全局槽位并发模式，保证无撕裂
-                _globalsState.IsConcurrent = true;
-                var task = Task.Run(() =>
-                {
-                    var asyncVm = CreateWorkerVirtualMachine();
-                    var result = asyncVm.ExecuteFunctionAndGetResult(function, args);
-                    return asyncVm.ConvertResultToLangValue(result);
-                });
-
-                // 将 Task 包装并压入栈
-                _stack.PushRef(new TaskLangValue(task));
+                StartAsyncFunctionTask(function, args, null, null);
             }
                 break;
 

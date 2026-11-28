@@ -186,7 +186,11 @@ public partial class Instance : LangValueType
 
         var returnType = local.LocalDelegateReturnTypes.GetValueOrDefault(Id.IdName, typeof(object));
 
-        ilGenerator.Emit(OpCodes.Ldloc, lambdaLocal);
+        if (local.AsyncStateMachineGenerator is not { } sm ||
+            !sm.TryLoadVariable(ilGenerator, Id.IdName))
+        {
+            ilGenerator.Emit(OpCodes.Ldloc, lambdaLocal);
+        }
         ilGenerator.Emit(OpCodes.Ldc_I4, Ids.Count);
         ilGenerator.Emit(OpCodes.Newarr, typeof(object));
         for (var i = 0; i < Ids.Count; i++)

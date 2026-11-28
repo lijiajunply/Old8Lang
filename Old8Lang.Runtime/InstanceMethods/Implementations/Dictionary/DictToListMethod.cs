@@ -41,11 +41,7 @@ public class DictToListMethod : BaseInstanceMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        IlValueBridge.EmitLoadWrapped(instance, ilGenerator, local);
-
-        var helperMethod = typeof(DictToListMethod).GetMethod(nameof(ToListHelper),
-            System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);
-        ilGenerator.Emit(OpCodes.Call, helperMethod!);
+        IlNativeCollectionBridge.EmitBridgeCall(this, instance, parameters, ilGenerator, local);
     }
 
     /// <summary>

@@ -32,7 +32,7 @@ public static class ImportStatementRuntimeExtensions
         if (node.IsSelective && node.Specifiers.Count > 0)
         {
             // 选择性导入
-            var selectedSymbols = node.Specifiers.Select(item => item.Alias).ToList();
+            var selectedSymbols = node.Specifiers.Select(item => item.Name).ToList();
             moduleValue = ModuleFactory.CreateSelectiveModule(node.ImportString, selectedSymbols, manager, node.Position);
         }
         else
@@ -133,7 +133,7 @@ public static class ImportStatementRuntimeExtensions
                 if (node.IsSelective && node.Specifiers.Count > 0)
                 {
                     // 选择性导入
-                    var selectedSymbols = node.Specifiers.Select(item => item.Alias).ToList();
+                    var selectedSymbols = node.Specifiers.Select(item => item.Name).ToList();
                     unifiedModule =
                         ModuleFactory.CreateSelectiveModule(actualModuleName, selectedSymbols, manager, node.Position);
                 }

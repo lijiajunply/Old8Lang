@@ -14,7 +14,7 @@ namespace Old8Lang.InstanceMethods.Implementations.List;
 /// <summary>
 /// List.Chunk(size) - 将列表分割成指定大小的块
 /// </summary>
-public class ListChunkMethod : BaseInstanceMethod
+public class ListChunkMethod : BaseInstanceMethod, IIlNativeValueInstanceMethod
 {
     public override string[] Names => ["Chunk", "chunk"];
     public override Type TargetType => typeof(ListLangValue);
@@ -55,11 +55,20 @@ public class ListChunkMethod : BaseInstanceMethod
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
         instance.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
-        parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        IlNativeCollectionBridge.EmitIntArgument(parameters[0], ilGenerator, local);
 
-        var helperMethod = typeof(ListChunkMethod).GetMethod(nameof(ChunkHelper),
+        var helperMethod = typeof(ListChunkMethod).GetMethod(nameof(ChunkNativeHelper),
             System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
         ilGenerator.Emit(OpCodes.Call, helperMethod!);
+    }
+
+    public static List<object?> ChunkNativeHelper(object? listObj, int size)
+    {
+        if (listObj is List<object?> typed)
+            return ChunkHelper(typed, size);
+        if (listObj is System.Collections.IList ilist)
+            return ChunkHelper(ilist.Cast<object?>().ToList(), size);
+        throw new ArgumentException($"实例必须是列表类型，实际是 {listObj?.GetType().Name ?? "null"}");
     }
 
     public static List<object?> ChunkHelper(List<object?> list, int size)

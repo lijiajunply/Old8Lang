@@ -1,10 +1,13 @@
+using System.Collections;
 using System.Reflection.Emit;
 using Old8Lang.AST;
 using Old8Lang.AST.Expression;
 using Old8Lang.Bytecode.Metadata;
 using Old8Lang.Compiler.CodeGeneration;
+using Old8Lang.Error;
 using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
+using Old8Lang.TypeSystem;
 
 namespace Old8Lang.Bytecode.VM;
 
@@ -16,12 +19,18 @@ public class BytecodeExtensionMethod : IInstanceMethod
     private readonly Type _targetType;
     private readonly FunctionMetadata _function;
     private readonly VirtualMachine _vm;
+    private readonly IReadOnlyList<GenericParameter> _targetGenericParameters;
 
-    public BytecodeExtensionMethod(Type targetType, FunctionMetadata function, VirtualMachine vm)
+    public BytecodeExtensionMethod(
+        Type targetType,
+        FunctionMetadata function,
+        VirtualMachine vm,
+        List<GenericParameter>? targetGenericParameters = null)
     {
         _targetType = targetType;
         _function = function;
         _vm = vm;
+        _targetGenericParameters = targetGenericParameters ?? [];
     }
 
     public string[] Names => [_function.Name.Split('$').Last()]; // 从 "TargetType$MethodName" 提取方法名
@@ -94,6 +103,11 @@ public class BytecodeExtensionMethod : IInstanceMethod
 
     public object? ExecuteInVM(object? instance, object?[] arguments)
     {
+        if (_targetGenericParameters.Count > 0 && instance is not null)
+        {
+            ValidateTargetGenericConstraintsInVm(instance);
+        }
+
         // 在 VM 中执行扩展方法
         // 准备参数：第一个参数是 this（实例本身）
         var methodArgs = new object?[arguments.Length + 1];
@@ -102,5 +116,12 @@ public class BytecodeExtensionMethod : IInstanceMethod
 
         // 调用 VM 的公共方法来执行函数
         return _vm.ExecuteFunction(_function, methodArgs);
+    }
+
+    private void ValidateTargetGenericConstraintsInVm(object instance)
+    {
+        var wrapped = IlValueBridge.Wrap(instance);
+        ExtensionMethodWrapper.ValidateGenericConstraintsForInstance(
+            _targetGenericParameters, wrapped, null, default);
     }
 }

@@ -969,7 +969,43 @@ public partial class BytecodeVisitor
 
     public Instruction? VisitAsyncFuncLangValue(AsyncFuncLangValue node)
     {
-        // 异步函数值在字节码模式中没有直接对应的指令
+        var lambdaName = node.Id?.IdName ?? $"<async_lambda_{Guid.NewGuid():N}>";
+        var paramNames = node.Ids?.Select(id => id.IdName).ToList() ?? [];
+        var paramTypes = node.Ids?.Select(id => id.AssumptionType ?? "").ToList() ?? [];
+        var defaultValues = new List<object?>();
+        int paramsIndex = -1;
+
+        if (node.Ids != null)
+        {
+            for (int i = 0; i < node.Ids.Count; i++)
+            {
+                var param = node.Ids[i];
+                if (param.IsParams)
+                {
+                    paramsIndex = i;
+                }
+
+                defaultValues.Add(param.DefaultValue != null
+                    ? EvaluateConstantExpression(param.DefaultValue)
+                    : null);
+            }
+        }
+
+        var returnType = node.Id?.AssumptionType ?? "";
+        var actualCapturedVars = AnalyzeClosureCaptures(node.BlockStatement, paramNames);
+
+        _compiler.CompileAsyncFunction(
+            lambdaName,
+            paramNames,
+            paramTypes,
+            defaultValues,
+            node.BlockStatement,
+            paramsIndex,
+            returnType,
+            actualCapturedVars);
+
+        int funcIndex = _compiler.GetFunctionIndex(lambdaName);
+        EmitClosureOrFunction(funcIndex, actualCapturedVars);
         return null;
     }
 

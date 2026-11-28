@@ -62,43 +62,10 @@ public class ListAggregateWithSeedMethod : BaseInstanceMethod
     protected override void GenerateIlInternal(LangExpression instance, List<LangExpression> parameters,
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        // 加载列表实例
-        instance.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
-
-        // 加载累加器函数
-        parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
-
-        // 加载初始值
-        parameters[1].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
-
-        // 调用辅助方法
-        var helperMethod = typeof(ListAggregateWithSeedMethod).GetMethod(nameof(AggregateWithSeedHelper),
-            System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);
-        ilGenerator.Emit(OpCodes.Call, helperMethod!);
+        IlNativeCollectionBridge.EmitBridgeCall(this, instance, parameters, ilGenerator, local);
     }
 
-    /// <summary>
-    /// 辅助方法：带初始值的聚合操作
-    /// </summary>
-    public static LangValueType AggregateWithSeedHelper(ListLangValue list, LangValueType accumulatorParam, LangValueType seed)
-    {
-        if (accumulatorParam is not FuncLangValue accumulator)
-        {
-            throw new Exception("第一个参数必须是函数类型");
-        }
-
-        var result = seed;
-
-        foreach (var item in list.Values)
-        {
-            var tempManager = new VariateManager();
-            result = accumulator.Run(tempManager, [result, item]);
-        }
-
-        return result;
-    }
-
-    protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)
+protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)
     {
         return typeof(LangValueType);
     }

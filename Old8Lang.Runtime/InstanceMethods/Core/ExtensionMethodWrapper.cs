@@ -2,6 +2,8 @@ using System.Collections;
 using System.Reflection.Emit;
 using Old8Lang.AST;
 using Old8Lang.AST.Expression;
+using Old8Lang.AST.Expression.AnyValues;
+using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.AST.Statement;
 using Old8Lang.Compiler;
@@ -106,17 +108,19 @@ public class ExtensionMethodWrapper(
             try
             {
                 manager.CurrentFunctionReturnType = function.Id?.AssumptionType;
-                manager.CurrentFunctionTypeArgumentMapping = GetTargetGenericTypeMapping(instance);
+                var typeArgumentMapping = GetTargetGenericTypeMapping(instance);
+                manager.CurrentFunctionTypeArgumentMapping = typeArgumentMapping;
 
                 // 绑定 this 关键字到实例
                 manager.Set(new LangId("this"), instance);
 
-                // 绑定用户定义的参数
+                // 绑定用户定义的参数（并校验泛型目标类型参数约束的形参类型）
                 for (int i = 0; i < parameters.Count; i++)
                 {
-                    var paramName = function.Ids![i].IdName;
+                    var paramId = function.Ids![i];
                     var paramValue = parameters[i].Accept(RuntimeVisitors.CreateInterpreter(manager));
-                    manager.Set(new LangId(paramName), paramValue);
+                    ValidateParameterTypeIfAnnotated(paramId, paramValue, typeArgumentMapping, position);
+                    manager.Set(new LangId(paramId.IdName), paramValue);
                 }
 
                 // 执行函数体
@@ -260,13 +264,16 @@ public class ExtensionMethodWrapper(
             try
             {
                 manager.CurrentFunctionReturnType = function.Id?.AssumptionType;
-                manager.CurrentFunctionTypeArgumentMapping = GetTargetGenericTypeMapping(instance);
+                var typeArgumentMapping = GetTargetGenericTypeMapping(instance);
+                manager.CurrentFunctionTypeArgumentMapping = typeArgumentMapping;
 
                 manager.Set(new LangId("this"), instance);
 
                 for (var i = 0; i < arguments.Length && i < function.Ids!.Count; i++)
                 {
-                    manager.Set(new LangId(function.Ids![i].IdName), arguments[i]);
+                    var paramId = function.Ids![i];
+                    ValidateParameterTypeIfAnnotated(paramId, arguments[i], typeArgumentMapping, function.Position);
+                    manager.Set(new LangId(paramId.IdName), arguments[i]);
                 }
 
                 function.BlockStatement.Accept(RuntimeVisitors.CreateInterpreter(manager));
@@ -293,77 +300,217 @@ public class ExtensionMethodWrapper(
         }
     }
 
-    private void ValidateTargetGenericConstraints(LangValueType instance)
+    private void ValidateParameterTypeIfAnnotated(
+        LangId paramId,
+        LangValueType paramValue,
+        Dictionary<string, ITypeInfo>? typeArgumentMapping,
+        SourcePosition position)
     {
-        if (TargetGenericParameters.Count == 0)
+        if (string.IsNullOrWhiteSpace(paramId.AssumptionType) || typeArgumentMapping is null || typeArgumentMapping.Count == 0)
         {
             return;
         }
 
-        var typeArguments = GetTargetGenericArgumentTypes(instance);
-        for (var index = 0; index < TargetGenericParameters.Count; index++)
+        var annotation = paramId.AssumptionType.Trim();
+        var isNullable = annotation.EndsWith('?');
+        var baseName = isNullable ? annotation[..^1].Trim() : annotation;
+        if (!typeArgumentMapping.TryGetValue(baseName, out var mappedType))
         {
-            if (!typeArguments.TryGetValue(TargetGenericParameters[index].Name, out var actualType))
+            return;
+        }
+
+        var resolved = isNullable ? $"{mappedType.Name}?" : mappedType.Name;
+
+        var actualType = TypeChecker.GetLangValueType(paramValue);
+        if (!TypeChecker.IsPolymorphicCompatible(actualType, resolved))
+        {
+            throw new TypeError(
+                position,
+                resolved,
+                actualType,
+                $"扩展方法 '{function.Id?.IdName}' 参数 '{paramId.IdName}' 类型不匹配");
+        }
+    }
+
+    private void ValidateTargetGenericConstraints(LangValueType instance)
+    {
+        ValidateGenericConstraintsForInstance(TargetGenericParameters, instance, DeclarationManager, function.Position);
+    }
+
+    /// <summary>
+    /// 校验泛型扩展方法的目标类型参数约束（供解释器、IL 与 VM 共享）。
+    /// </summary>
+    public static void ValidateGenericConstraintsForInstance(
+        IReadOnlyList<GenericParameter> targetGenericParameters,
+        LangValueType instance,
+        VariateManager? manager,
+        SourcePosition position)
+    {
+        if (targetGenericParameters.Count == 0)
+        {
+            return;
+        }
+
+        // 字典按条目逐对校验，保证多类型参数交叉约束（如 where K: V）检查所有键值对。
+        if (instance is DictionaryLangValue dictionary)
+        {
+            var entries = GetDictionaryEntries(dictionary);
+            if (entries.Count == 0)
             {
-                // 空集合不携带足够的运行期元素类型信息；保留动态语言对空集合的可用性。
+                ValidateEmptyCollectionDeclaredTypes(targetGenericParameters,
+                    [dictionary.KeyType, dictionary.ValueType], manager, position);
+                return;
+            }
+
+            foreach (var (key, value) in entries)
+            {
+                var pairValues = targetGenericParameters.Count >= 2
+                    ? new[] { key, value }
+                    : new[] { key };
+                ValidateTypeArgumentTuple(targetGenericParameters, pairValues, manager, position);
+            }
+
+            return;
+        }
+
+        if (instance is ListLangValue list)
+        {
+            if (list.Values.Count == 0)
+            {
+                ValidateEmptyCollectionDeclaredTypes(targetGenericParameters, [list.ElementType], manager, position);
+                return;
+            }
+
+            foreach (var item in list.Values)
+            {
+                ValidateTypeArgumentTuple(targetGenericParameters, [item], manager, position);
+            }
+
+            return;
+        }
+
+        if (instance is ArrayLangValue array)
+        {
+            var items = array.GetItems().ToArray();
+            if (items.Length == 0)
+            {
+                ValidateEmptyCollectionDeclaredTypes(targetGenericParameters, [array.ElementType], manager, position);
+                return;
+            }
+
+            foreach (var item in items)
+            {
+                ValidateTypeArgumentTuple(targetGenericParameters, [item], manager, position);
+            }
+        }
+    }
+
+    private static void ValidateEmptyCollectionDeclaredTypes(
+        IReadOnlyList<GenericParameter> targetGenericParameters,
+        string?[] declaredTypeNames,
+        VariateManager? manager,
+        SourcePosition position)
+    {
+        var typeInfoMapping = new Dictionary<string, ITypeInfo>(StringComparer.Ordinal);
+        for (var i = 0; i < Math.Min(targetGenericParameters.Count, declaredTypeNames.Length); i++)
+        {
+            if (!string.IsNullOrWhiteSpace(declaredTypeNames[i]))
+            {
+                typeInfoMapping[targetGenericParameters[i].Name] = new PrimitiveTypeInfo(declaredTypeNames[i]!.Trim());
+            }
+        }
+
+        if (typeInfoMapping.Count == 0)
+        {
+            return;
+        }
+
+        for (var i = 0; i < targetGenericParameters.Count; i++)
+        {
+            var parameter = targetGenericParameters[i];
+            if (!typeInfoMapping.TryGetValue(parameter.Name, out var actualTypeInfo))
+            {
                 continue;
             }
 
-            var parameter = TargetGenericParameters[index];
-            foreach (var candidate in GetTargetElementTypes(instance, index).DefaultIfEmpty(actualType))
+            var validation = GenericConstraintValidator.Validate(parameter, actualTypeInfo, typeInfoMapping, manager);
+            if (!validation.IsValid)
             {
-                var candidateArguments = new Dictionary<string, Type>(typeArguments, StringComparer.Ordinal)
-                {
-                    [parameter.Name] = candidate
-                };
-                var validation = GenericConstraintValidator.ValidateWithDotNetType(
-                    parameter, candidate, candidateArguments);
-                if (!validation.IsValid)
-                    throw new TypeError(function.Position, validation.ErrorMessage ?? "泛型目标类型不满足约束");
+                throw new TypeError(position, validation.ErrorMessage ?? "泛型目标类型不满足约束");
             }
         }
     }
 
-    private static IEnumerable<Type> GetTargetElementTypes(LangValueType instance, int parameterIndex)
+    private static void ValidateTypeArgumentTuple(
+        IReadOnlyList<GenericParameter> targetGenericParameters,
+        LangValueType[] values,
+        VariateManager? manager,
+        SourcePosition position)
     {
-        if (parameterIndex == 0 && instance is ListLangValue list)
-            return list.Values.Select(GetRuntimeType);
-        if (parameterIndex == 0 && instance is ArrayLangValue array)
-            return array.GetItems().Select(GetRuntimeType);
-        if (parameterIndex is 0 or 1 && instance is DictionaryLangValue dictionary)
-            return dictionary.Tuples.Select(tuple => GetRuntimeType(tuple.Get(parameterIndex)));
+        var count = Math.Min(targetGenericParameters.Count, values.Length);
+        var typeInfoMapping = new Dictionary<string, ITypeInfo>(StringComparer.Ordinal);
+        var dotNetMapping = new Dictionary<string, Type>(StringComparer.Ordinal);
+
+        for (var i = 0; i < count; i++)
+        {
+            var paramName = targetGenericParameters[i].Name;
+            typeInfoMapping[paramName] = new PrimitiveTypeInfo(GetLangTypeName(values[i]));
+            dotNetMapping[paramName] = GetRuntimeType(values[i]);
+        }
+
+        for (var i = 0; i < count; i++)
+        {
+            var parameter = targetGenericParameters[i];
+            if (parameter.StructuredConstraints is null || parameter.StructuredConstraints.Count == 0)
+            {
+                continue;
+            }
+
+            // Old8Lang 类实例使用语言层类型信息校验（支持 Old8Lang new()/继承/接口/跨参数约束）；
+            // 原生 CLR 对象或 .NET 标量若语言层无法解析则回退到 .NET Type 校验。
+            var actualValue = values[i];
+            var useLangValidator = actualValue is AnyLangValue or IntLangValue or DoubleLangValue
+                or BoolLangValue or CharLangValue or StringLangValue or ListLangValue
+                or ArrayLangValue or DictionaryLangValue or TupleLangValue or NullLangValue;
+
+            var validation = useLangValidator
+                ? GenericConstraintValidator.Validate(parameter, typeInfoMapping[parameter.Name], typeInfoMapping, manager)
+                : GenericConstraintValidator.ValidateWithDotNetType(parameter, dotNetMapping[parameter.Name], dotNetMapping);
+
+            if (!validation.IsValid)
+            {
+                throw new TypeError(position, validation.ErrorMessage ?? "泛型目标类型不满足约束");
+            }
+        }
+    }
+
+    private static List<(LangValueType Key, LangValueType Value)> GetDictionaryEntries(DictionaryLangValue dictionary)
+    {
+        if (dictionary.Value.Count > 0)
+        {
+            return dictionary.Value;
+        }
+
+        if (dictionary.Tuples.Count > 0)
+        {
+            return dictionary.Tuples.Select(t => (t.Get(0), t.Get(1))).ToList();
+        }
+
         return [];
     }
 
-    private Dictionary<string, Type> GetTargetGenericArgumentTypes(LangValueType instance)
+    private static string GetLangTypeName(LangValueType value)
     {
-        var result = new Dictionary<string, Type>(StringComparer.Ordinal);
-        if (instance is ListLangValue list && TargetGenericParameters.Count >= 1 && list.Values.Count > 0)
+        if (value is NativeAnyLangValue nativeAny)
         {
-            result[TargetGenericParameters[0].Name] = GetRuntimeType(list.Values[0]);
-        }
-        else if (instance is ArrayLangValue array && TargetGenericParameters.Count >= 1)
-        {
-            var firstValue = array.GetItems().FirstOrDefault();
-            if (firstValue is not null)
+            var obj = nativeAny.GetValue();
+            if (obj is not null)
             {
-                result[TargetGenericParameters[0].Name] = GetRuntimeType(firstValue);
-            }
-        }
-        else if (instance is DictionaryLangValue dictionary && dictionary.Tuples.Count > 0)
-        {
-            if (TargetGenericParameters.Count >= 1)
-            {
-                result[TargetGenericParameters[0].Name] = GetRuntimeType(dictionary.Tuples[0].Get(0));
-            }
-
-            if (TargetGenericParameters.Count >= 2)
-            {
-                result[TargetGenericParameters[1].Name] = GetRuntimeType(dictionary.Tuples[0].Get(1));
+                return obj.GetType().Name;
             }
         }
 
-        return result;
+        return TypeChecker.GetLangValueType(value);
     }
 
     private static Type GetRuntimeType(LangValueType value)
@@ -386,20 +533,64 @@ public class ExtensionMethodWrapper(
             return null;
         }
 
-        LangValueType[] values = instance switch
-        {
-            ListLangValue list when list.Values.Count > 0 => [list.Values[0]],
-            ArrayLangValue array when array.GetItems().FirstOrDefault() is { } first => [first],
-            DictionaryLangValue dictionary when dictionary.Tuples.Count > 0 && TargetGenericParameters.Count >= 2 =>
-                [dictionary.Tuples[0].Get(0), dictionary.Tuples[0].Get(1)],
-            _ => []
-        };
-
         var mapping = new Dictionary<string, ITypeInfo>(StringComparer.Ordinal);
-        for (var index = 0; index < Math.Min(values.Length, TargetGenericParameters.Count); index++)
+
+        if (instance is ListLangValue list)
         {
-            mapping[TargetGenericParameters[index].Name] =
-                new PrimitiveTypeInfo(TypeChecker.GetLangValueType(values[index]));
+            if (list.Values.Count > 0)
+            {
+                mapping[TargetGenericParameters[0].Name] = new PrimitiveTypeInfo(GetLangTypeName(list.Values[0]));
+            }
+            else if (!string.IsNullOrWhiteSpace(list.ElementType))
+            {
+                mapping[TargetGenericParameters[0].Name] = new PrimitiveTypeInfo(list.ElementType.Trim());
+            }
+        }
+        else if (instance is ArrayLangValue array)
+        {
+            var first = array.GetItems().FirstOrDefault();
+            if (first is not null)
+            {
+                mapping[TargetGenericParameters[0].Name] = new PrimitiveTypeInfo(GetLangTypeName(first));
+            }
+            else if (!string.IsNullOrWhiteSpace(array.ElementType))
+            {
+                mapping[TargetGenericParameters[0].Name] = new PrimitiveTypeInfo(array.ElementType.Trim());
+            }
+        }
+        else if (instance is DictionaryLangValue dictionary)
+        {
+            var entries = GetDictionaryEntries(dictionary);
+            if (entries.Count > 0)
+            {
+                if (TargetGenericParameters.Count >= 1)
+                {
+                    mapping[TargetGenericParameters[0].Name] = new PrimitiveTypeInfo(GetLangTypeName(entries[0].Key));
+                }
+
+                if (TargetGenericParameters.Count >= 2)
+                {
+                    mapping[TargetGenericParameters[1].Name] = new PrimitiveTypeInfo(GetLangTypeName(entries[0].Value));
+                }
+            }
+            else
+            {
+                if (TargetGenericParameters.Count >= 1 && !string.IsNullOrWhiteSpace(dictionary.KeyType))
+                {
+                    mapping[TargetGenericParameters[0].Name] = new PrimitiveTypeInfo(dictionary.KeyType.Trim());
+                }
+
+                if (TargetGenericParameters.Count >= 2 && !string.IsNullOrWhiteSpace(dictionary.ValueType))
+                {
+                    mapping[TargetGenericParameters[1].Name] = new PrimitiveTypeInfo(dictionary.ValueType.Trim());
+                }
+            }
+        }
+
+        // 未绑定类型参数（如无类型注解的空集合）回退为 any，避免方法体内 `-> T` 报未解析参数名。
+        foreach (var param in TargetGenericParameters)
+        {
+            mapping.TryAdd(param.Name, new PrimitiveTypeInfo("any"));
         }
 
         return mapping;
@@ -441,6 +632,18 @@ public class ExtensionMethodWrapper(
                 for (var index = 0; index < array.Length; index++)
                     wrappedArray.RunResult[index] = Wrap(array.GetValue(index));
                 return wrappedArray;
+            }
+
+            if (value is IDictionary dictionary)
+            {
+                var wrappedDict = new DictionaryLangValue();
+                Remember(value, wrappedDict);
+                foreach (DictionaryEntry entry in dictionary)
+                {
+                    wrappedDict.Value.Add((Wrap(entry.Key), Wrap(entry.Value)));
+                }
+
+                return wrappedDict;
             }
 
             if (value is IList list)
@@ -495,6 +698,29 @@ public class ExtensionMethodWrapper(
                 case IList { IsReadOnly: false, IsFixedSize: false } list when wrapped is ListLangValue wrappedList:
                     SynchronizeList(list, wrappedList, visited);
                     break;
+                case IDictionary { IsReadOnly: false, IsFixedSize: false } dictionary when wrapped is DictionaryLangValue wrappedDict:
+                    SynchronizeDictionary(dictionary, wrappedDict, visited);
+                    break;
+            }
+        }
+
+        private void SynchronizeDictionary(IDictionary dictionary, DictionaryLangValue wrappedDict, HashSet<object> visited)
+        {
+            var entries = wrappedDict.Value.ToArray();
+            foreach (var (key, val) in entries)
+            {
+                SynchronizeNested(key, visited);
+                SynchronizeNested(val, visited);
+            }
+
+            dictionary.Clear();
+            foreach (var (key, val) in entries)
+            {
+                var unwrappedKey = Unwrap(key);
+                if (unwrappedKey is not null)
+                {
+                    dictionary[unwrappedKey] = Unwrap(val);
+                }
             }
         }
 
@@ -554,99 +780,25 @@ public class ExtensionMethodWrapper(
             return instanceType;
         }
 
+        if ((function.Id?.AssumptionType.StartsWith("dict", StringComparison.OrdinalIgnoreCase) == true ||
+             function.Id?.AssumptionType.StartsWith("dictionary", StringComparison.OrdinalIgnoreCase) == true) &&
+            TargetType == typeof(DictionaryLangValue))
+        {
+            return instanceType;
+        }
+
+        if (function.Id?.AssumptionType.StartsWith("array", StringComparison.OrdinalIgnoreCase) == true &&
+            TargetType == typeof(ArrayLangValue))
+        {
+            return instanceType;
+        }
+
         // 其他返回值仍是动态类型（IL 模式下结果已转回原生表示）。
         return typeof(object);
     }
 
     public object? ExecuteInVM(object? instance, object?[] arguments)
     {
-        // 在 VM 模式下执行扩展方法
-        // 需要创建一个临时的 VariateManager 来执行函数体
-
-        // 创建新的作用域
-        var tempManager = new VariateManager();
-        tempManager.AddChildren();
-
-        try
-        {
-            // 绑定 this 关键字到实例
-            tempManager.Set(new LangId("this"), ConvertToLangValue(instance));
-
-            // 绑定用户定义的参数
-            for (int i = 0; i < arguments.Length && i < function.Ids!.Count; i++)
-            {
-                var paramName = function.Ids![i].IdName;
-                var paramValue = ConvertToLangValue(arguments[i]);
-                tempManager.Set(new LangId(paramName), paramValue);
-            }
-
-            // 执行函数体
-            function.BlockStatement.Accept(RuntimeVisitors.CreateInterpreter(tempManager));
-
-            // 检查是否有返回值
-            if (tempManager.IsReturn)
-            {
-                return ConvertFromLangValue(tempManager.Result);
-            }
-
-            // 如果没有显式返回，返回 null
-            return null;
-        }
-        finally
-        {
-            tempManager.RemoveChildren();
-        }
-    }
-
-    /// <summary>
-    /// 将 VM 对象转换为 LangValueType
-    /// </summary>
-    private static LangValueType ConvertToLangValue(object? value)
-    {
-        if (value == null)
-            return new NullLangValue();
-
-        if (value is LangValueType langValue)
-            return langValue;
-
-        // 基本类型转换
-        return value switch
-        {
-            int i => new IntLangValue(i),
-            long l => new IntLangValue((int)l),
-            double d => new DoubleLangValue(d),
-            bool b => new BoolLangValue(b),
-            string s => new StringLangValue(s),
-            char c => new CharLangValue(c),
-            LangValueType lv => lv,
-            _ => (LangValueType)value // 强制转换为 LangValueType
-        };
-    }
-
-    /// <summary>
-    /// 将 LangValueType 转换回 VM 对象
-    /// </summary>
-    private static object? ConvertFromLangValue(LangValueType value)
-    {
-        if (value is NullLangValue)
-            return null;
-
-        if (value is IntLangValue intVal)
-            return intVal.Value;
-
-        if (value is DoubleLangValue doubleVal)
-            return doubleVal.Value;
-
-        if (value is BoolLangValue boolVal)
-            return boolVal.Value;
-
-        if (value is CharLangValue charVal)
-            return charVal.Value;
-
-        if (value is StringLangValue str)
-            return str.Value;
-
-        // 其他类型保持原样
-        return value;
+        return InvokeNativeExtension(this, instance, arguments);
     }
 }

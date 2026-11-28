@@ -208,6 +208,13 @@ public class ClosureCaptureAnalyzer
             return;
         }
 
+        // 处理 await 表达式：await expr
+        if (node is AwaitExpression awaitExpression)
+        {
+            AnalyzeNode(awaitExpression.Expression);
+            return;
+        }
+
         // 处理 Operation（二元操作）
         if (node is Operation operation)
         {
@@ -231,6 +238,15 @@ public class ClosureCaptureAnalyzer
             AnalyzeNestedFunction(
                 funcValue.Ids?.Select(id => id.IdName).ToList() ?? new List<string>(),
                 funcValue.BlockStatement);
+            return;
+        }
+
+        // 处理 AsyncFuncLangValue（异步函数值 / async lambda）
+        if (node is AST.Expression.Value.AsyncFuncLangValue asyncFuncValue)
+        {
+            AnalyzeNestedFunction(
+                asyncFuncValue.Ids?.Select(id => id.IdName).ToList() ?? new List<string>(),
+                asyncFuncValue.BlockStatement);
             return;
         }
 

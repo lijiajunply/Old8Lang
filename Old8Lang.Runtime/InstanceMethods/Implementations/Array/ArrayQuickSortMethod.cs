@@ -13,7 +13,7 @@ namespace Old8Lang.InstanceMethods.Implementations.Array;
 /// <summary>
 /// Array.QuickSort() - 使用快速排序算法对数组进行排序
 /// </summary>
-public class ArrayQuickSortMethod : BaseInstanceMethod
+public class ArrayQuickSortMethod : BaseInstanceMethod, IIlNativeValueInstanceMethod
 {
     public override string[] Names => ["QuickSort", "quickSort"];
     public override Type TargetType => typeof(ArrayLangValue);
@@ -34,17 +34,13 @@ public class ArrayQuickSortMethod : BaseInstanceMethod
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
         instance.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
-        var helperMethod = typeof(ArrayQuickSortMethod).GetMethod(nameof(QuickSortHelper),
+        var helperMethod = typeof(ArrayQuickSortMethod).GetMethod(nameof(QuickSortNativeHelper),
             System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
         ilGenerator.Emit(OpCodes.Call, helperMethod!);
     }
 
-    public static ArrayLangValue QuickSortHelper(ArrayLangValue array)
-    {
-        var items = array.GetItems().ToArray();
-        QuickSort(items, 0, items.Length - 1);
-        return new ArrayLangValue(items, array.ElementType, array.Position);
-    }
+    public static object?[] QuickSortNativeHelper(object? instance) =>
+        ArraySortVmSupport.SortAndReturn(instance, QuickSort);
 
     private static void QuickSort(LangValueType[] nums, int left, int right)
     {
@@ -79,7 +75,7 @@ public class ArrayQuickSortMethod : BaseInstanceMethod
 
     protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)
     {
-        return typeof(ArrayLangValue);
+        return typeof(object?[]);
     }
 
     protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)

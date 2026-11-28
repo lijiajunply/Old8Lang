@@ -99,6 +99,24 @@ public class ModuleSystemService
             {
                 _symbolRegistry.RegisterModule(manager, moduleName, stdModule);
             }
+            else if (stdModule is UnifiedModule fromModule && options.ImportSpecifiers is { Count: > 0 })
+            {
+                // import { F as G } from "Module"：按（别名）把符号登记到当前作用域
+                foreach (var specifierName in options.ImportSpecifiers)
+                {
+                    var symbol = fromModule.GetSymbol(specifierName);
+                    if (symbol is null)
+                    {
+                        result.IsSuccess = false;
+                        result.Error = new ImportError(default, moduleName,
+                            $"模块 '{moduleName}' 中未找到符号 '{specifierName}'");
+                        return result;
+                    }
+
+                    var localName = options.SymbolAliases?.GetValueOrDefault(specifierName) ?? specifierName;
+                    manager.Scopes[^1][localName] = symbol;
+                }
+            }
         }
         else
         {

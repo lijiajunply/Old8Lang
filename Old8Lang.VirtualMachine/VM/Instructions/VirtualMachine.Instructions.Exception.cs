@@ -189,6 +189,23 @@ public partial class VirtualMachine
                         throw new AttributeError(GetPosition(instruction), fieldName, "BytecodeObject");
                     }
                 }
+                // 如果是 from 导入的原生类（访问静态成员，如 Vector2.Zero）
+                else if (obj is Old8Lang.AST.Expression.Intermediates.NativeAnyLangValue
+                         { InstanceObj: null, ClassType: { } nativeStaticType })
+                {
+                    const System.Reflection.BindingFlags staticFlags =
+                        System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static;
+                    var staticProperty = nativeStaticType.GetProperty(fieldName, staticFlags);
+                    var staticField = staticProperty is null ? nativeStaticType.GetField(fieldName, staticFlags) : null;
+                    if (staticProperty is null && staticField is null)
+                    {
+                        throw new AttributeError(GetPosition(instruction), fieldName, nativeStaticType.Name);
+                    }
+
+                    _stack.PushObject(staticProperty is not null
+                        ? staticProperty.GetValue(null)
+                        : staticField!.GetValue(null));
+                }
                 // 如果是枚举模板（访问枚举成员）
                 else if (obj is EnumTemplate enumTemplate)
                 {
@@ -595,6 +612,16 @@ public partial class VirtualMachine
                     args[i] = _stack.PopObject();
                 }
 
+                // 命名参数的值紧跟在位置参数之后；只有标准库模块调用按名绑定，
+                // 其余目标维持按位置传参（命名值不参与）。
+                string[]? callNamedNames = operands.Length > 2 ? operands[2] as string[] : null;
+                object?[]? callNamedValues = null;
+                if (callNamedNames is { Length: > 0 } && callNamedNames.Length <= args.Length)
+                {
+                    callNamedValues = args[^callNamedNames.Length..];
+                    args = args[..^callNamedNames.Length];
+                }
+
                 // 弹出对象
                 var obj = _stack.PopObject();
                 if (obj == null)
@@ -844,6 +871,18 @@ public partial class VirtualMachine
 
                     if (methodMetadata == null)
                     {
+                        // 若类没有同名方法，但存在保存函数值的字段（如 `this.validator(x)`），
+                        // 按字段访问权限校验后直接调用该函数值
+                        if (bytecodeObj.Fields.TryGetValue(methodName, out var fieldValue) &&
+                            fieldValue is FunctionMetadata or Old8Lang.Bytecode.Closures.ClosureValue)
+                        {
+                            ValidateFieldAccess(bytecodeObj.ClassName, methodName, isStatic: false, instruction,
+                                objectClass: classMetadata);
+                            var fieldCallResult = CallFunctionObject(fieldValue, args);
+                            _stack.Push(VmValue.FromObject(fieldCallResult));
+                            break;
+                        }
+
                         throw new MethodNotFoundError(GetPosition(instruction), methodName, bytecodeObj.ClassName);
                     }
 
@@ -895,7 +934,7 @@ public partial class VirtualMachine
                 {
                     // 原生 C# 对象或 Old8Lang 类型，使用 InvokeTypeMethod 调用方法
                     // 这个方法会优先查找扩展方法，然后查找实例方法
-                    var result = InvokeTypeMethod(obj, methodName, args);
+                    var result = InvokeTypeMethod(obj, methodName, args, callNamedNames, callNamedValues);
 
                     // 必须无条件压入：调用方按"一次调用在栈上留下一个值"的约定消费。
                     // 无返回值的方法本身就以 VoidLangValue 表示"没有值"，直接压它即可

@@ -51,6 +51,22 @@ internal static class ArraySortVmSupport
         return [.. items];
     }
 
+    /// <summary>归一化后排序，并以 <c>List&lt;object?&gt;</c> 返回（供 List 原生排序复用）。</summary>
+    public static List<object?> SortToList(object? instance, Action<List<object?>> sort)
+    {
+        var items = Normalize(instance);
+        sort(items);
+        return items;
+    }
+
+    /// <summary>归一化后按语言序稳定排序，并以 <c>List&lt;object?&gt;</c> 返回。</summary>
+    public static List<object?> SortToListDefault(object? instance)
+    {
+        var items = Normalize(instance);
+        items.Sort(Compare);
+        return items;
+    }
+
     public static bool Less(object? a, object? b) => Compare(a, b) < 0;
 
     public static void Swap(List<object?> items, int i, int j)

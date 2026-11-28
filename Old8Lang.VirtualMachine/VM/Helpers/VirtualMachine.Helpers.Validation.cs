@@ -1,5 +1,6 @@
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Value;
+using Old8Lang.Bytecode.Closures;
 using Old8Lang.Bytecode.Core;
 using Old8Lang.Bytecode.Metadata;
 using Old8Lang.Error;
@@ -263,6 +264,16 @@ public partial class VirtualMachine
     public object? ExecuteFunctionAndGetResult(FunctionMetadata function, object?[] args)
     {
         CallFunction(function, args);
+        return _stack.Count > 0 ? _stack.PopObject() : null;
+    }
+
+    public object? ExecuteClosureAndGetResult(
+        FunctionMetadata function,
+        object?[] args,
+        ClosureEnvironment closureEnvironment,
+        ConstantPool? closureConstantPool = null)
+    {
+        CallClosureFunction(function, args, closureEnvironment, closureConstantPool);
         return _stack.Count > 0 ? _stack.PopObject() : null;
     }
 }

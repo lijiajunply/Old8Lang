@@ -93,6 +93,14 @@ public partial class AsyncFuncLangValue : ImportInfo
     public TaskLangValue RunAsync(VariateManager variateManagerFunc, List<LangExpression> ids,
         CancellationToken cancellationToken = default)
     {
+        // 在调用方线程同步求值实参并克隆执行作用域，
+        // 避免后台线程进入 Task.Run 后读取已被调用方线程修改或弹出的作用域栈
+        var evaluatedArgs = ids
+            .Select(t => t.Accept(RuntimeVisitors.CreateInterpreter(variateManagerFunc)))
+            .ToList();
+        var baseManager = CapturedScope ?? variateManagerFunc;
+        var executionManager = baseManager.Clone();
+
         // 创建 .NET Task
         var task = Task.Run(() =>
         {
@@ -100,21 +108,13 @@ public partial class AsyncFuncLangValue : ImportInfo
             cancellationToken.ThrowIfCancellationRequested();
 
             // 参数数量检查
-            if (Ids is not null && ids.Count > Ids.Count)
+            if (Ids is not null && evaluatedArgs.Count > Ids.Count)
             {
                 throw new ArgumentError(
                     Position,
-                    $"异步函数 '{Id?.IdName ?? "anonymous"}' 期望最多 {Ids.Count} 个参数，但实际提供了 {ids.Count} 个参数"
+                    $"异步函数 '{Id?.IdName ?? "anonymous"}' 期望最多 {Ids.Count} 个参数，但实际提供了 {evaluatedArgs.Count} 个参数"
                 );
             }
-
-            // 使用捕获的作用域或调用时的作用域
-            var baseManager = CapturedScope ?? variateManagerFunc;
-
-            // 克隆 baseManager 创建独立的执行作用域
-            // 这确保每个异步任务有独立的参数作用域，避免并发冲突
-            // 如果需要在异步函数中修改外部变量，应使用锁定变量（lock）机制
-            var executionManager = baseManager.Clone();
 
             // 重置返回状态，确保异步函数体能够正常执行
             executionManager.IsReturn = false;
@@ -142,8 +142,7 @@ public partial class AsyncFuncLangValue : ImportInfo
                             InitializeDefaultValueCache(executionManager);
                         }
 
-                        // 评估参数
-                        var paramValues = ids.Select(t => t.Accept(RuntimeVisitors.CreateInterpreter(variateManagerFunc))).ToList();
+                        var paramValues = new List<LangValueType>(evaluatedArgs);
 
                         // 补全默认参数
                         for (var i = paramValues.Count; i < Ids.Count; i++)
@@ -175,12 +174,21 @@ public partial class AsyncFuncLangValue : ImportInfo
                         }
                     }
 
-                    // 参数设置完成后，恢复非函数上下文标志
-                    // 这样函数体中的赋值语句可以正常查找和修改外部作用域的变量
+                    // 参数设置完成后，恢复非函数上下文标志，并设置当前异步函数自身的返回类型注解
+                    // （避免经 CapturedScope.Clone() 继承外层同步函数的 CurrentFunctionReturnType）
                     executionManager.IsFunc = false;
+                    var originalReturnType = executionManager.CurrentFunctionReturnType;
+                    executionManager.CurrentFunctionReturnType = Id?.AssumptionType;
 
-                    // 执行函数体
-                    BlockStatement.Accept(RuntimeVisitors.CreateInterpreter(executionManager));
+                    try
+                    {
+                        // 执行函数体
+                        BlockStatement.Accept(RuntimeVisitors.CreateInterpreter(executionManager));
+                    }
+                    finally
+                    {
+                        executionManager.CurrentFunctionReturnType = originalReturnType;
+                    }
 
                     // 保存返回值（在清理之前）
                     var result = executionManager.Result;

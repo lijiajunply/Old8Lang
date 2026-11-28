@@ -394,7 +394,7 @@ public class UnifiedModule(
 
         if (func is FuncLangValue funcValue)
         {
-            return funcValue.Run(currentManager, instance.Ids);
+            return funcValue.Run(currentManager, instance.Ids, instance.NamedArgs, instance.Position);
         }
 
         if (func is AsyncFuncLangValue asyncFuncValue)
@@ -407,8 +407,9 @@ public class UnifiedModule(
             // Handle native class instantiation
             List<LangValueType> args = [];
             args.AddRange(instance.Ids.Select(id => id.Accept(RuntimeVisitors.CreateInterpreter(currentManager))));
-            nativeAnyValue.New([.. Apis.ListToObjects(args)]);
-            return nativeAnyValue;
+            var holder = nativeAnyValue.CreateInstanceHolder();
+            holder.New([.. Apis.ListToObjects(args)]);
+            return holder;
         }
 
         throw new AttributeError(this, functionName, ModuleName);

@@ -13,7 +13,7 @@ namespace Old8Lang.InstanceMethods.Implementations.Array;
 /// <summary>
 /// Array.MergeSort() - 使用归并排序算法对数组进行排序
 /// </summary>
-public class ArrayMergeSortMethod : BaseInstanceMethod
+public class ArrayMergeSortMethod : BaseInstanceMethod, IIlNativeValueInstanceMethod
 {
     public override string[] Names => ["MergeSort", "mergeSort"];
     public override Type TargetType => typeof(ArrayLangValue);
@@ -34,16 +34,21 @@ public class ArrayMergeSortMethod : BaseInstanceMethod
         ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
         instance.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
-        var helperMethod = typeof(ArrayMergeSortMethod).GetMethod(nameof(MergeSortHelper),
+        var helperMethod = typeof(ArrayMergeSortMethod).GetMethod(nameof(MergeSortNativeHelper),
             System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
         ilGenerator.Emit(OpCodes.Call, helperMethod!);
     }
 
-    public static ArrayLangValue MergeSortHelper(ArrayLangValue array)
+    public static object?[] MergeSortNativeHelper(object? instance)
     {
-        var items = array.GetItems().ToArray();
-        MergeSortImpl(items, 0, items.Length - 1);
-        return new ArrayLangValue(items, array.ElementType, array.Position);
+        var items = ArraySortVmSupport.Normalize(instance);
+        if (items.Count > 1)
+        {
+            var buffer = new object?[items.Count];
+            MergeSortRange(items, buffer, 0, items.Count - 1);
+        }
+
+        return items.ToArray();
     }
 
     private static void MergeSortImpl(LangValueType[] nums, int left, int right)
@@ -102,7 +107,7 @@ public class ArrayMergeSortMethod : BaseInstanceMethod
 
     protected override Type GetReturnTypeInternal(Type instanceType, List<LangExpression> parameters, LocalManager local)
     {
-        return typeof(ArrayLangValue);
+        return typeof(object?[]);
     }
 
     protected override object? ExecuteInVMInternal(object? instance, object?[] arguments)

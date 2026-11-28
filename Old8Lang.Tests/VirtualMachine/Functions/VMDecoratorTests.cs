@@ -516,24 +516,26 @@ public class VMDecoratorTests
     }
 
     [Fact]
-    public void Decorator_OnAsyncFunction_ReportsUnsupported()
+    public void Decorator_OnAsyncFunction_ExecutesWithAsyncLambdaWrapper()
     {
         var code = @"
             func twice(f) {
-                return (x) -> f(x) * 2
+                return async (x) -> {
+                    v <- await f(x)
+                    return v * 2
+                }
             }
 
             @twice
             async func fetch(x:int) -> int {
-                return x
+                return x + 1
             }
 
             result <- await fetch(10)
         ";
 
-        // 异步函数在虚拟机里不走全局绑定，装饰器无法生效，
-        // 与其静默丢弃装饰器，不如明确报不支持。
-        Assert.Throws<VmUnsupportedError>(() => Execute(code));
+        // fetch(10) = 11，装饰后 22
+        Assert.Equal(22, Execute(code));
     }
 
     [Fact]

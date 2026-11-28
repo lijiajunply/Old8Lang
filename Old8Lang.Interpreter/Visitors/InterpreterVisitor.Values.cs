@@ -267,8 +267,8 @@ public partial class InterpreterVisitor
 
         // 获取所有可能的匹配函数（函数名和参数数量匹配）
         var matchingFunctions = manager.ImportInfos
-            .Where(x => (x is FuncLangValue func && func.Id!.IdName == node.Id.IdName && func.Ids?.Count == totalArgCount)
-                        || (x is AsyncFuncLangValue asyncFunc && asyncFunc.Id!.IdName == node.Id.IdName &&
+            .Where(x => (x is FuncLangValue func && func.Id?.IdName == node.Id.IdName && func.Ids?.Count == totalArgCount)
+                        || (x is AsyncFuncLangValue asyncFunc && asyncFunc.Id?.IdName == node.Id.IdName &&
                             asyncFunc.Ids?.Count == totalArgCount))
             .ToList();
 
@@ -361,8 +361,10 @@ public partial class InterpreterVisitor
             {
                 if (bestMatch is AsyncFuncLangValue asyncFunc)
                 {
-                    // 先调用 Run() 捕获闭包（可能返回AsyncFuncLangValue或AsyncGeneratorLangValue）
-                    var closedFunc = asyncFunc.Accept(this);
+                    // 已捕获闭包的异步函数值（如异步 Lambda / 装饰器返回闭包）保留其原始 CapturedScope
+                    var closedFunc = asyncFunc.CapturedScope is not null && !asyncFunc.IsAsyncGenerator
+                        ? asyncFunc
+                        : asyncFunc.Accept(this);
 
                     // 如果是异步生成器，需要设置参数
                     if (closedFunc is AsyncGeneratorLangValue asyncGen)
@@ -504,8 +506,9 @@ public partial class InterpreterVisitor
                 // 如果idResult是AsyncFuncLangValue，则调用它
                 else if (idResult is AsyncFuncLangValue asyncFuncValue)
                 {
-                    // 先调用 Run() 捕获闭包，然后调用返回的副本的 RunAsync()
-                    var closedAsyncFunc = (AsyncFuncLangValue)asyncFuncValue.Accept(this);
+                    var closedAsyncFunc = asyncFuncValue.CapturedScope is not null && !asyncFuncValue.IsAsyncGenerator
+                        ? asyncFuncValue
+                        : (AsyncFuncLangValue)asyncFuncValue.Accept(this);
                     result = closedAsyncFunc.RunAsync(manager, node.Ids);
                 }
                 // 如果idResult是TaskStaticMethodWrapper，则调用它
@@ -586,8 +589,9 @@ public partial class InterpreterVisitor
             // 如果idResult是AsyncFuncLangValue，则调用它
             else if (idResult is AsyncFuncLangValue asyncFuncValue)
             {
-                // 先调用 Run() 捕获闭包，然后调用返回的副本的 RunAsync()
-                var closedAsyncFunc = (AsyncFuncLangValue)asyncFuncValue.Accept(this);
+                var closedAsyncFunc = asyncFuncValue.CapturedScope is not null && !asyncFuncValue.IsAsyncGenerator
+                    ? asyncFuncValue
+                    : (AsyncFuncLangValue)asyncFuncValue.Accept(this);
                 result = closedAsyncFunc.RunAsync(manager, node.Ids);
             }
             // 如果idResult是TaskStaticMethodWrapper，则调用它
@@ -1402,7 +1406,7 @@ public partial class InterpreterVisitor
 
         var closureFunc = new AsyncFuncLangValue(node.Id, node.Ids, node.BlockStatement, node.Position)
         {
-            CapturedScope = manager
+            CapturedScope = manager.Clone()
         };
         return closureFunc;
     }

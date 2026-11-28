@@ -113,10 +113,18 @@ public partial class CompilerVisitor
             return null;
         }
 
+        // 动态对象（如通过 Delegate 返回的 Task）在运行期规范化为 Task<object?>
+        if (exprType == typeof(object) || exprType?.GetMethod("GetAwaiter") is null)
+        {
+            ilGenerator.Emit(OpCodes.Call,
+                typeof(IlRuntimeFunctions).GetMethod(nameof(IlRuntimeFunctions.ToAwaitableTask))!);
+            exprType = typeof(Task<object>);
+        }
+
         // 现在栈上是 Task<object>，调用 GetAwaiter() 方法获取等待器
         // 注意：这里假设如果是泛型 Task，一定是 Task<object>，或者至少有 GetAwaiter
         // 如果是 Task<T>，GetAwaiter 返回 TaskAwaiter<T>
-        var getAwaiterMethod = exprType?.GetMethod("GetAwaiter")!;
+        var getAwaiterMethod = exprType.GetMethod("GetAwaiter")!;
         ilGenerator.Emit(OpCodes.Callvirt, getAwaiterMethod);
 
         // 获取等待器类型
@@ -191,10 +199,28 @@ public partial class CompilerVisitor
             var invokeMethod = funcType.GetMethod("Invoke");
             if (invokeMethod != null)
             {
-                // 加载参数
-                foreach (var arg in node.Arguments)
+                // 加载参数（处理值类型装箱与 object 拆箱）
+                var invokeParams = invokeMethod.GetParameters();
+                for (var i = 0; i < node.Arguments.Count; i++)
                 {
+                    var arg = node.Arguments[i];
                     arg.Accept(this);
+                    if (i < invokeParams.Length)
+                    {
+                        var argType = arg.Accept(new TypeInferenceVisitor(local));
+                        var paramType = invokeParams[i].ParameterType;
+                        if (argType is not null && argType != paramType)
+                        {
+                            if (argType.IsValueType && !paramType.IsValueType)
+                            {
+                                ilGenerator.Emit(OpCodes.Box, argType);
+                            }
+                            else if (!argType.IsValueType && paramType.IsValueType)
+                            {
+                                ilGenerator.Emit(OpCodes.Unbox_Any, paramType);
+                            }
+                        }
+                    }
                 }
 
                 // 调用委托的 Invoke 方法
@@ -203,9 +229,10 @@ public partial class CompilerVisitor
             }
         }
 
-        // 集合索引、字典读取等表达式在编译期通常只能推断为 object，但运行期可能保存
-        // lambda / 函数值。保留接收者与实参，通过 Delegate.DynamicInvoke 进行动态调用。
-        if (funcType == typeof(object) && node.NamedArguments.Count == 0)
+        // 集合索引、字典读取或返回抽象 Delegate 的表达式在编译期无法直接调用具体 Invoke，
+        // 保留接收者与实参，通过 DynamicDelegateInvoker 进行动态调用。
+        if ((funcType == typeof(object) || typeof(Delegate).IsAssignableFrom(funcType)) &&
+            node.NamedArguments.Count == 0)
         {
             ilGenerator.Emit(OpCodes.Ldc_I4, node.Arguments.Count);
             ilGenerator.Emit(OpCodes.Newarr, typeof(object));
@@ -747,6 +774,12 @@ public partial class CompilerVisitor
 
     public object? VisitInstance(Instance node)
     {
+        // from "Module" import { F }：直接调用导入的标准库函数
+        if (StandardLibraryILHelper.TryResolveFunction(node, local, out var importedFunction, out _))
+        {
+            StandardLibraryILHelper.EmitFunctionCall(importedFunction, node, ilGenerator, local);
+            return null;
+        }
 
         // 纯位置调用：已注册函数但实参数量少于必需参数时，编译期就报 ArgumentError
         // （解释器/VM 在运行期报；这里属于 IL 类型检查的一部分，避免生成错误调用）。
@@ -945,7 +978,11 @@ public partial class CompilerVisitor
             // 结果静默变成 null）。
             if (local.GetLocalVar(node.Id.IdName) is { } functionLocal)
             {
-                ilGenerator.Emit(OpCodes.Ldloc, functionLocal);
+                if (local.AsyncStateMachineGenerator is not { } sm ||
+                    !sm.TryLoadVariable(ilGenerator, node.Id.IdName))
+                {
+                    ilGenerator.Emit(OpCodes.Ldloc, functionLocal);
+                }
                 ilGenerator.Emit(OpCodes.Ldc_I4, node.Ids.Count);
                 ilGenerator.Emit(OpCodes.Newarr, typeof(object));
                 for (var index = 0; index < node.Ids.Count; index++)
@@ -2365,6 +2402,10 @@ public partial class CompilerVisitor
 
         if (operation.Opera == LangTokenType.Dot && StandardLibraryILHelper.TryResolve(operation.Left, right, local, out var library, out var libraryCall))
             return StandardLibraryILHelper.EmitCall(library, libraryCall, ilGenerator, local);
+
+        if (operation.Opera == LangTokenType.Dot &&
+            StandardLibraryILHelper.TryResolveStaticMember(operation.Left, right, local, out var nativeClass, out var staticMember))
+            return StandardLibraryILHelper.EmitStaticMember(nativeClass, staticMember, ilGenerator);
 
         var leftType = operation.Left?.Accept(new TypeInferenceVisitor(local));
         var rightType = right?.Accept(new TypeInferenceVisitor(local));
