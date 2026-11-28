@@ -1,6 +1,4 @@
-using System.Reflection;
 using System.Reflection.Emit;
-using Old8Lang.AST.Expression.Value;
 using Old8Lang.AST.Statement;
 using Old8Lang.AST.Visitor;
 using Old8Lang.Compiler;
@@ -32,7 +30,9 @@ internal static class FuncLangValueIlCompilerExtensions
             FilePath = local.FilePath,
             Interpreter = local.Interpreter,
             Globals = local.Globals,
-            InClassEnv = local.InClassEnv
+            InClassEnv = local.InClassEnv,
+            BuildingClassMethods = local.BuildingClassMethods,
+            IsInDynamicMethod = true
         };
 
         foreach (var (key, value) in local.GlobalStaticClasses)

@@ -6,7 +6,6 @@ using Old8Lang.Error;
 using Old8Lang.GlobalFunctions.Core;
 
 // ReSharper disable once CheckNamespace
-using Old8Lang.AST.Visitor;
 
 namespace Old8Lang.Bytecode.VM;
 

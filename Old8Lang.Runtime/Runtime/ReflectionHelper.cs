@@ -6,9 +6,7 @@ using Old8Lang.Bytecode.Core;
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
 using System.Reflection;
-using System.Reflection.Emit;
 using Old8Lang.Bytecode.Metadata;
-using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.GlobalFunctions.Core;
 
 namespace Old8Lang.Runtime;
@@ -655,22 +653,26 @@ public static class ReflectionHelper
     /// <summary>
     /// 从对象获取类型
     /// </summary>
-    public static TypeLangValue TypeOf(object obj)
+    public static TypeLangValue TypeOf(object? obj)
     {
-        if (obj is not AnyLangValue anyValue)
+        if (obj is AnyLangValue anyValue)
         {
-            throw new InvalidOperationException("对象不是类实例");
+            var className = anyValue.ClassId.IdName;
+            var template = TypeTemplate.FindType(className);
+            return template is not null ? new TypeLangValue(template) : new TypeLangValue(className);
         }
 
-        var className = anyValue.ClassId.IdName;
-        var template = TypeTemplate.FindType(className);
-
-        if (template is null)
+        if (obj is not null)
         {
-            throw new InvalidOperationException($"找不到类型: {className}");
+            var nativeTemplate = TypeTemplate.FindType(obj.GetType().Name);
+            if (nativeTemplate is not null)
+            {
+                return new TypeLangValue(nativeTemplate);
+            }
         }
 
-        return new TypeLangValue(template);
+        // 非类实例（基本类型、枚举值、集合、元组、null 等）与解释器/VM 统一返回语言类型名。
+        return new TypeLangValue(VMReflectionHelper.DescribeValueType(obj));
     }
 
     /// <summary>

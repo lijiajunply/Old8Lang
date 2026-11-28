@@ -1,5 +1,3 @@
-using Old8Lang.AST.Visitor;
-
 namespace Old8Lang.Bytecode;
 
 /// <summary>

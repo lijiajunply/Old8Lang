@@ -9,8 +9,6 @@ using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Runtime;
 
-using Old8Lang.AST.Visitor;
-
 namespace Old8Lang.GlobalFunctions.Implementations.Concurrency;
 
 /// <summary>

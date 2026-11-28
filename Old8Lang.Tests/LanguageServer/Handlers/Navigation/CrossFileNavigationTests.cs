@@ -1,7 +1,6 @@
 using Old8Lang.LanguageServer.Handlers;
 using Old8Lang.LanguageServer.Services;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
-using Xunit;
 
 namespace Old8Lang.Tests.LanguageServer.Handlers.Navigation;
 

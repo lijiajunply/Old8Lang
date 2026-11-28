@@ -1,5 +1,3 @@
-using Xunit;
-
 namespace Old8Lang.Tests;
 
 /// <summary>

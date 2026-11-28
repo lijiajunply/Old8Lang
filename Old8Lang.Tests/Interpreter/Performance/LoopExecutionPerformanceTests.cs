@@ -1,9 +1,5 @@
-using System;
 using System.Diagnostics;
 using Old8Lang.Interpreter;
-using Old8Lang.LangParser;
-using Xunit;
-
 using Old8Lang.Profiler;
 
 namespace Old8Lang.Tests.Interpreter.Performance;

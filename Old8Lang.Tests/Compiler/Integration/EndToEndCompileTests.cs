@@ -56,7 +56,7 @@ public class EndToEndCompileTests
     /// <summary>
     /// 测试 IL 模式下的基本语法结构
     /// </summary>
-    [Fact(Skip = "函数调用的IL生成有已知bug - 需要编译器层面修复")]
+    [Fact]
     public void EndToEndCompile_BasicSyntaxStructures_CompilesCorrectly()
     {
         // 测试各种基本语法结构在 IL 模式下的表现

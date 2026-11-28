@@ -46,6 +46,14 @@
 
 ## 本次复核修正的条目
 
+### 2026-11-28（续：IL 异步生成器非阻塞挂起、遗留项清理与矩阵校正）
+
+- **IL 异步生成器非阻塞挂起**：将 `yield` 纳入 `AsyncStateMachineGenerator` 状态机挂起点与受保护区域派发链，`IlAsyncYieldEmitter` 改用非阻塞 `TaskCompletionSource`（`YieldAsync`），暂停期间占 0 个线程池线程，并支持在 `try`/`catch`/`finally`（含异步 `finally`）与 `using` 中安全挂起、恢复和提前取消清理。
+- **IL 类内 `this.method()` 直接 `callvirt`**：普通类（`ClassInitRuntimeExtensions`）与泛型特化类（`GenericClassSpecializer`）改为两遍方法定义，预先在 `LocalManager.BuildingClassMethods` 登记全部 `MethodBuilder` 签名；类内 `this.method()` 恢复直接 `callvirt`/`call` 发射与精确返回类型推断（闭包 `DynamicMethod`、异步状态机及函数值字段仍安全回退动态分派）。
+- **类字段集合初值三模式独立**：VM 的 `AllocateObjectInstance` 与导入类 `CreateObjectInstance` 对常量池中的列表/数组/字典（含嵌套）字段初值执行递归深拷贝，三种模式统一为「每实例独立」。
+- **`type()` 与 `TypeOf()` 三模式语言类型名统一**：`EnumLangValue.TypeToString()` 返回 `"Int"`（枚举类型校验仍读取 `EnumTypeName`）；`TypeFunction` 与 `ReflectionHelper.TypeOf` 在三种模式统一输出语言类型名（`Int`/`Double`/`String`/`Bool`/`List`/`Array`/`Dictionary`/`Null` 等），不再暴露 `Value`/`Int32`/`EnumLangValue`。
+- **支持矩阵全面校正**：同步修正历史过时单元格与限制说明（IL 闭包写回、泛型函数/类/约束、装饰器、接口默认方法、Mixin、异步生成器、`async for-in`、顶层 `for` 作用域、标准库 `import`；VM 异步函数装饰器、Match 元组解构、LINQ `join`/`into`、DAP 调试器）。报告见 `changes/2026-11-28-IL异步生成器与遗留项清理/test.md`。
+
 ### 2026-11-28（测试与工程问题全面清理与跨模式语义对齐）
 
 - **IL 表达式内部 `await`**：新增 `AsyncExpressionAwaitLowerer` 将二元运算、调用参数、集合/字典/元组/模板字面量、短路逻辑及三元表达式中的 `await` 预降级提升为状态机临时字段，挂起点保持栈空，消除 `InvalidProgramException`（仅 `catch` 过滤器、`defer` 及非异步生成器 `yield` 保留编译期拒绝）。
@@ -175,7 +183,7 @@
 | 类型转换 `as` | ✅ | ✅ | ✅ | VM 支持将字典转换为本地或导入类的实例。 |
 | 三元表达式 | ✅ | ✅ | ✅ | |
 | 字符串模板 `$"..."` | ✅ | ✅ | ✅ | |
-| Match 表达式 | ✅ | ✅ | ⚠️ | 语法为 `x <- match v { case p -> e ... }`，分支必须带 `case` 关键字；IL 自 2026-11-15 起通过 `IlMatchRegistry` 复用解释器的匹配语义，范围 / 类型 / 元组解构 / `guard` 全部可用；虚拟机暂不支持元组解构模式 |
+| Match 表达式 | ✅ | ✅ | ✅ | 语法为 `x <- match v { case p -> e ... }`，分支必须带 `case` 关键字；三种模式均支持值、绑定、范围、类型、多元素元组解构与 `guard`（IL 通过 `IlMatchRegistry` 复用解释器匹配语义；VM 于 2026-11-28 补齐原生多元组展平解构） |
 | 列表推导式 | ✅ | ✅ | ✅ | |
 
 ### 5. 语句与控制流
@@ -190,7 +198,7 @@
 | `using` 语句 | ✅ | ✅ | ✅ | |
 | `select` 语句 | ✅ | ✅ | ✅ | Channel 多路选择 |
 | `defer` 语句 | ✅ | ✅ | ✅ | |
-| `yield`（同步生成器） | ✅ | ❌ | ✅ | IL 的 `VisitYieldStatement` 未生成状态机，含 `yield` 的函数会产出无法验证的 IL |
+| `yield`（同步生成器） | ✅ | ❌ | ✅ | IL 模式不支持同步生成器，编译期明确报 `CompilerException`（含 `yield` 的异步生成器见第 8 节，三模式均支持） |
 
 ### 6. 函数
 
@@ -202,11 +210,11 @@
 | Lambda 表达式 | ✅ | ✅ | ✅ | |
 | 高阶函数 | ✅ | ✅ | ✅ | |
 | 闭包（只读捕获） | ✅ | ✅ | ✅ | |
-| 具名函数 / lambda / 类方法访问顶层变量 | ✅ | ✅ | ✅ | IL 模式自 2026-11-11 起把被函数引用的顶层变量放入运行期全局槽位；同名参数、局部变量和字段仍遮蔽它。异步函数自 2026-11-22 起通过 `AsyncLocal` 上下文读写同一份槽位；`catch` / `finally` 内的 `await` 仍不支持 |
-| **闭包写回外层局部变量** | ✅ | ❌ | ✅ | 虚拟机自 2026-10-09 起由共享单元（`UpValueCell`）支持；解释器自 2026-10-24 起在“外层帧仍存活”时直接在外层帧上执行闭包。IL 的 lambda 仍不能读写外层局部变量 |
-| 泛型函数 | ✅ | ❌ | ✅ | 虚拟机下必须显式给出类型参数（`id<int>(1)`） |
-| 泛型约束 | ✅ | ❌ | ❌ | |
-| 函数装饰器 | ✅ | ❌ | ⚠️ | 虚拟机下**普通函数**的装饰器可用；**异步函数**的装饰器报 `VM_UNSUPPORTED_ERROR`。IL 模式编译期报「返回类型不匹配」 |
+| 具名函数 / lambda / 类方法访问顶层变量 | ✅ | ✅ | ✅ | IL 模式自 2026-11-11 起把被函数引用的顶层变量放入运行期全局槽位；同名参数、局部变量和字段仍遮蔽它。异步函数自 2026-11-22 起通过 `AsyncLocal` 上下文读写同一份槽位 |
+| **闭包写回外层局部变量** | ✅ | ✅ | ✅ | 虚拟机自 2026-10-09 起由共享单元（`UpValueCell`）支持；解释器自 2026-10-24 起在“外层帧仍存活”时直接在外层帧上执行闭包；IL 自 2026-11-11~28 起支持局部变量读写、形参捕获、嵌套闭包隔离、循环每轮快照与函数类型参数再捕获 |
+| 泛型函数 | ✅ | ⚠️ | ⚠️ | IL（通过 `GenericFunctionSpecializer`）与虚拟机均需显式给出类型参数（`id<int>(1)`），解释器支持实参推断 |
+| 泛型约束 | ✅ | ✅ | ✅ | 三模式均支持 `where` / `new()` / `class` / `struct` / 接口 / 交叉类型参数约束及泛型扩展方法约束（2026-11-28 补齐） |
+| 函数装饰器 | ✅ | ✅ | ✅ | 三模式均支持普通函数与异步函数装饰器（含参数化、堆叠、改变返回类型及读写顶层变量，2026-11-23~28 补齐） |
 | 访问修饰符 | ✅ | ✅ | ✅ | `public` / `private` / `static` |
 
 ### 7. 类和面向对象
@@ -217,9 +225,9 @@
 | 构造函数 (`init`) | ✅ | ✅ | ✅ | |
 | 访问修饰符 | ✅ | ✅ | ✅ | |
 | 类继承 (`extends`) | ✅ | ✅ | ✅ | |
-| 接口 / 接口实现 | ✅ | ⚠️ | ✅ | IL 不支持带默认实现的接口方法（`implements` 的类未覆盖时找不到方法） |
-| Mixin (`mixin` / `with`) | ✅ | ❌ | ⚠️ | IL 未把 mixin 成员并入类（方法未找到）；虚拟机可绑定 mixin 方法但读不到 mixin 字段（2026-11-15 实测） |
-| 泛型类 | ✅ | ❌ | ✅ | 可显式写 `Box<int>()`，解释器也支持由构造函数实参推断（`Box(123)`）；**`new` 关键字不存在** |
+| 接口 / 接口实现 | ✅ | ✅ | ✅ | IL 自 2026-11-15 起通过 `MergeMixinMembers` 合并接口默认方法实现，类自身实现优先 |
+| Mixin (`mixin` / `with`) | ✅ | ✅ | ⚠️ | IL 自 2026-11-15 起递归合并 mixin（含父 mixin）的字段与方法；虚拟机可绑定 mixin 方法，mixin 字段待进一步核验 |
+| 泛型类 | ✅ | ⚠️ | ✅ | 三模式支持显式写 `Box<int>()`（含可空 `T?` 与静态成员）；解释器额外支持由构造函数实参推断（`Box(123)`），IL 省略类型参数时报明确编译错误；**`new` 关键字不存在** |
 | `this` / `super` | ✅ | ✅ | ✅ | |
 | 枚举 | ✅ | ✅ | ✅ | 含显式值、混合值、成员访问 |
 
@@ -227,9 +235,9 @@
 
 | 特性 | 解释器 | IL | 虚拟机 | 备注 |
 |------|--------|-----|--------|------|
-| `async` / `await` | ✅ | ⚠️ | ✅ | |
-| 异步生成器 | ✅ | ❌ | ✅ | 体内含 `await` 同样可用（2026-10-10 修复，见「已知限制」第 1 条） |
-| `async for-in` | ✅ | ❌ | ✅ | 支持 `async for k, v in ...` 多标识符解构 |
+| `async` / `await` | ✅ | ⚠️ | ✅ | IL 支持顶层、`try`/`catch`/`finally`/`using` 及复合表达式内部 `await`；仅 `catch` 过滤器、`defer` 与非异步生成器 `yield` 保留编译期拒绝 |
+| 异步生成器 | ✅ | ✅ | ✅ | 三模式均支持在异步生成器内混用 `await` 与 `yield`；IL 自 2026-11-28 起将 `yield` 纳入异步状态机实现非阻塞挂起（0 线程占用）；VM 见「已知限制」第 1 条 |
+| `async for-in` | ✅ | ✅ | ✅ | 三模式均支持 `async for k, v in ...` 多标识符解构，并兼容异步流与普通可枚举集合 |
 | Task API | ✅ | ✅ | ✅ | 实例方法 `Then` / `Catch` / `Finally` / `ContinueWith` 自 2026-10-10 起三种模式都可用（IL 用原生 `Task` 表示，VM 用 `TaskLangValue`）；静态方法见「已知限制」第 3 条 |
 
 ### 9. 并发编程
@@ -248,7 +256,7 @@
 | `CancellationTokenSource`（类形式） | ✅ | ❌ | ✅ | 2026-10-10 起虚拟机支持 `CancellationTokenSource()` / `(timeout)` 及 `Cancel` / `CancelAfter` / `Dispose` / `IsCancellationRequested` |
 | `spawn` | ✅ | ✅ | ✅ | **只创建线程，必须再调用 `Start()` 才会执行**，之后 `Join()` 等待并取回返回值；三种模式一致 |
 | `Sleep` / `GetCurrentThreadId` / `GetProcessorCount` | ✅ | ✅ | ✅ | 全局函数形式，无需 `Thread.` 前缀 |
-| Thread API（静态类） | ✅ | ⚠️ | ✅ | 三种模式支持 `Thread.Sleep` 和 `Thread.CurrentThread`（属性及无参调用）；IL 其他成员需逐项复核。 |
+| Thread API（静态类） | ✅ | ✅ | ✅ | 三种模式均支持 `Thread.Sleep`、`Thread.CurrentThread`（属性及无参调用）、`Lock` 共享锁变量及 `spawn` 全局上下文同步 |
 | Thread 实例方法 `Then` / `Cancel` / `Retry` / `WithTimeout` | ✅ | ✅ | ✅ | IL 自 2026-10-10 起可用（配合 `spawn`）；虚拟机同日起可用（`VMThreadLangValue` 专属实现）。`Cancel` 是**协作式**的：只对尚未 `Start()` 的线程生效；`Retry` 只能用于 `spawn(...)` 创建的线程 |
 
 ### 10. 异常处理
@@ -263,8 +271,8 @@
 
 | 特性 | 解释器 | IL | 虚拟机 | 备注 |
 |------|--------|-----|--------|------|
-| `import` 简单导入 | ✅ | ⚠️ | ⚠️ | IL 的标准库模块名调用仍未打通；VM 已验证 `Math` 模块调用，其余标准库待复核。 |
-| 命名导入 / 别名导入 / 通配符导入 | ✅ | ⚠️ | ⚠️ | VM 已验证 `Math` 模块别名和选择性函数导入；其他标准库及导入形式需复核。 |
+| `import` 简单导入 | ✅ | ✅ | ✅ | 2026-11-28 起三模式已打通 `Math`/`Regex`/`Crypto`/`Csv`/`Time`/`Vector`/`Net` 等标准库导入、函数体内调用、命名参数及原生静态类导出（含 VM 字节码往返） |
+| 命名导入 / 别名导入 / 通配符导入 | ✅ | ✅ | ✅ | 三模式均支持别名导入、选择性导入与模块作用域隔离（2026-11-28 补齐） |
 | 模块注册表 / 加载器 | ✅ | ✅ | ✅ | `ModuleRegistry` / `ModuleLoader` |
 
 ### 12. 外部互操作
@@ -302,8 +310,8 @@
 | 特性 | 解释器 | IL | 虚拟机 | 备注 |
 |------|--------|-----|--------|------|
 | 动态类型 / 类型注解 / 类型推断 | ✅ | ✅ | ✅ | IL 模式要求完整注解 |
-| 泛型集合 / 泛型函数 | ✅ | ⚠️ | ✅ | IL 模式不支持泛型类与泛型函数 |
-| 泛型类 | ✅ | ❌ | ✅ | |
+| 泛型集合 / 泛型函数 | ✅ | ⚠️ | ⚠️ | 三模式均支持泛型集合与泛型函数；IL 与虚拟机下泛型函数需显式提供类型参数 |
+| 泛型类 | ✅ | ⚠️ | ✅ | IL 与虚拟机均支持显式类型参数泛型类；解释器额外支持构造实参推断 |
 | 可空类型 / 联合类型 / 交叉类型 | ✅ | ✅ | ✅ | |
 | 类型转换 (`as`) | ✅ | ✅ | ✅ | |
 
@@ -314,7 +322,7 @@
 | LINQ 查询 | ✅ | ✅ | ✅ | |
 | 断言 API（`Assert`） | ✅ | ⚠️ | ✅ | 虚拟机下 24 个方法均可用，失败抛 `AssertionError`（**语言层 `try/catch` 能捕获**；解释器抛的普通异常捕获不到） |
 | 字节码序列化 | ❌ | ❌ | ✅ | `BytecodeFile` / `ConstantPool`；`-compile` 产出、`-execute` 载入，有 CLI 与测试覆盖 |
-| 调试器 | ✅ | ❌ | ❌ | 解释器侧 `Old8Lang.Debugger.Debugger` + `DebuggableInterpreter`，入口是 `debug-start <文件>` |
+| 调试器 | ✅ | ❌ | ✅ | 解释器侧提供 `debug-start <文件>` 交互调试；虚拟机侧自 2026-11-27 起提供 `Old8Lang.App --dap`（`VmDapServer`）标准 DAP 调试与 VS Code 集成 |
 | 性能分析器 | ✅ | ❌ | ❌ | 解释器侧 `ProfilerManager`，入口是交互式 `profile start` 命令 |
 | 反汇编器 | ❌ | ❌ | ❌ | 字节码 `Disassembler` 类存在但**全仓库无调用点**，当前无法使用 |
 
@@ -322,28 +330,27 @@
 
 ## 已知限制
 
-### 三种模式共同的跨模式差异（2026-11-15 逐条实测）
+### 三种模式跨模式语义核对表（2026-11-28 校正）
 
-下列行为在三种模式下不一致，且都还没有统一的语义约定，改动前请先确认：
+本表保留**仍存在的既定模式差异**（前 3 项）以及近期已逐项统一并有回归覆盖的跨模式行为：
 
 | 场景 | 解释器 | IL | 虚拟机 | 说明 |
 |------|--------|-----|--------|------|
-| `obj + 1`（`obj` 静态类型 `object`，运行期是 `double`） | 正确 | ✅（2026-11-28 起走 `IlDynamicArithmetic`） | 正确 | 六种算术运算均支持动态 `object` 操作数并在赋值回写已定型变量时做动态转换 |
-| 32 位 `int` 溢出（`2147483647 + 2147483646`） | 提升为 `double`（`4294967293`） | 32 位 `unchecked` 回绕（`-3`） | 提升为 `double`（`4294967293`） | IL 刻意保持 `int` 静态映射 CLR `Int32` 以保性能；超范围计算请使用 `double` 字面量 |
-| 数组 / 列表 `+` 拼接 | ✅（2026-11-15 起） | ✅（2026-11-15 起） | ✅ | 同类型拼接；数组 + 列表混合仍报错 |
-| 集合的 `.Length` 属性（无括号） | ✅（2026-11-15 起） | ✅ | ✅ | 数组/列表/字符串/字典均支持，等价 `len(x)`；字典键名 `"Length"` 用 `d["Length"]` |
-| `PrintLine(null)` 与集合里的 `null` 元素 | `null` | `null` | `null` | 2026-11-15 起统一为小写；类型名仍是 `Null` |
-| `null.ToStr()` | `null` | `null` | `null` | 2026-11-15 起三种模式一致 |
+| 32 位 `int` 溢出（`2147483647 + 2147483646`） | 提升为 `double`（`4294967293`） | 32 位 `unchecked` 回绕（`-3`） | 提升为 `double`（`4294967293`） | **既定差异**：IL 刻意保持 `int` 静态映射 CLR `Int32` 以保性能；超范围计算请使用 `double` 字面量 |
+| `(-1.0).Sqrt()` | ❌ 没有该方法（用 `Math.Sqrt`） | 抛「平方根函数的参数必须是非负数」 | 抛同样的错 | **既定差异**：有效值在 IL/VM 返回 `2`；跨模式推荐使用 `Math.Sqrt(value)` |
+| 私有成员访问 / 未声明变量 / 未知方法（如 `"".Match(...)`） | 运行期报错 | 编译期报错 | 运行期报错 | **既定差异**：2026-11-23 起 VM 补齐私有字段访问控制（`ACCESS_VIOLATION_ERROR`）；编译期 vs 运行期阶段差异属后端模型本身；正则请用 `Regex.RegexIsMatch` / `Regex.RegexMatch` |
+| `obj + 1`（`obj` 静态类型 `object`，运行期是 `double`） | ✅ | ✅ | ✅ | 2026-11-28 起 IL 六种算术运算均走 `IlDynamicArithmetic` 并在写回已定型变量时做动态转换 |
+| 数组 / 列表 `+` 拼接 | ✅ | ✅ | ✅ | 2026-11-15 统一：同类型按顺序拼接；数组 + 列表混合一致报错 |
+| 集合的 `.Length` 属性（无括号） | ✅ | ✅ | ✅ | 2026-11-15 统一：数组/列表/字符串/字典均支持，等价 `len(x)`；字典键名 `"Length"` 用 `d["Length"]` |
+| `PrintLine(null)`、`null.ToStr()` 与字符串拼接显示 | `null` / `xtrue` / `x[1, 2]` | `null` / `xtrue` / `x[1, 2]` | `null` / `xtrue` / `x[1, 2]` | 2026-11-15 统一为小写 `null` 与语言显示规则；类型名仍是 `Null` |
 | 字典缺失键 `d["missing"]` | `KEY_ERROR` | `KEY_ERROR` | `KEY_ERROR` | 2026-11-15 统一；安全访问用 `GetOrElse` / `TryGet` |
-| `(-1.0).Sqrt()` | ❌ 没有该方法（用 `Math.Sqrt`） | 抛「平方根函数的参数必须是非负数」 | 抛同样的错 | 2026-11-15 与 `Math.Sqrt` 统一；有效值仍返回 `2` |
-| `int?` / `string?` 联合类型的返回值 | ✅ | ✅（2026-11-15 起用 `object` 承载） | ✅ | |
-| 集合注解的元素类型不匹配（`list<int> <- {1, "x"}`） | ❌ 运行期 `TYPE_ERROR`（2026-11-28 统一） | ❌ 编译期报错 | ❌ 编译期报错 | 三模式均拒绝不匹配元素（含嵌套集合） |
-| `try { } catch (e) { x <- e }` 之后读 `x` | 保持 `1` | ✅ 保持 `1`（2026-11-28 覆盖值类型与引用类型） | 保持 `1` | 三模式一致 |
-| 线程内 `throw` 后 `Join()` | 保留原始语言错误（2026-11-28 统一） | 保留原始语言错误（2026-11-28 统一） | 保留原始语言错误 | 三模式 `catch (e)` 均获得原始抛出的错误消息 |
-| `join` 后引用内层范围变量（`... let z <- y where z > 2 select z`） | `[3]` | `[4, 4, 4]` | `[3, 4]` | join 结果只保留外层元素，内层变量是循环残留值，三模式配对语义都未统一 |
-| `join ... into g` 分组结果 | `[[1, 1], [2, 2, 2], [3]]` | `[[3], [3], [3]]` | 同解释器 | IL 的 group join 没有按外层元素分别收集匹配项 |
-| 字符串拼接的 bool / 集合显示（`"x" + true`、`"x" + {1, 2}`） | `xtrue` / `x[1, 2]` | `xtrue` / `x[1, 2]` | `xtrue` / `x[1, 2]` | 2026-11-15 起三模式统一走语言显示规则 |
-| 私有成员访问 / 未声明变量 / 未知方法（如 `"".Match(...)`） | 运行期报错 | 编译期报错 | 运行期报错 | 2026-11-23 起 VM 补齐私有字段访问控制（不再静默放行），与解释器一致抛 `ACCESS_VIOLATION_ERROR`；编译期 vs 运行期阶段差异属后端模型本身；正则请用 `Regex.RegexIsMatch` / `Regex.RegexMatch` |
+| `int?` / `string?` 联合类型的返回值 | ✅ | ✅ | ✅ | 2026-11-15 起 IL 用 `object` 承载并在返回路径做校验转换 |
+| 集合注解的元素类型不匹配（`list<int> <- {1, "x"}`） | ❌ 运行期 `TYPE_ERROR` | ❌ 编译期报错 | ❌ 编译期报错 | 2026-11-28 统一拒绝不匹配元素（含嵌套集合） |
+| `try { } catch (e) { x <- e }` 之后读 `x` | 保持原值 | 保持原值 | 保持原值 | 2026-11-28 起 IL 覆盖值类型与引用类型局部变量 |
+| 线程内 `throw` 后 `Join()` | 保留原始语言错误 | 保留原始语言错误 | 保留原始语言错误 | 2026-11-28 统一：`catch (e)` 均获得原始抛出的错误消息 |
+| LINQ `join` 内层变量与 `join ... into g` 分组延续 | ✅ | ✅ | ✅ | 2026-11-23~28 统一：支持多段 `join`/`let`/`orderby`/`group by`/`into`（165/165 全通过） |
+| 类字段可变集合初值（如 `public items <- {1, 2}`） | 每实例独立 | 每实例独立 | 每实例独立 | 2026-11-28 统一：VM 实例化时深拷贝常量池集合初值，修改互不影响 |
+| `type(枚举值)` / `TypeOf(枚举值)` 与内建类型名 | `Int` | `Int` | `Int` | 2026-11-28 统一返回语言类型名（`Int`/`Double`/`String`/`List`/`Array`/`Dictionary`/`Null` 等） |
 
 ### 三种模式共同
 
@@ -363,13 +370,13 @@
    **2026-11-15 更新**：lambda 参数注解的白名单已补上 `array` / `dictionary` / `object` / `function`；
    lambda 现在也能捕获外层局部变量、函数形参以及外层闭包已捕获的变量。
    `object` 静态类型的操作数参与算术运算已于 2026-11-28 起走 `IlDynamicArithmetic` 运行期分派。
-2. 不支持泛型函数、泛型类、运算符重载、装饰器。
+2. **动态与泛型边界**：不支持用户定义运算符重载与同步生成器（`yield`，编译期明确报错）；泛型函数与泛型类支持显式类型参数特化（不支持由构造函数实参省略推断）；普通与异步函数装饰器均已通过转发委托支持。
 3. 不支持 C/C++ P/Invoke、Python 互操作与托管库导入。
 4. **异步功能支持边界**（2026-11-28 更新）：异步状态机在 `try` / `catch` / `finally` / `using` 区域以及
    复合表达式内部（如 `1 + await f()`、`PrintLine(await f())`、集合/字典/元组/模板字面量、短路逻辑与三元表达式）的
-   `await` 均已通过 `AsyncExpressionAwaitLowerer` 支持；含 `yield` 的异步生成器与 `async for-in` 迭代也已可用；
+   `await` 均已通过 `AsyncExpressionAwaitLowerer` 支持；含 `yield` 的异步生成器已直接纳入异步状态机实现非阻塞挂起（0 线程池线程占用）并支持 `async for-in` 迭代；
    用户 `finally` 与 using 的 Dispose 只在函数真正退出时执行一次。仍不支持的位置会在编译期给出明确错误：
-   `catch` 过滤器中的 `await`、`defer` 中的 `await`，以及非异步生成器内的 `yield` 中的 `await`。
+   `catch` 过滤器中的 `await`/`yield`、`defer` 中的 `await`/`yield`，以及非异步生成器内的 `yield`。
    `Task.Completed` / `Task.WaitAll` / `Task.WaitAny` 已于 2026-11-23 在三种模式下统一实现。
 5. **IL 校验失败已清空（2026-11-15）**：`Common Language Runtime detected an invalid program`
    在 `TestFiles/CompilerTests/` 的 157 个用例里已不再出现。**2026-11-15 实测**：
@@ -402,9 +409,8 @@
 8. **线程自 2026-10-10 起可用**：`spawn(f)` 会真的创建线程对象，
    `Thread.Start` / `Join` / `IsAlive` / `Then` / `Cancel` / `Retry` / `WithTimeout` 都可用；
    `Retry` 必须写成 `spawn(f).Retry(n)`（解释器把 `Retry` 特判为「重新执行函数调用」）。
-9. **顶层 C 风格 `for` 循环变量仍是全局变量**（2026-10-24 记录）：解释器与虚拟机已把循环变量
-   收进循环作用域，IL 仍是全局变量——循环结束后仍可读、同名嵌套循环共用同一个变量。
-   与第 5 条同属 IL 的全局/作用域模型问题，见 [统一待办](../changes/Todo.md)。
+9. **顶层 C 风格 `for` 循环变量作用域（已于 2026-11-13~15 修复）**：IL 模式现已将循环初始化变量收敛到独立局部绑定并在循环退出后恢复外层作用域，同名嵌套循环与每轮闭包捕获语义均与解释器、虚拟机一致。
+10. **类内 `this.method()` 直接分派（2026-11-28 优化）**：普通类与泛型特化类在构建期间预先登记所有 `MethodBuilder`，类内 `this.method()`（含前向调用、私有方法、重载、命名实参与继承父类方法）直接发射 `callvirt`/`call` 并保留精确返回类型推断；闭包 `DynamicMethod`、异步状态机及函数值字段仍安全回退运行期分派。
 
 ### 虚拟机模式
 
@@ -415,10 +421,7 @@
    现已改为同步恢复（生成器体内的 `await` 改为阻塞等待），并让异步生成器实现 `IEnumerable`
    以复用普通 for-in 的迭代协议；`async for k, v in ...` 多标识符解构同时可用。
    同步生成器（`yield`）不受影响；`yield` 集合/类实例也不再丢值。
-2. **异步函数的装饰器不可用**：`@decorator async func` 报 `VM_UNSUPPORTED_ERROR`。
-   普通函数的装饰器可用。根因不是虚拟机独有：装饰器必须返回「异步函数值」，而
-   `async (x) -> ...` 这种异步 Lambda 目前解释器下也会抛 `NullReferenceException`
-   （`Instance.Run`），三种模式都还没有异步函数值。等异步函数值落地后再处理。
+2. **异步函数的装饰器（已于 2026-11-28 支持）**：三模式现已补齐异步 Lambda / 异步函数值以及简单、参数化与堆叠异步函数装饰器（含 VM 字节码往返）。
 3. **静态类 API 大部分可用**：编译期把 `类名.方法(...)` 改写成静态类原生调用，支持集合集中在
    `VmStaticClassRegistry`。可用：`Task.Delay`/`WhenAll`/`WhenAny`/`WaitAll`/`WaitAny`/`Completed`/`FromResult`/`FromException`/
    `Run`/`StartNew`、`Task.Factory`（属性）与 `Task.Factory.StartNew`、`TaskScheduler.Default`、
@@ -448,10 +451,7 @@
    同时整数除/模零改为语言层的 `ZERO_DIVISION_ERROR`（原先直接抛 .NET `DivideByZeroException`，
    既没有位置信息也不可被语言层 `try/catch` 识别）。
 9. Python / JavaScript / C# DLL 三类 `extern` 未验证；C/C++ P/Invoke 已可用。
-10. **`VMProfiler` / `VMDebugger` / `Disassembler` 三个类是死代码**（2026-10-09 核查）：
-    均在 `Old8Lang.VirtualMachine/Bytecode/` 下设目录各自定义，但全仓库找不到任何调用点，
-    因此虚拟机模式目前**没有**可用的性能分析器、调试器与反汇编器。
-    可用的调试与性能分析工具都在解释器侧（见上表）。
+10. **调试与性能工具现状（2026-11-27 更新）**：虚拟机调试现已通过 `VmDapServer` 与 `Old8Lang.App --dap`（标准 DAP 协议，含 VS Code 集成）提供；旧的 `VMProfiler` 与字节码 `Disassembler` 仍无命令行入口（解释器侧保留交互式 `debug-start` 与 `profile start`）。
 11. **Thread 实例方法自 2026-10-10 起可用**：`Then` / `WithTimeout` / `Retry` / `Cancel` 注册在
     `VMThreadLangValue` 上（VM 的线程对象是整数线程 id + `Concurrency.ResourceManager`，
     与解释器的 `ThreadLangValue` 不同构）。语义与解释器对齐，但有两条协作式限制：
@@ -471,8 +471,9 @@
 
 | 套件 | 2026-11-28 实测结果 | 说明 |
 |------|--------------------|------|
-| `Old8Lang.Tests` 全量默认档 | **7,256 通过 / 0 失败 / 26 跳过**（总计 7,282，耗时 47 s） | 覆盖解释器、IL、VM、Parser、LSP 与 Architecture，无挂起 |
+| `Old8Lang.Tests` 全量默认档 | **7,264 通过 / 0 失败 / 24 跳过**（总计 7,288，耗时 48 s） | 覆盖解释器、IL、VM、Parser、LSP 与 Architecture，无挂起 |
 | `Old8Lang.Tests.Architecture` | **73 通过 / 0 失败 / 0 跳过** | 程序集边界、宿主模块隔离与语法节点规范 |
+| `IlAsyncGeneratorStreamTests`（`performance.runsettings` 性能档） | **1 通过 / 0 失败 / 0 跳过**（248 ms） | 1,000 挂起流 + 300 并发编译期异步生成器无线程池阻塞 |
 | `SpawnTests`（`performance.runsettings` 性能档） | **13 通过 / 0 失败 / 0 跳过** | 含线程 `Sleep` 的并发用例分档隔离 |
 | `TestFiles/run_syntax_tests.sh` | **89 通过 / 0 失败** | 全部语法正反例 |
 | `TestFiles/run_vm_tests.sh` | **79 通过 / 0 失败** | 全部 VM 与字节码脚本用例 |

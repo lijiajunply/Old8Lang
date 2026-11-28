@@ -259,8 +259,7 @@
   发射 `InvokeDynamicObjectMethod`，并允许匹配 CLR 私有方法）。
   `MemberAccessTests` 4→6 项通过，`ErrorPropagatesThroughClassMethods` 一并修复；
   `Compiler.Classes` 23→21 失败、`Compiler.Exceptions` 12→11 失败，其余 17 组不变。
-  见 change（`2026-11-14-IL类内方法调用/test.md`）。遗留：`this.method()` 目前是反射分派，
-  后续可在 `LocalManager` 预登记 `MethodBuilder` 恢复直接 `callvirt`。
+  见 change（`2026-11-14-IL类内方法调用/test.md`）。2026-11-28 已在普通类（`ClassInitRuntimeExtensions`）与泛型特化类（`GenericClassSpecializer`）改为两遍方法定义，预先在 `LocalManager.BuildingClassMethods` 登记全部 `MethodBuilder`，类内 `this.method()` 恢复直接 `callvirt`/`call` 发射与精确返回类型推断（闭包 `DynamicMethod`、异步状态机与函数值字段安全回退动态分派）；见 `changes/2026-11-28-IL异步生成器与遗留项清理/test.md`。
 
 - [x] **IL 静态字段声明期初值从不写入**：`DefineFields` 只把实例字段初值交给构造函数，
   静态字段既没有 `.cctor` 也没有其它写入口，`class M { public static PI <- 3.14159 }` 在
@@ -520,8 +519,7 @@
 - [x] **虚拟机不支持集合字面量作为字段初值**：`BytecodeCompiler.EvaluateConstantExpression`
   现在递归求值列表/数组/字典字面量（`List<object?>` / `object[]` / `Dictionary<object,object>`），
   `class C { public items <- {1,2,3} }` 在 `-vm` 下可用；新增 1 项 VM 回归。
-  注意：字段集合在解释器与 VM 中仍是「所有实例共享同一个对象」，IL 是每实例独立，
-  该语义差异未变，已记在遗留里。见 change（`2026-11-15-VM字段集合初值/test.md`）。
+  2026-11-28 已于 `VirtualMachine.Helpers.ModuleAndObject` 补齐常量池集合初值深拷贝与导入类默认字段初始化，结合解释器已移除集合字面量单实例缓存，三模式现已统一为「每实例独立」。见 change（`2026-11-15-VM字段集合初值/test.md`、`changes/2026-11-28-IL异步生成器与遗留项清理/test.md`）。
 
 - [x] **`MemberAccessWithComplexTypes_CompilesAndExecutesCorrectly` 的断言与语言语义冲突**：
   用例先取 `numbers <- collection.getNumbers()`，随后 `collection.addNumber(6)`，再断言
@@ -708,8 +706,7 @@
   `NativeObject(Red)`、`match` 匹配不到 `case 0`。现在返回 `typeof(int)`，类型推断同步为 int；
   `MatchExpression_EnumValue` 用例改为文档语法（逗号分隔成员、数值 case）。
   `Compiler.Collections` 4 → 3 失败，新增 `EnumValueIlTests`。
-  见 change（`2026-11-15-IL枚举成员值/test.md`）。
-  遗留：`type(枚举值)` 在解释器返回 `Value`、IL/VM 返回 `Int32`。
+  见 change（`2026-11-15-IL枚举成员值/test.md`）。2026-11-28 已重写 `EnumLangValue.TypeToString() => "Int"` 并将 `TypeFunction` / `ReflectionHelper.TypeOf` 在三模式统一为语言类型名（`Int`/`Double`/`String`/`List` 等），三模式 `type(枚举值)` 与 `TypeOf(枚举值)` 均一致返回 `"Int"`；见 `changes/2026-11-28-IL异步生成器与遗留项清理/test.md`。
 
 - [x] **IL 包装字典的 ToStr 输出空元组**：`d.ToStr()` 在 IL 下得到 `{(), ()}`——`IlValueBridge.Wrap`
   构造的 `DictionaryLangValue` 只填 `Tuples`、`Value` 为空，而显示/索引读的是 `Value`。
@@ -997,12 +994,10 @@
 
 2026-11-11 测试结果见 待办核对测试报告（`2026-11-11-08-30-待办核对测试.md`）。
 
-## 2026-11-15 复核更新
+## 2026-11-15 复核更新（2026-11-28 收尾校正）
 
 该轮修复已覆盖 VM `in`、同类型集合 `+`、范围端点排除、集合 `.Length`、null 显示、
 字典缺失键错误、IL match 高级模式与作用域、mixin/接口默认方法、反射及命名实参校验等。
-逐项范围以对应 change 的 `test.md` 为准；本次没有把这些历史结果当作三模式全量复测。
-`Docs/MODE_SUPPORT.md` 仍有历史说明与后续修复记录不一致（例如 IL 泛型/装饰器总括限制、
-顶层 for 作用域，以及“共同差异”表中的已统一行为），后续需按现有报告逐项校正。
+`Docs/MODE_SUPPORT.md` 中的历史过时标记与跨模式差异表已于 2026-11-28 按实测结果逐项校正完成。
 
-- [ ] **IL 异步生成器的线程占用**：当前逐项握手在 yield 等待消费者时占用线程池线程；大量并发或长期暂停的生成器可能造成线程池压力。后续应将 yield 纳入异步状态机实现真正的非阻塞挂起，并补并发压力测试。
+- [x] **IL 异步生成器的线程占用**：2026-11-28 已将 `YieldStatement` 直接纳入 `AsyncStateMachineGenerator` 挂起点与受保护区域派发链（含 `try`/`catch`/`finally` 搬移支持），并将 `IlAsyncYieldEmitter` 改用非阻塞 `TaskCompletionSource`（`YieldAsync`），暂停期间占 0 个线程池线程；新增 128 并发挂起单测及 `[Trait("Category", "Performance")]` 1,000 挂起 + 300 并发压力测试全部通过。见 `changes/2026-11-28-IL异步生成器与遗留项清理/test.md`。

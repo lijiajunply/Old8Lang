@@ -1,4 +1,3 @@
-using Old8Lang.Compiler;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
@@ -165,6 +164,18 @@ public class AsyncStateMachineGenerator : IAsyncStateMachineGenerator
                 if (IsAsyncGenerator)
                 {
                     AnalyzeExpression(yieldStmt.YieldExpression, region, unsupportedContext);
+                    if (unsupportedContext is not null)
+                    {
+                        throw new CompilerException(
+                            $"IL 模式暂不支持 {unsupportedContext} 中的 yield：该位置无法从 MoveNext 入口恢复",
+                            yieldStmt.Position);
+                    }
+
+                    var yieldState = GetAwaitNodeStateIndex(yieldStmt);
+                    if (!region.DirectAwaitStates.Contains(yieldState))
+                    {
+                        region.DirectAwaitStates.Add(yieldState);
+                    }
                 }
                 else
                 {
@@ -810,7 +821,7 @@ public class AsyncStateMachineGenerator : IAsyncStateMachineGenerator
         il.Emit(OpCodes.Leave, _completeLabel!.Value);
     }
 
-    private static bool ContainsSuspendPoint(OldStatement? statement)
+    private bool ContainsSuspendPoint(OldStatement? statement)
     {
         switch (statement)
         {
@@ -836,7 +847,7 @@ public class AsyncStateMachineGenerator : IAsyncStateMachineGenerator
             case ThrowStatement throwStmt:
                 return ContainsSuspendPoint(throwStmt.Expression);
             case YieldStatement yieldStmt:
-                return ContainsSuspendPoint(yieldStmt.YieldExpression);
+                return IsAsyncGenerator || ContainsSuspendPoint(yieldStmt.YieldExpression);
             case DeferStatement deferStmt:
                 return ContainsSuspendPoint(deferStmt.Statement);
             case IfStatement ifStmt:
@@ -945,12 +956,14 @@ public class AsyncStateMachineGenerator : IAsyncStateMachineGenerator
         }
     }
 
-    public void EmitYield(ILGenerator il, Type valueType)
+    public void EmitYield(ILGenerator il, YieldStatement yieldStmt, Type valueType)
     {
         if (YieldEmitterField is null)
         {
             throw new InvalidOperationException("当前异步状态机不是异步生成器，无法发射 yield");
         }
+
+        var stateIndex = GetAwaitNodeStateIndex(yieldStmt);
 
         var tempValue = il.DeclareLocal(typeof(object));
         if (valueType == typeof(void))
@@ -963,10 +976,28 @@ public class AsyncStateMachineGenerator : IAsyncStateMachineGenerator
         }
         il.Emit(OpCodes.Stloc, tempValue);
 
+        // 调用非阻塞 YieldAsync 获取恢复任务，并直接纳入异步状态机挂起/恢复协议。
         il.Emit(OpCodes.Ldarg_0);
         il.Emit(OpCodes.Ldfld, YieldEmitterField);
         il.Emit(OpCodes.Ldloc, tempValue);
-        il.Emit(OpCodes.Callvirt, typeof(IlAsyncYieldEmitter).GetMethod(nameof(IlAsyncYieldEmitter.Yield))!);
+        il.Emit(OpCodes.Callvirt, typeof(IlAsyncYieldEmitter).GetMethod(nameof(IlAsyncYieldEmitter.YieldAsync))!);
+
+        var awaiterType = typeof(TaskAwaiter);
+        var awaiterLocal = il.DeclareLocal(awaiterType);
+        il.Emit(OpCodes.Callvirt, typeof(Task).GetMethod(nameof(Task.GetAwaiter))!);
+        il.Emit(OpCodes.Stloc, awaiterLocal);
+
+        var completedLabel = il.DefineLabel();
+        il.Emit(OpCodes.Ldloca, awaiterLocal);
+        il.Emit(OpCodes.Call, awaiterType.GetProperty(nameof(TaskAwaiter.IsCompleted))!.GetGetMethod()!);
+        il.Emit(OpCodes.Brtrue, completedLabel);
+
+        EmitAwaitYield(il, stateIndex, awaiterLocal);
+        EmitAwaitResume(il, stateIndex, awaiterLocal);
+
+        il.MarkLabel(completedLabel);
+        il.Emit(OpCodes.Ldloca, awaiterLocal);
+        il.Emit(OpCodes.Call, awaiterType.GetMethod(nameof(TaskAwaiter.GetResult))!);
     }
     
     /// <summary>

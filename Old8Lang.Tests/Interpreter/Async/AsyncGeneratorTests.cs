@@ -267,7 +267,7 @@ public class AsyncGeneratorTests
         Assert.Equal(3, ((IntLangValue)result).Value); // "start", "error caught", "end"
     }
 
-    [Fact(Skip = "asdf")]
+    [Fact]
     public void AsyncGenerator_PrimeGenerator_GeneratesPrimes()
     {
         // Arrange

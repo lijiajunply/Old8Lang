@@ -1,6 +1,5 @@
 using Old8Lang.AST.Visitor;
 using Old8Lang.ModuleSystem.Resolution;
-using Old8Lang.Interpreter;
 using Old8Lang.ModuleSystem.StandardLibrary;
 
 namespace Old8Lang.Bytecode.ModuleSystem;

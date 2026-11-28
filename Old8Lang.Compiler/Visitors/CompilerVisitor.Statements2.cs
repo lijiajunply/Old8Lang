@@ -4,41 +4,19 @@ using System.Reflection.Emit;
 using Old8Lang.Compiler.Helpers;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.AnyValues;
-using Old8Lang.AST.Expression.Generators;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.ModuleObjects;
-using Old8Lang.AST.Expression.OperationHelpers;
-using Old8Lang.AST.Expression.StaticValues;
 using Old8Lang.AST.Expression.Value;
-using Old8Lang.AST.Expression.ValueFunctions;
-using Old8Lang.AST.Visitor;
 using Old8Lang.AsyncGeneration;
 using Old8Lang.Compiler;
 using Old8Lang.Compiler.CodeGeneration;
-using Old8Lang.Compiler.Specialization;
-using Old8Lang.Compiler.Verification;
-using Old8Lang.Concurrency;
-using Old8Lang.ExternProviders;
-using Old8Lang.GlobalFunctions.Core;
 using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
-using Old8Lang.ModuleSystem.Core;
-using Old8Lang.ModuleSystem.Loading;
 using Old8Lang.ModuleSystem.Resolution;
 using Old8Lang.ModuleSystem.StandardLibrary;
-using Old8Lang.ModuleSystem.Symbols;
-using Old8Lang.ProjectManagement;
 using Old8Lang.Runtime;
 using Old8Lang.TypeSystem;
-using System.Collections;
-using System.Collections.Concurrent;
-using System.Diagnostics;
-using System.Globalization;
 using System.Reflection;
-using System.Runtime.ExceptionServices;
-using System.Text;
-using System.Text.Json;
-using Old8Lang.LangParser;
 
 namespace Old8Lang.AST.Visitor;
 
@@ -1095,7 +1073,7 @@ public partial class CompilerVisitor
         {
             node.YieldExpression.Accept(this);
             var valueType = node.YieldExpression.Accept(new TypeInferenceVisitor(local)) ?? typeof(object);
-            asyncGen.EmitYield(ilGenerator, valueType);
+            asyncGen.EmitYield(ilGenerator, node, valueType);
             return null;
         }
 

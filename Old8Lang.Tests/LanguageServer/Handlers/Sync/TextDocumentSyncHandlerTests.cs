@@ -1,11 +1,9 @@
 using MediatR;
 using Moq;
 using Old8Lang.LanguageServer.Handlers;
-using Old8Lang.LanguageServer.Models;
 using Old8Lang.LanguageServer.Services;
 using OmniSharp.Extensions.LanguageServer.Protocol;
 using OmniSharp.Extensions.LanguageServer.Protocol.Client.Capabilities;
-using OmniSharp.Extensions.LanguageServer.Protocol.Document;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
 using OmniSharp.Extensions.LanguageServer.Protocol.Server;
 using OmniSharp.Extensions.LanguageServer.Protocol.Server.Capabilities;

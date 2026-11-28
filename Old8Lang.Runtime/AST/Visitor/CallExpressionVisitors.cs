@@ -1,6 +1,5 @@
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Value;
-using Old8Lang.Bytecode.Core;
 
 namespace Old8Lang.AST.Visitor;
 

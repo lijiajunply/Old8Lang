@@ -7,8 +7,6 @@ using Old8Lang.Error;
 using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
 
-using Old8Lang.AST.Visitor;
-
 namespace Old8Lang.InstanceMethods.Implementations.List;
 
 /// <summary>

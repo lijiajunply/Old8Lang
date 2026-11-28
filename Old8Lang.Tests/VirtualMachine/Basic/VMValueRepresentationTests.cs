@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using Old8Lang.Bytecode.Closures;
 using Old8Lang.Bytecode.Core;
 using Old8Lang.Bytecode.Metadata;
 using Xunit.Abstractions;

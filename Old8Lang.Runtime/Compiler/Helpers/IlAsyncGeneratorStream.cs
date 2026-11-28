@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading.Channels;
 using Old8Lang.Error;
@@ -20,7 +19,9 @@ public sealed class IlAsyncYieldEmitter
         });
 
     private readonly CancellationToken _cancellationToken;
-    private readonly SemaphoreSlim _resume = new(0, 1);
+    private readonly Lock _sync = new();
+    private TaskCompletionSource? _resumeTcs;
+    private bool _cancelled;
 
     internal IlAsyncYieldEmitter(CancellationToken cancellationToken)
     {
@@ -29,19 +30,63 @@ public sealed class IlAsyncYieldEmitter
 
     internal ChannelReader<object?> Reader => _channel.Reader;
 
-    internal bool IsCancellationRequested => _cancellationToken.IsCancellationRequested;
+    internal bool IsCancellationRequested => _cancellationToken.IsCancellationRequested || _cancelled;
 
     /// <summary>
-    /// 产出一个元素到异步流；若消费者已取消迭代则抛出 <see cref="OperationCanceledException"/> 以便触发生成器内的 <c>finally</c>。
+    /// 以非阻塞方式产出一个元素到异步流，并返回等待消费者推进下一次迭代的 <see cref="Task"/>。
+    /// 若消费者已取消迭代则返回已取消任务，以便恢复后抛出 <see cref="OperationCanceledException"/> 触发生成器内的 <c>finally</c>。
     /// </summary>
-    public void Yield(object? value)
+    public Task YieldAsync(object? value)
     {
-        _cancellationToken.ThrowIfCancellationRequested();
+        TaskCompletionSource resumeTcs;
+        lock (_sync)
+        {
+            if (_cancelled || _cancellationToken.IsCancellationRequested)
+            {
+                return Task.FromCanceled(_cancellationToken.IsCancellationRequested
+                    ? _cancellationToken
+                    : new CancellationToken(canceled: true));
+            }
+
+            resumeTcs = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+            _resumeTcs = resumeTcs;
+        }
+
         _channel.Writer.TryWrite(value);
-        _resume.Wait(_cancellationToken);
+        return resumeTcs.Task;
     }
 
-    internal void Resume() => _resume.Release();
+    /// <summary>
+    /// 同步兼容入口：委托给 <see cref="YieldAsync"/>。状态机生成的 IL 统一调用非阻塞的 <see cref="YieldAsync"/>。
+    /// </summary>
+    public void Yield(object? value) => YieldAsync(value).GetAwaiter().GetResult();
+
+    internal void Resume()
+    {
+        TaskCompletionSource? tcs;
+        lock (_sync)
+        {
+            tcs = _resumeTcs;
+            _resumeTcs = null;
+        }
+
+        tcs?.TrySetResult();
+    }
+
+    internal void Cancel()
+    {
+        TaskCompletionSource? tcs;
+        lock (_sync)
+        {
+            _cancelled = true;
+            tcs = _resumeTcs;
+            _resumeTcs = null;
+        }
+
+        tcs?.TrySetCanceled(_cancellationToken.IsCancellationRequested
+            ? _cancellationToken
+            : new CancellationToken(canceled: true));
+    }
 
     internal void Complete() => _channel.Writer.TryComplete();
 
@@ -63,6 +108,7 @@ public sealed class IlAsyncGeneratorStream(Func<IlAsyncYieldEmitter, Task<object
         private readonly Func<IlAsyncYieldEmitter, Task<object?>> _producerFactory;
         private readonly CancellationTokenSource _cts;
         private readonly IlAsyncYieldEmitter _emitter;
+        private readonly CancellationTokenRegistration _cancelRegistration;
         private Task? _producerTask;
         private object? _current;
         private bool _disposed;
@@ -73,6 +119,9 @@ public sealed class IlAsyncGeneratorStream(Func<IlAsyncYieldEmitter, Task<object
             _producerFactory = producerFactory;
             _cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
             _emitter = new IlAsyncYieldEmitter(_cts.Token);
+            _cancelRegistration = _cts.Token.Register(
+                static state => ((IlAsyncYieldEmitter)state!).Cancel(),
+                _emitter);
         }
 
         public object? Current => _current;
@@ -82,7 +131,7 @@ public sealed class IlAsyncGeneratorStream(Func<IlAsyncYieldEmitter, Task<object
             if (_disposed) return false;
 
             if (_producerTask is null)
-                _producerTask = Task.Run(RunProducerAsync);
+                _producerTask = RunProducerAsync();
             else if (_hasCurrent)
                 _emitter.Resume();
             _hasCurrent = false;
@@ -130,6 +179,7 @@ public sealed class IlAsyncGeneratorStream(Func<IlAsyncYieldEmitter, Task<object
             _disposed = true;
             _cts.Cancel();
             if (_producerTask is not null) await _producerTask.ConfigureAwait(false);
+            await _cancelRegistration.DisposeAsync().ConfigureAwait(false);
             _cts.Dispose();
         }
     }

@@ -42,6 +42,12 @@ public partial class EnumLangValue(
     public override string ToString() => Value.ToString();
 
     /// <summary>
+    /// 枚举成员在三种执行模式下底层均为整数值，返回统一语言类型名 <c>Int</c>；
+    /// 枚举类型注解校验仍直接读取 <see cref="EnumTypeName"/>。
+    /// </summary>
+    public override string TypeToString() => "Int";
+
+    /// <summary>
     /// 获取枚举的完整表示（类型名.成员名）
     /// </summary>
     public string GetFullName() => $"{EnumTypeName}.{MemberName}";

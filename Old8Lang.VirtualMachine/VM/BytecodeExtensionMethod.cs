@@ -1,13 +1,10 @@
-using System.Collections;
 using System.Reflection.Emit;
 using Old8Lang.AST;
 using Old8Lang.AST.Expression;
 using Old8Lang.Bytecode.Metadata;
 using Old8Lang.Compiler.CodeGeneration;
-using Old8Lang.Error;
 using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
-using Old8Lang.TypeSystem;
 
 namespace Old8Lang.Bytecode.VM;
 

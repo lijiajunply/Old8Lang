@@ -1,7 +1,5 @@
 using System.Collections.Concurrent;
 using System.Reflection.Emit;
-using System.Threading;
-using Old8Lang.AST;
 using Old8Lang.Error;
 
 namespace Old8Lang.Compiler;

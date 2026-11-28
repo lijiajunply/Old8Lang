@@ -8,7 +8,6 @@ using Old8Lang.Bytecode.Core;
 using Old8Lang.Bytecode.Metadata;
 using Old8Lang.Concurrency;
 using Old8Lang.Compiler.CodeGeneration;
-using Old8Lang.Error;
 using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
 

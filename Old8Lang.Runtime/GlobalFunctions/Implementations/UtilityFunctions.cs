@@ -7,6 +7,7 @@ using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Error;
 using Old8Lang.GlobalFunctions.Core;
 using Old8Lang.Interpreter;
+using Old8Lang.Runtime;
 
 using Old8Lang.AST.Visitor;
 
@@ -256,11 +257,19 @@ public sealed class TypeFunction : BaseGlobalFunction
 
     protected override void GenerateIlInternal(List<LangExpression> parameters, ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
-        // IL 模式下type()函数返回类型名称字符串
+        // IL 模式下 type() 与解释器/VM 统一返回语言类型名（Int / Double / String / List 等）。
+        // 静态类型为 object 或未知时在运行期按实际值解析，避免返回无意义的 "Object"。
         var typeId = parameters[0];
         var typeIdType = typeId.Accept(new TypeInferenceVisitor(local));
-        // 直接返回类型名称字符串，不调用GetType()
-        ilGenerator.Emit(OpCodes.Ldstr, typeIdType is not null ? typeIdType.Name : "object");
+        if (typeIdType is null || typeIdType == typeof(object))
+        {
+            typeId.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+            ilGenerator.Emit(OpCodes.Call,
+                typeof(VMReflectionHelper).GetMethod(nameof(VMReflectionHelper.DescribeValueType))!);
+            return;
+        }
+
+        ilGenerator.Emit(OpCodes.Ldstr, VMReflectionHelper.DescribeTypeName(typeIdType));
     }
 
     protected override Type GetReturnTypeInternal(List<LangExpression> parameters, LocalManager local)
@@ -270,8 +279,7 @@ public sealed class TypeFunction : BaseGlobalFunction
 
     protected override object ExecuteInVMInternal(object?[] arguments)
     {
-        object? value = arguments[0];
-        return value?.GetType().Name ?? "null";
+        return VMReflectionHelper.DescribeValueType(arguments[0]);
     }
 }
 

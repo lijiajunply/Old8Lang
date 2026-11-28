@@ -6,40 +6,15 @@ using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Linq;
 using Old8Lang.AST.Expression.StaticValues;
 using Old8Lang.AST.Expression.Value;
-using Old8Lang.AST.Expression.ModuleObjects;
 using Old8Lang.AST.Expression.OperationHelpers;
-using Old8Lang.AST.Expression.ValueFunctions;
-using Old8Lang.AST.Statement;
-using Old8Lang.AST.Visitor;
-using Old8Lang.AsyncGeneration;
 using Old8Lang.Compiler;
 using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Compiler.Helpers;
 using Old8Lang.Compiler.Specialization;
-using Old8Lang.Compiler.Verification;
-using Old8Lang.Concurrency;
 using Old8Lang.Error;
-using Old8Lang.ExternProviders;
-using Old8Lang.GlobalFunctions.Core;
 using Old8Lang.InstanceMethods.Core;
-using Old8Lang.Interpreter;
-using Old8Lang.ModuleSystem.Core;
-using Old8Lang.ModuleSystem.Loading;
-using Old8Lang.ModuleSystem.Resolution;
-using Old8Lang.ModuleSystem.StandardLibrary;
-using Old8Lang.ModuleSystem.Symbols;
-using Old8Lang.ProjectManagement;
-using Old8Lang.Runtime;
-using Old8Lang.TypeSystem;
-using System.Collections;
-using System.Collections.Concurrent;
-using System.Diagnostics;
-using System.Globalization;
 using System.Reflection;
 using System.Reflection.Emit;
-using System.Runtime.ExceptionServices;
-using System.Text;
-using System.Text.Json;
 using Old8Lang.LangParser;
 
 namespace Old8Lang.AST.Visitor;
@@ -1292,14 +1267,28 @@ public partial class CompilerVisitor
                 // 加载 node 指针
                 ilGenerator.Emit(OpCodes.Ldloc, localA);
 
+                // MethodBuilder 在 CreateType 前不能调用 GetParameters()，优先从预登记表获取形参类型。
+                Type[]? initParamTypes = null;
+                if (initFunc is MethodBuilder initMb && classType is TypeBuilder initTb &&
+                    local.BuildingClassMethods.TryGetValue(initTb, out var buildingMethods))
+                {
+                    initParamTypes = buildingMethods
+                        .FirstOrDefault(m => ReferenceEquals(m.Method, initMb))
+                        ?.ParameterTypes;
+                }
+                else if (initFunc is not MethodBuilder)
+                {
+                    initParamTypes = initFunc.GetParameters().Select(p => p.ParameterType).ToArray();
+                }
+
                 // 加载参数
-                var a = initFunc.GetParameters();
                 for (var i = 0; i < node.Ids.Count; i++)
                 {
                     var id = node.Ids[i];
                     id.Accept(this);
                     var idType = id.Accept(new TypeInferenceVisitor(local));
-                    if (a[i].ParameterType == typeof(object) && idType!.IsValueType)
+                    if (initParamTypes is not null && i < initParamTypes.Length &&
+                        initParamTypes[i] == typeof(object) && idType is { IsValueType: true })
                     {
                         ilGenerator.Emit(OpCodes.Box, idType);
                     }

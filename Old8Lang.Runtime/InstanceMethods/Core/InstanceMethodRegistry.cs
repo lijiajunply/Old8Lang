@@ -1,5 +1,4 @@
 using Old8Lang.AST;
-using Old8Lang.AST.Expression;
 using Old8Lang.Compiler.CodeGeneration;
 
 namespace Old8Lang.InstanceMethods.Core;

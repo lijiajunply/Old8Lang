@@ -1,5 +1,4 @@
-using System.Text.Json;
-
+// ReSharper disable CheckNamespace
 namespace Old8Lang.ProjectManagement;
 
 /// <summary>
@@ -147,9 +146,7 @@ public class EnvironmentManager
     /// </summary>
     public EnvironmentConfig? GetCurrentEnvironmentConfig()
     {
-        return _projectConfig.Old8Lang.Environments.TryGetValue(CurrentEnvironment, out var config)
-            ? config
-            : null;
+        return _projectConfig.Old8Lang.Environments.GetValueOrDefault(CurrentEnvironment);
     }
 
     /// <summary>

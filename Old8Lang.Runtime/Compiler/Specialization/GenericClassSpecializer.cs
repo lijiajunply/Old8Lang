@@ -294,7 +294,7 @@ public static class GenericClassSpecializer
     }
 
     /// <summary>
-    /// 生成实例方法
+    /// 生成实例方法（两遍：先声明并预登记所有 MethodBuilder，再生成方法体）
     /// </summary>
     private static void GenerateInstanceMethods(
         TypeTemplate typeTemplate,
@@ -304,39 +304,52 @@ public static class GenericClassSpecializer
         Dictionary<string, Type> typeArguments,
         Dictionary<string, FieldBuilder> fieldMap)
     {
-        // 初始化方法先定义，递归构造自身或相互引用的特化时才能取得 MethodBuilder。
+        var declared = new List<(FuncLangValue FuncValue, MethodBuilder MethodBuilder, Type[] ParamTypes, Type ReturnType)>();
+
+        // Pass 1：声明全部实例方法并预登记到 BuildingClassMethods
         foreach (var (memberId, memberExpr) in typeTemplate.Variates.OrderBy(pair => pair.Key.IdName == "init" ? 0 : 1))
         {
-            // 只处理方法
             if (memberExpr is not FuncLangValue funcValue)
                 continue;
 
-            // 解析参数类型
             var parameterTypes = resolver.ResolveParameterTypes(funcValue.Ids!);
-
-            // 解析返回类型
+            var parameterNames = funcValue.Ids?.Select(id => id.IdName).ToArray() ?? [];
             var returnType = AST.Statement.IlReturnTypeHelper.Resolve(
                 funcValue.Id,
                 resolver.ResolveReturnType(funcValue.Id?.AssumptionType));
 
-            // 创建方法
             var methodBuilder = typeBuilder.DefineMethod(
                 memberId.IdName,
                 MethodAttributes.Public,
                 returnType,
                 parameterTypes);
 
+            for (var i = 0; i < parameterNames.Length; i++)
+            {
+                methodBuilder.DefineParameter(i + 1, ParameterAttributes.None, parameterNames[i]);
+            }
+
+            local.RegisterBuildingClassMethod(typeBuilder, new PendingClassMethod(
+                methodBuilder,
+                memberId.IdName,
+                parameterTypes,
+                parameterNames,
+                returnType,
+                IsStatic: false));
+
             if (memberId.IdName == "init")
             {
                 local.GenericClassInitializers[typeBuilder] = methodBuilder;
             }
 
+            declared.Add((funcValue, methodBuilder, parameterTypes, returnType));
+        }
+
+        // Pass 2：生成方法体
+        foreach (var (funcValue, methodBuilder, parameterTypes, returnType) in declared)
+        {
             var methodIL = methodBuilder.GetILGenerator();
-
-            // 创建方法的局部管理器
             var methodLocal = CreateMethodLocalManager(local, resolver, typeBuilder, fieldMap);
-
-            // 生成方法体
             GenerateMethodBody(funcValue, methodIL, methodLocal, parameterTypes, returnType);
         }
     }
@@ -353,6 +366,8 @@ public static class GenericClassSpecializer
         Dictionary<string, Type> typeArguments,
         Dictionary<string, FieldBuilder> fieldMap)
     {
+        var declared = new List<(FuncLangValue FuncValue, MethodBuilder MethodBuilder, Type[] ParamTypes, Type ReturnType)>();
+
         foreach (var (memberId, memberExpr) in typeTemplate.StaticVariates)
         {
             if (memberExpr is not FuncLangValue funcValue)
@@ -361,6 +376,7 @@ public static class GenericClassSpecializer
             }
 
             var parameterTypes = resolver.ResolveParameterTypes(funcValue.Ids!);
+            var parameterNames = funcValue.Ids?.Select(id => id.IdName).ToArray() ?? [];
             var returnType = AST.Statement.IlReturnTypeHelper.Resolve(
                 funcValue.Id,
                 resolver.ResolveReturnType(funcValue.Id?.AssumptionType));
@@ -369,6 +385,25 @@ public static class GenericClassSpecializer
                 MethodAttributes.Public | MethodAttributes.Static | MethodAttributes.HideBySig,
                 returnType,
                 parameterTypes);
+
+            for (var i = 0; i < parameterNames.Length; i++)
+            {
+                methodBuilder.DefineParameter(i + 1, ParameterAttributes.None, parameterNames[i]);
+            }
+
+            local.RegisterBuildingClassMethod(typeBuilder, new PendingClassMethod(
+                methodBuilder,
+                memberId.IdName,
+                parameterTypes,
+                parameterNames,
+                returnType,
+                IsStatic: true));
+
+            declared.Add((funcValue, methodBuilder, parameterTypes, returnType));
+        }
+
+        foreach (var (funcValue, methodBuilder, parameterTypes, returnType) in declared)
+        {
             var methodLocal = CreateMethodLocalManager(local, resolver, typeBuilder, fieldMap);
             GenerateMethodBody(funcValue, methodBuilder.GetILGenerator(), methodLocal,
                 parameterTypes, returnType, isStatic: true);
@@ -393,6 +428,7 @@ public static class GenericClassSpecializer
             GenericClassSpecializations = local.GenericClassSpecializations,
             GenericClassConstructors = local.GenericClassConstructors,
             GenericClassInitializers = local.GenericClassInitializers,
+            BuildingClassMethods = local.BuildingClassMethods,
             CurrentGenericTypeResolver = resolver,
             InClassEnv = typeBuilder,
             Globals = local.Globals

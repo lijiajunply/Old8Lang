@@ -5,7 +5,6 @@ using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.InstanceMethods.Core;
 using Old8Lang.Interpreter;
 using System.Reflection.Emit;
-using Xunit;
 
 namespace Old8Lang.Tests.InstanceMethods;
 

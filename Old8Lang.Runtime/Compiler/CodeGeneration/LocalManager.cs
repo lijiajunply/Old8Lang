@@ -2,7 +2,6 @@ using System.Reflection;
 using System.Reflection.Emit;
 using System.Text;
 using Old8Lang.AST;
-using Old8Lang.Compiler;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Error;
@@ -126,6 +125,18 @@ public class LocalManager
 
     /// <summary>正在生成的泛型类的初始化方法。</summary>
     public Dictionary<Type, MethodInfo> GenericClassInitializers { get; init; } = [];
+
+    /// <summary>
+    /// 正在构建的类（<see cref="TypeBuilder"/>）预登记的方法签名表，供类内 <c>this.method()</c>
+    /// 在 <c>CreateType()</c> 之前直接发射 <c>callvirt</c> / <c>call</c> 与精确返回类型。
+    /// </summary>
+    public Dictionary<TypeBuilder, List<PendingClassMethod>> BuildingClassMethods { get; init; } = [];
+
+    /// <summary>
+    /// 当前是否正在向独立的 <see cref="DynamicMethod"/>（如闭包 lambda）发射 IL。
+    /// <see cref="DynamicMethod"/> 无法直接引用尚未完成的 <see cref="MethodBuilder"/>。
+    /// </summary>
+    public bool IsInDynamicMethod { get; init; }
 
     /// <summary>
     /// 当前泛型类型解析器，用于在特化方法生成时解析泛型参数
@@ -525,7 +536,9 @@ public class LocalManager
             DynamicAssembly = DynamicAssembly,
             DynamicModule = DynamicModule,
             Globals = Globals,
-            IsTopLevelScope = IsTopLevelScope
+            IsTopLevelScope = IsTopLevelScope,
+            BuildingClassMethods = BuildingClassMethods,
+            IsInDynamicMethod = IsInDynamicMethod
         };
 
         // 克隆局部变量
@@ -878,4 +891,187 @@ public class LocalManager
     {
         return TryInferVariableType(variableName);
     }
+
+    /// <summary>
+    /// 在正在构建的类型中登记一个方法签名，供同类的后续/前向 <c>this.method()</c> 直接发 <c>callvirt</c> / <c>call</c>。
+    /// </summary>
+    public void RegisterBuildingClassMethod(TypeBuilder typeBuilder, PendingClassMethod method)
+    {
+        if (!BuildingClassMethods.TryGetValue(typeBuilder, out var list))
+        {
+            list = [];
+            BuildingClassMethods[typeBuilder] = list;
+        }
+
+        list.Add(method);
+    }
+
+    /// <summary>
+    /// 在正在构建的 <see cref="TypeBuilder"/>（含其继承链）上按名称、实参个数/命名参数与类型解析方法。
+    /// 避免在 <c>CreateType()</c> 前调用 <see cref="TypeBuilder.GetMethod"/> 或 <see cref="MethodBuilder.GetParameters"/>。
+    /// </summary>
+    public bool TryResolveBuildingMethod(
+        TypeBuilder typeBuilder,
+        string methodName,
+        int positionalArgCount,
+        IReadOnlyList<string>? namedArgNames,
+        IReadOnlyList<Type>? positionalArgTypes,
+        out PendingClassMethod? pendingMethod,
+        out MethodInfo? completedBaseMethod)
+    {
+        pendingMethod = null;
+        completedBaseMethod = null;
+
+        var totalArgs = positionalArgCount + (namedArgNames?.Count ?? 0);
+        var hasNamed = namedArgNames is { Count: > 0 };
+
+        // 1. 沿 TypeBuilder 继承链查找预登记方法
+        Type? current = typeBuilder;
+        while (current is TypeBuilder currentTb)
+        {
+            if (BuildingClassMethods.TryGetValue(currentTb, out var methods))
+            {
+                var candidates = methods
+                    .Where(m => m.Name == methodName && m.ParameterTypes.Length == totalArgs)
+                    .ToList();
+
+                if (candidates.Count > 0)
+                {
+                    pendingMethod = SelectBestPendingCandidate(candidates, namedArgNames, hasNamed, positionalArgTypes);
+                    if (pendingMethod is not null)
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            current = currentTb.BaseType;
+        }
+
+        // 2. 在已完成的基类上查找可访问方法（排除 System.Object 兜底以免截走语言 ToStr 等特判）
+        if (current is not null && current != typeof(object))
+        {
+            const BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic |
+                                       BindingFlags.Instance | BindingFlags.Static;
+            var baseCandidates = current.GetMethods(flags)
+                .Where(m => m.Name == methodName &&
+                            (m.IsPublic || m.IsFamily || m.IsFamilyOrAssembly) &&
+                            m.GetParameters().Length == totalArgs)
+                .ToList();
+
+            if (baseCandidates.Count > 0)
+            {
+                completedBaseMethod = SelectBestCompletedCandidate(baseCandidates, namedArgNames, hasNamed, positionalArgTypes);
+                if (completedBaseMethod is not null)
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private static PendingClassMethod? SelectBestPendingCandidate(
+        List<PendingClassMethod> candidates,
+        IReadOnlyList<string>? namedArgNames,
+        bool hasNamed,
+        IReadOnlyList<Type>? positionalArgTypes)
+    {
+        if (hasNamed)
+        {
+            return candidates.FirstOrDefault(m =>
+                       namedArgNames!.All(name => Array.IndexOf(m.ParameterNames, name) >= 0))
+                   ?? candidates[0];
+        }
+
+        if (positionalArgTypes is { Count: > 0 })
+        {
+            var exact = candidates.FirstOrDefault(m => TypesMatchExactly(m.ParameterTypes, positionalArgTypes));
+            if (exact is not null) return exact;
+
+            var compatible = candidates.FirstOrDefault(m => TypesMatchCompatibly(m.ParameterTypes, positionalArgTypes));
+            if (compatible is not null) return compatible;
+        }
+
+        return candidates[0];
+    }
+
+    private static MethodInfo? SelectBestCompletedCandidate(
+        List<MethodInfo> candidates,
+        IReadOnlyList<string>? namedArgNames,
+        bool hasNamed,
+        IReadOnlyList<Type>? positionalArgTypes)
+    {
+        if (hasNamed)
+        {
+            return candidates.FirstOrDefault(m =>
+                   {
+                       var ps = m.GetParameters();
+                       return namedArgNames!.All(name => ps.Any(p => p.Name == name));
+                   })
+                   ?? candidates[0];
+        }
+
+        if (positionalArgTypes is { Count: > 0 })
+        {
+            var exact = candidates.FirstOrDefault(m =>
+                TypesMatchExactly(m.GetParameters().Select(p => p.ParameterType).ToArray(), positionalArgTypes));
+            if (exact is not null) return exact;
+
+            var compatible = candidates.FirstOrDefault(m =>
+                TypesMatchCompatibly(m.GetParameters().Select(p => p.ParameterType).ToArray(), positionalArgTypes));
+            if (compatible is not null) return compatible;
+        }
+
+        return candidates[0];
+    }
+
+    private static bool TypesMatchExactly(Type[] paramTypes, IReadOnlyList<Type> argTypes)
+    {
+        if (paramTypes.Length != argTypes.Count) return false;
+        for (var i = 0; i < paramTypes.Length; i++)
+        {
+            if (paramTypes[i] != argTypes[i]) return false;
+        }
+        return true;
+    }
+
+    private static bool TypesMatchCompatibly(Type[] paramTypes, IReadOnlyList<Type> argTypes)
+    {
+        if (paramTypes.Length != argTypes.Count) return false;
+        for (var i = 0; i < paramTypes.Length; i++)
+        {
+            var paramType = paramTypes[i];
+            var argType = argTypes[i];
+            if (paramType == argType || paramType == typeof(object) || argType == typeof(object))
+            {
+                continue;
+            }
+
+            if (paramType == typeof(double) && argType == typeof(int))
+            {
+                continue;
+            }
+
+            if (paramType is not TypeBuilder && argType is not TypeBuilder && paramType.IsAssignableFrom(argType))
+            {
+                continue;
+            }
+
+            return false;
+        }
+        return true;
+    }
 }
+
+/// <summary>
+/// 正在构建的类（<see cref="TypeBuilder"/>）中预登记的方法签名。
+/// </summary>
+public sealed record PendingClassMethod(
+    MethodBuilder Method,
+    string Name,
+    Type[] ParameterTypes,
+    string[] ParameterNames,
+    Type ReturnType,
+    bool IsStatic);

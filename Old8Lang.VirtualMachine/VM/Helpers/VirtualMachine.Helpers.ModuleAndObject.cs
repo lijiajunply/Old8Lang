@@ -162,7 +162,7 @@ public partial class VirtualMachine
             {
                 var index = field.DefaultValueIndex;
                 var value = index >= 0 && index < classFile.ConstantPool.Count
-                    ? classFile.ConstantPool.GetConstant(index)
+                    ? CloneFieldDefaultValue(classFile.ConstantPool.GetConstant(index))
                     : null;
                 instance.Fields.TryAdd(field.Name, value);
             }
@@ -177,6 +177,20 @@ public partial class VirtualMachine
 
         return instance;
     }
+
+    /// <summary>
+    /// 为每个新对象实例深拷贝可变集合字段初值，确保与解释器/IL 一致（每实例独立，不共享常量池集合）。
+    /// </summary>
+    private static object? CloneFieldDefaultValue(object? value) => value switch
+    {
+        null => null,
+        List<object?> list => list.Select(CloneFieldDefaultValue).ToList(),
+        object?[] array => array.Select(CloneFieldDefaultValue).ToArray(),
+        Dictionary<object, object?> dict => dict.ToDictionary(
+            kvp => CloneFieldDefaultValue(kvp.Key)!,
+            kvp => CloneFieldDefaultValue(kvp.Value)),
+        _ => value
+    };
 
     /// <summary>
     /// 创建对象实例（用于从模块导入的类的实例化）
@@ -269,12 +283,17 @@ public partial class VirtualMachine
             }
         }
 
-        // 初始化所有字段
+        // 初始化所有字段（含常量池默认值深拷贝，确保导入类实例同样每实例独立）
+        var ownerClassFile = FindClassModule(classMetadata)?.BytecodeFile ?? _bytecodeFile;
         foreach (var field in allFields)
         {
             if (!obj.Fields.ContainsKey(field.Name))
             {
-                obj.Fields[field.Name] = null;
+                var index = field.DefaultValueIndex;
+                var value = index >= 0 && index < ownerClassFile.ConstantPool.Count
+                    ? CloneFieldDefaultValue(ownerClassFile.ConstantPool.GetConstant(index))
+                    : null;
+                obj.Fields[field.Name] = value;
             }
         }
 

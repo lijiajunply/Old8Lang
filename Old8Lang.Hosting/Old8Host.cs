@@ -4,8 +4,6 @@ using Old8Lang.Compiler;
 using Old8Lang.Interpreter;
 using Old8Lang.Profiler;
 using Old8Lang.Bytecode;
-using Old8Lang.Bytecode.Core;
-using Old8Lang.Bytecode.VM;
 
 namespace Old8Lang.Hosting;
 

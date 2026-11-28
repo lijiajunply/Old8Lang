@@ -40,8 +40,8 @@ public interface IAsyncStateMachineGenerator
     /// <summary>当前状态机是否为异步生成器（含 yield）。</summary>
     bool IsAsyncGenerator { get; }
 
-    /// <summary>在异步生成器中将栈顶的值产出到异步流。</summary>
-    void EmitYield(ILGenerator il, Type valueType);
+    /// <summary>在异步生成器中将栈顶的值以非阻塞方式产出到异步流，并在状态机内挂起等待消费者推进。</summary>
+    void EmitYield(ILGenerator il, YieldStatement yieldStmt, Type valueType);
 
     /// <summary>获取 await 表达式的状态编号。</summary>
     int GetStateIndex(AwaitExpression expr);

@@ -1,5 +1,4 @@
 using Old8Lang.LangParser;
-using Old8Lang.LanguageServer.Models;
 using Old8Lang.LanguageServer.Services;
 using OmniSharp.Extensions.LanguageServer.Protocol.Client.Capabilities;
 using OmniSharp.Extensions.LanguageServer.Protocol.Document;

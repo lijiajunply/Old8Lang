@@ -957,12 +957,16 @@ public static class DotOperatorILHelper
         }
 
         // 类体内部对自身方法的调用（this.method()）：
-        // 当前类还是 TypeBuilder，CreateType 之前既不能用 GetMethod 解析，
-        // 也无法提前拿到 MethodBuilder（方法与调用顺序无关地互相引用）。
-        // 与 object 接收者一样改由运行期按实际类型分派，避免编译期直接抛
-        // NotSupportedException: The invoked member is not supported before the type is created。
-        if (leftType is TypeBuilder)
+        // 优先从 LocalManager 预登记的 MethodBuilder（及已完成的父类方法）直接发射 callvirt/call，
+        // 避免反射分派开销；若位于 DynamicMethod 闭包/异步状态机或目标为函数值字段，则安全回退动态分派。
+        if (leftType is TypeBuilder buildingType)
         {
+            if (TryEmitBuildingClassMethodCall(left!, instance, ilGenerator, local, buildingType, operation,
+                    out var directReturnType))
+            {
+                return directReturnType;
+            }
+
             return GenerateDynamicObjectMethodCall(left!, instance, ilGenerator, local);
         }
 
@@ -1234,6 +1238,148 @@ public static class DotOperatorILHelper
         ilGenerator.Emit(m.IsStatic ? OpCodes.Call : OpCodes.Callvirt, m);
 
         return m.ReturnType;
+    }
+
+    /// <summary>
+    /// 在当前正在构建的类（<see cref="TypeBuilder"/>）内尝试直接发射 <c>callvirt</c> / <c>call</c>
+    /// 调用预登记的 <see cref="MethodBuilder"/> 或已完成基类的 <see cref="MethodInfo"/>。
+    /// </summary>
+    private static bool TryEmitBuildingClassMethodCall(
+        LangExpression left,
+        Instance instance,
+        ILGenerator ilGenerator,
+        LocalManager local,
+        TypeBuilder buildingType,
+        Operation operation,
+        out Type returnType)
+    {
+        returnType = typeof(object);
+
+        // DynamicMethod（闭包）与异步状态机（独立动态程序集）无法直接引用未完成的 MethodBuilder。
+        if (local.IsInDynamicMethod || local.AsyncStateMachineGenerator is not null || local.InClassEnv is not TypeBuilder)
+        {
+            return false;
+        }
+
+        var namedArgs = instance.NamedArgs;
+        var hasNamed = namedArgs is { Count: > 0 };
+        var namedNames = hasNamed ? namedArgs!.Select(na => na.Name).ToArray() : null;
+        var positionalTypes = hasNamed
+            ? null
+            : instance.Ids.Select(id => id.Accept(new TypeInferenceVisitor(local)) ?? typeof(object)).ToArray();
+
+        if (!local.TryResolveBuildingMethod(
+                buildingType,
+                instance.Id.IdName,
+                instance.Ids.Count,
+                namedNames,
+                positionalTypes,
+                out var pendingMethod,
+                out var completedBaseMethod))
+        {
+            return false;
+        }
+
+        MethodInfo targetMethod;
+        Type[] paramTypes;
+        string[] paramNames;
+        bool isStatic;
+
+        if (pendingMethod is not null)
+        {
+            targetMethod = pendingMethod.Method;
+            paramTypes = pendingMethod.ParameterTypes;
+            paramNames = pendingMethod.ParameterNames;
+            returnType = pendingMethod.ReturnType;
+            isStatic = pendingMethod.IsStatic;
+        }
+        else if (completedBaseMethod is not null)
+        {
+            var ps = completedBaseMethod.GetParameters();
+            targetMethod = completedBaseMethod;
+            paramTypes = ps.Select(p => p.ParameterType).ToArray();
+            paramNames = ps.Select(p => p.Name ?? string.Empty).ToArray();
+            returnType = completedBaseMethod.ReturnType;
+            isStatic = completedBaseMethod.IsStatic;
+        }
+        else
+        {
+            return false;
+        }
+
+        // 若静态方法通过非无副作用表达式调用，退回动态路径以免丢失左侧求值。
+        if (isStatic && left is not (ThisExpression or LangId))
+        {
+            return false;
+        }
+
+        LangExpression[] orderedArgs;
+        if (hasNamed)
+        {
+            var reordered = new LangExpression?[paramTypes.Length];
+            for (var i = 0; i < instance.Ids.Count; i++)
+            {
+                reordered[i] = instance.Ids[i];
+            }
+
+            var seenNames = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var namedArg in namedArgs!)
+            {
+                if (!seenNames.Add(namedArg.Name))
+                {
+                    throw new ArgumentError(namedArg.Position,
+                        $"方法 '{instance.Id.IdName}' 的命名参数 '{namedArg.Name}' 重复");
+                }
+
+                var paramIndex = Array.FindIndex(paramNames, name => name == namedArg.Name);
+                if (paramIndex < 0)
+                {
+                    throw new ArgumentError(namedArg.Position,
+                        $"方法 '{instance.Id.IdName}' 没有名为 '{namedArg.Name}' 的参数");
+                }
+
+                if (reordered[paramIndex] is not null)
+                {
+                    throw new ArgumentError(namedArg.Position,
+                        $"方法 '{instance.Id.IdName}' 的参数 '{namedArg.Name}' 已由位置参数提供");
+                }
+
+                reordered[paramIndex] = namedArg.Value;
+            }
+
+            for (var i = 0; i < paramTypes.Length; i++)
+            {
+                if (reordered[i] is null)
+                {
+                    throw new ArgumentError(operation.Position,
+                        $"方法 '{instance.Id.IdName}' 缺少必需参数 '{(string.IsNullOrEmpty(paramNames[i]) ? $"arg{i}" : paramNames[i])}'");
+                }
+            }
+
+            orderedArgs = reordered.Select(expr => expr!).ToArray();
+        }
+        else
+        {
+            orderedArgs = instance.Ids.ToArray();
+        }
+
+        if (!isStatic)
+        {
+            left.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        }
+
+        for (var i = 0; i < orderedArgs.Length; i++)
+        {
+            orderedArgs[i].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+            var actualType = orderedArgs[i].Accept(new TypeInferenceVisitor(local)) ?? typeof(object);
+            if (NeedConversion(actualType, paramTypes[i]))
+            {
+                EmitArgumentConversion(ilGenerator, actualType, paramTypes[i]);
+            }
+        }
+
+        ilGenerator.Emit(isStatic ? OpCodes.Call : OpCodes.Callvirt, targetMethod);
+        return true;
     }
 
     /// <summary>

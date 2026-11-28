@@ -6,39 +6,13 @@ using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Linq;
 using Old8Lang.AST.Expression.StaticValues;
 using Old8Lang.AST.Expression.Value;
-using Old8Lang.AST.Expression.ModuleObjects;
 using Old8Lang.AST.Expression.OperationHelpers;
-using Old8Lang.AST.Expression.ValueFunctions;
-using Old8Lang.AST.Statement;
-using Old8Lang.AST.Visitor;
-using Old8Lang.AsyncGeneration;
-using Old8Lang.Compiler;
 using Old8Lang.Compiler.CodeGeneration;
 using Old8Lang.Compiler.Helpers;
 using Old8Lang.Compiler.Specialization;
-using Old8Lang.Concurrency;
-using Old8Lang.Error;
-using Old8Lang.ExternProviders;
-using Old8Lang.GlobalFunctions.Core;
-using Old8Lang.InstanceMethods.Core;
-using Old8Lang.Interpreter;
-using Old8Lang.ModuleSystem.Core;
-using Old8Lang.ModuleSystem.Loading;
-using Old8Lang.ModuleSystem.Resolution;
-using Old8Lang.ModuleSystem.StandardLibrary;
-using Old8Lang.ModuleSystem.Symbols;
-using Old8Lang.ProjectManagement;
-using Old8Lang.Runtime;
 using Old8Lang.TypeSystem;
-using System.Collections;
-using System.Collections.Concurrent;
-using System.Diagnostics;
-using System.Globalization;
 using System.Reflection;
 using System.Reflection.Emit;
-using System.Runtime.ExceptionServices;
-using System.Text;
-using System.Text.Json;
 using Old8Lang.LangParser;
 
 namespace Old8Lang.AST.Visitor;
@@ -590,12 +564,49 @@ public partial class TypeInferenceVisitor
                 }
             }
 
-            // 对于其他方法调用，尝试查找方法并返回其返回类型。
             // 正在创建的类型（TypeBuilder）在 CreateType 之前不支持反射查询，
-            // 类体内 this.method() 的调用改由运行期按实际类型分派，这里只能给出 object，
-            // 与 DotOperatorILHelper 的发射路径保持一致（否则会在编译期抛
-            // NotSupportedException: The invoked member is not supported before the type is created）。
-            if (leftType is not null && leftType is not TypeBuilder)
+            // 先查 LocalManager 预登记的 MethodBuilder（含已完成基类方法）以获取精确返回类型；
+            // 条件与 DotOperatorILHelper.TryEmitBuildingClassMethodCall 保持严格一致，确保栈类型匹配。
+            if (leftType is TypeBuilder buildingType)
+            {
+                if (!local.IsInDynamicMethod &&
+                    local.AsyncStateMachineGenerator is null &&
+                    local.InClassEnv is TypeBuilder)
+                {
+                    var namedNames = instance.NamedArgs is { Count: > 0 }
+                        ? instance.NamedArgs.Select(na => na.Name).ToArray()
+                        : null;
+                    var positionalTypes = instance.NamedArgs is { Count: > 0 }
+                        ? null
+                        : instance.Ids.Select(id => id.Accept(this) ?? typeof(object)).ToArray();
+
+                    if (local.TryResolveBuildingMethod(
+                            buildingType,
+                            instance.Id.IdName,
+                            instance.Ids.Count,
+                            namedNames,
+                            positionalTypes,
+                            out var pendingMethod,
+                            out var completedBaseMethod))
+                    {
+                        var isStatic = pendingMethod?.IsStatic ?? completedBaseMethod?.IsStatic ?? false;
+                        var canEmitDirect = !isStatic || node.Left is ThisExpression or LangId;
+                        if (canEmitDirect)
+                        {
+                            if (pendingMethod is not null)
+                            {
+                                return pendingMethod.ReturnType;
+                            }
+
+                            if (completedBaseMethod is not null)
+                            {
+                                return completedBaseMethod.ReturnType;
+                            }
+                        }
+                    }
+                }
+            }
+            else if (leftType is not null)
             {
                 MethodInfo? method;
                 if (instance.NamedArgs is { Count: > 0 })

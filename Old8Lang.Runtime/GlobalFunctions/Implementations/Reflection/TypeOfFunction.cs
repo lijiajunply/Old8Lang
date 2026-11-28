@@ -56,8 +56,13 @@ public sealed class TypeOfFunction : BaseGlobalFunction
         LocalManager local,
         SourcePosition position)
     {
-        // 加载对象参数
+        // 加载对象参数；值类型须先装箱再传给 ReflectionHelper.TypeOf(object)。
         parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        var paramType = parameters[0].Accept(new TypeInferenceVisitor(local));
+        if (paramType is { IsValueType: true })
+        {
+            ilGenerator.Emit(OpCodes.Box, paramType);
+        }
 
         // 调用 ReflectionHelper.TypeOf(object)
         var method = GlobalMethodInfoCache.GetMethod(typeof(ReflectionHelper), nameof(ReflectionHelper.TypeOf));

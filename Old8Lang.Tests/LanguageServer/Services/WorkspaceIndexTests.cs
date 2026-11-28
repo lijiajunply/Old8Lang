@@ -1,5 +1,4 @@
 using Old8Lang.LanguageServer.Services;
-using Xunit;
 
 namespace Old8Lang.Tests.LanguageServer.Services;
 

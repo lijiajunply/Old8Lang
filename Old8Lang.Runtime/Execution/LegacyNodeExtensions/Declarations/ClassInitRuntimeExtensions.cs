@@ -1,15 +1,11 @@
 using Old8Lang.Syntax;
 using System.Reflection;
 using System.Reflection.Emit;
-using System.Text;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.AnyValues;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler.CodeGeneration;
-using Old8Lang.Error;
 using Old8Lang.Interpreter;
-using Old8Lang.TypeSystem;
-using LangObject = Old8Lang.Runtime.LangObject;
 using Old8Lang.AST.Visitor;
 
 namespace Old8Lang.AST.Statement;
@@ -214,31 +210,28 @@ public static partial class ClassInitRuntimeExtensions
     }
 
     /// <summary>
-    /// 定义类的方法
+    /// 定义类的方法（两遍：先声明所有方法签名与 MethodBuilder 并预登记到 LocalManager，再生成各方法体，
+    /// 使类内 <c>this.method()</c> 无论声明顺序如何均可直接发射 <c>callvirt</c> / <c>call</c>）。
     /// </summary>
     internal static void DefineMethods(this ClassInit node, TypeBuilder typeBuilder, LocalManager local)
     {
-        var methods = new List<(ClassMemberId, FuncLangValue)>();
+        var methodEntries = new List<(ClassMemberId MemberId, FuncLangValue FuncValue, MethodAttributes Attributes)>();
 
         foreach (var variate in node.GetTypeTemplate().Variates)
         {
             if (variate.Value is FuncLangValue funcValue)
             {
-                methods.Add((variate.Key, funcValue));
+                methodEntries.Add((variate.Key, funcValue,
+                    MethodAttributes.Public | MethodAttributes.Virtual | MethodAttributes.HideBySig));
             }
             else if (variate.Value is MethodOverloadList overloadList)
             {
                 foreach (var overload in overloadList.Overloads)
                 {
-                    methods.Add((variate.Key, overload));
+                    methodEntries.Add((variate.Key, overload,
+                        MethodAttributes.Public | MethodAttributes.Virtual | MethodAttributes.HideBySig));
                 }
             }
-        }
-
-        // 定义实例方法
-        foreach (var (memberId, funcValue) in methods)
-        {
-            node.DefineMethod(typeBuilder, memberId, funcValue, local);
         }
 
         // 静态成员存放在独立的 StaticVariates 表中，不能遗漏，否则 IL 类型只会
@@ -247,11 +240,37 @@ public static partial class ClassInitRuntimeExtensions
         {
             if (memberValue is FuncLangValue funcValue)
             {
-                node.DefineMethodInternal(typeBuilder, memberId, funcValue, local,
-                    MethodAttributes.Public | MethodAttributes.Static | MethodAttributes.HideBySig);
+                methodEntries.Add((memberId, funcValue,
+                    MethodAttributes.Public | MethodAttributes.Static | MethodAttributes.HideBySig));
             }
         }
+
+        // Pass 1：先声明有显式返回注解的方法，再声明无显式注解的方法，保证相互调用的方法都能拿到精确返回类型。
+        var declared = new List<DeclaredClassMethod>(methodEntries.Count);
+        var orderedEntries = methodEntries
+            .OrderBy(e => string.IsNullOrWhiteSpace(e.FuncValue.Id?.AssumptionType) ? 1 : 0)
+            .ToList();
+
+        foreach (var (memberId, funcValue, attributes) in orderedEntries)
+        {
+            declared.Add(node.DeclareMethodInternal(typeBuilder, memberId, funcValue, local, attributes));
+        }
+
+        // Pass 2：全部方法签名已预登记，再依次生成方法体。
+        foreach (var item in declared)
+        {
+            node.EmitDeclaredMethodBody(typeBuilder, item, local);
+        }
     }
+
+    private sealed record DeclaredClassMethod(
+        ClassMemberId MemberId,
+        FuncLangValue FuncValue,
+        MethodAttributes Attributes,
+        MethodBuilder MethodBuilder,
+        LocalManager MethodLocal,
+        List<Type> ParameterTypes,
+        Type ReturnType);
     /// <summary>
     /// 定义接口的成员（只能有方法，不能有字段）
     /// </summary>
@@ -446,41 +465,56 @@ public static partial class ClassInitRuntimeExtensions
     internal static MethodBuilder DefineMethodInternal(this ClassInit node, TypeBuilder typeBuilder, ClassMemberId memberId, FuncLangValue funcValue,
         LocalManager local, MethodAttributes attributes)
     {
-        // 获取方法名称
+        var declared = node.DeclareMethodInternal(typeBuilder, memberId, funcValue, local, attributes);
+        node.EmitDeclaredMethodBody(typeBuilder, declared, local);
+        return declared.MethodBuilder;
+    }
+
+    private static DeclaredClassMethod DeclareMethodInternal(
+        this ClassInit node,
+        TypeBuilder typeBuilder,
+        ClassMemberId memberId,
+        FuncLangValue funcValue,
+        LocalManager local,
+        MethodAttributes attributes)
+    {
         string methodName = memberId.IdName;
 
-        // 创建一个新的LocalManager实例，继承外部的函数和类定义
+        // 创建一个新的LocalManager实例，继承外部的函数、类、字段与预登记方法表
         var methodLocal = new LocalManager
         {
             FilePath = local.FilePath,
             Interpreter = local.Interpreter,
             InClassEnv = typeBuilder,
             CurrentConstructorBuilder = local.CurrentConstructorBuilder,
-            Globals = local.Globals
+            Globals = local.Globals,
+            BuildingClassMethods = local.BuildingClassMethods
         };
 
-        // 继承外部的函数定义（包括内置函数如 PrintLine）
         foreach (var kvp in local.DelegateVar)
         {
             methodLocal.DelegateVar[kvp.Key] = kvp.Value;
         }
 
-        // 继承外部的类定义
+        foreach (var kvp in local.GlobalStaticClasses)
+        {
+            methodLocal.GlobalStaticClasses[kvp.Key] = kvp.Value;
+        }
+
         foreach (var kvp in local.ClassVar)
         {
             methodLocal.ClassVar[kvp.Key] = kvp.Value;
         }
 
-        // 继承字段定义
         foreach (var kvp in local.FieldVar)
         {
             methodLocal.FieldVar[kvp.Key] = kvp.Value;
         }
 
-        // 获取参数类型（不包含 this，this 是隐式的）
+        // 获取参数类型与参数名（不包含 this，this 是隐式的）
         var parameterTypes = new List<Type>();
+        var parameterNames = new List<string>();
 
-        // 添加方法参数，并将它们添加到LocalVarTypes中，以便OutputType能正确推断类型
         if (funcValue.Ids is not null)
         {
             foreach (var paramId in funcValue.Ids)
@@ -496,12 +530,11 @@ public static partial class ClassInitRuntimeExtensions
                 }
 
                 parameterTypes.Add(paramType!);
-                // 将参数类型添加到LocalVarTypes中，以便在获取返回类型时能正确推断
+                parameterNames.Add(paramId.IdName);
                 methodLocal.LocalVarTypes[paramId.IdName] = paramType;
             }
         }
 
-        // 获取返回类型（现在methodLocal中已经有参数信息了）
         Type returnType;
         try
         {
@@ -515,7 +548,6 @@ public static partial class ClassInitRuntimeExtensions
         // int? / bool? 等可空值类型返回没有 CLR 载体，改用 object 承载 null。
         returnType = IlReturnTypeHelper.Resolve(funcValue.Id, returnType);
 
-        // 定义方法
         var methodBuilder = typeBuilder.DefineMethod(
             methodName,
             attributes,
@@ -530,6 +562,39 @@ public static partial class ClassInitRuntimeExtensions
                 methodBuilder.DefineParameter(i + 1, ParameterAttributes.None, funcValue.Ids[i].IdName);
             }
         }
+
+        var isStatic = (attributes & MethodAttributes.Static) != 0;
+        local.RegisterBuildingClassMethod(typeBuilder, new PendingClassMethod(
+            methodBuilder,
+            methodName,
+            parameterTypes.ToArray(),
+            parameterNames.ToArray(),
+            returnType,
+            isStatic));
+
+        if (methodName == "init")
+        {
+            local.CurrentInitMethodBuilder = methodBuilder;
+        }
+
+        return new DeclaredClassMethod(memberId, funcValue, attributes, methodBuilder, methodLocal, parameterTypes, returnType);
+    }
+
+    private static void EmitDeclaredMethodBody(
+        this ClassInit node,
+        TypeBuilder typeBuilder,
+        DeclaredClassMethod declared,
+        LocalManager local)
+    {
+        var methodName = declared.MemberId.IdName;
+        var funcValue = declared.FuncValue;
+        var attributes = declared.Attributes;
+        var methodBuilder = declared.MethodBuilder;
+        var methodLocal = declared.MethodLocal;
+        var parameterTypes = declared.ParameterTypes;
+        var returnType = declared.ReturnType;
+
+        methodLocal.CurrentInitMethodBuilder = local.CurrentInitMethodBuilder;
 
         // 创建方法的IL生成器
         var methodIl = methodBuilder.GetILGenerator();
@@ -550,15 +615,12 @@ public static partial class ClassInitRuntimeExtensions
             int paramTypeIndex = 0;
             foreach (var paramId in funcValue.Ids)
             {
-                // 声明局部变量
                 var paramType = parameterTypes[paramTypeIndex];
                 var localVar = methodIl.DeclareLocal(paramType);
 
-                // 加载参数并存储到局部变量
                 methodIl.Emit(OpCodes.Ldarg, paramIndex);
                 methodIl.Emit(OpCodes.Stloc, localVar);
 
-                // 将参数添加到新的LocalManager中，完全隔离
                 methodLocal.AddLocalVar(paramId.IdName, localVar);
 
                 paramIndex++;
@@ -572,38 +634,26 @@ public static partial class ClassInitRuntimeExtensions
         // 生成方法体的IL代码
         funcValue.BlockStatement.Accept(RuntimeVisitors.CreateCompiler(methodIl, methodLocal));
 
-        // 检查方法体的最后一个语句是否是 ReturnStatement
         var lastStatement = funcValue.BlockStatement.Count > 0
             ? funcValue.BlockStatement[^1]
             : null;
 
-        // 只有当最后一个语句不是 ReturnStatement 时，才添加 Ret 指令
         if (lastStatement is not ReturnStatement)
         {
-            // 对于 void 方法，添加 Ret 指令
-            // 对于有返回值的方法，如果没有显式 return，这里会导致栈不平衡，但这是用户代码的问题
             methodIl.Emit(OpCodes.Ret);
         }
 
-        // 检查是否是运算符重载方法，如果是，生成桥接方法
         if (OperatorNames.Contains(methodName))
         {
             node.GenerateOperatorBridge(typeBuilder, methodName, methodBuilder, parameterTypes.ToArray(), returnType);
         }
 
-        // 如果是 init 方法，保存到 LocalManager
         if (methodName == "init")
         {
             local.CurrentInitMethodBuilder = methodBuilder;
-
-            // 类实例化（U("Alice")）走的是「按实参个数找 init」的路径，
-            // 那里没有补默认参数的逻辑：少传参数会留下未压栈的形参，生成无效 IL。
-            // 这里为带默认值的 init 生成「前缀重载」，让少传参数的构造也能调用完整实现。
             node.DefineInitializerOverloads(typeBuilder, methodBuilder, parameterTypes, returnType,
                 attributes, funcValue, methodLocal);
         }
-
-        return methodBuilder;
     }
 
     /// <summary>
