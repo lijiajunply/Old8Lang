@@ -1754,13 +1754,6 @@ public partial class CompilerVisitor
         // 处理不同类型的模块
         string? resolvedPath = resolution.ResolvedPath;
 
-        // 如果是网络模块，IL 模式暂不支持
-        if (resolution.ModuleType == ModuleType.NetworkModule)
-        {
-            throw new ImportError(node.Position, moduleName,
-                "IL 模式暂不支持从网络URL导入模块。请使用解释模式 (-f) 或将模块下载到本地。");
-        }
-
         // 对于本地文件、第三方包和子模块，继续处理
         if (string.IsNullOrEmpty(resolvedPath))
         {

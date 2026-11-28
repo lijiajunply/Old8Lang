@@ -249,11 +249,24 @@ public class PackageManager
     }
 
     /// <summary>
-    /// 查找包的入口文件
+    /// 查找包的入口文件（优先读取 o8package.json 中的 main 字段）
     /// </summary>
     private string? FindPackageEntryFile(string packagePath, string packageName)
     {
-        // 优先级顺序：
+        var config = ProjectConfig.LoadFromDirectory(packagePath);
+        if (!string.IsNullOrWhiteSpace(config?.Main))
+        {
+            var mainCandidate = Path.GetFullPath(Path.Combine(packagePath, config.Main));
+            var fullPackageRoot = Path.GetFullPath(packagePath);
+            if ((mainCandidate.StartsWith(fullPackageRoot + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase) ||
+                 mainCandidate.Equals(fullPackageRoot, StringComparison.OrdinalIgnoreCase)) &&
+                File.Exists(mainCandidate))
+            {
+                return mainCandidate;
+            }
+        }
+
+        // 回退优先级顺序：
         // 1. index.old8
         // 2. {packageName}.old8
         // 3. main.old8

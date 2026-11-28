@@ -30,6 +30,43 @@ public class ProjectConfig : PackageConfiguration
     public string License { get; set; } = "MIT";
 
     /// <summary>
+    /// 项目主页 URL（发布到包仓库时使用）
+    /// </summary>
+    [JsonPropertyName("projectUrl")]
+    public string? ProjectUrl { get; set; }
+
+    /// <summary>
+    /// 包标签（发布到包仓库时使用）
+    /// </summary>
+    [JsonPropertyName("tags")]
+    public List<string> Tags { get; set; } = [];
+
+    /// <summary>
+    /// 远程包仓库地址（唯一协议：Old8Lang.PackageManager.Server，可指向自建私有实例）
+    /// </summary>
+    [JsonPropertyName("registry")]
+    public string? Registry { get; set; }
+
+    /// <summary>
+    /// 获取项目配置中生效的远程包仓库地址（优先 registry，兼容旧 sources 中第一个启用的 HTTP 源）
+    /// </summary>
+    public string? GetEffectiveRegistryUrl()
+    {
+        if (!string.IsNullOrWhiteSpace(Registry))
+        {
+            return Registry.Trim();
+        }
+
+        var legacyRemote = Sources.FirstOrDefault(s =>
+            s.IsEnabled &&
+            !string.IsNullOrWhiteSpace(s.Source) &&
+            (s.Source.StartsWith("http://", StringComparison.OrdinalIgnoreCase) ||
+             s.Source.StartsWith("https://", StringComparison.OrdinalIgnoreCase)));
+
+        return legacyRemote?.Source.Trim();
+    }
+
+    /// <summary>
     /// Old8Lang 运行时配置
     /// </summary>
     [JsonPropertyName("old8lang")]

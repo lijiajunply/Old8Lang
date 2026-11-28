@@ -16,30 +16,28 @@ public class RestoreCommand : ICommand
 
 说明:
   restore 命令会读取 o8package.json 中的依赖配置，
-  自动解析依赖关系并安装所有必需的包。
-
-  这个命令集成了 Old8Lang.PackageManager.Core 库，
-  支持依赖解析、版本管理和冲突处理。
+  从 Old8Lang.PackageManager.Server 自动解析依赖关系并安装所有必需的包。
 
 选项:
   --production           只恢复生产依赖（跳过 devDependencies）
+  -r, --registry <地址>  指定远程 Old8Lang.PackageManager.Server 地址
+  -k, --api-key <密钥>   指定访问私有仓库的 API 密钥
   -h, --help             显示帮助信息
 
 示例:
-  old8lang restore                   # 恢复所有依赖
-  old8lang restore --production      # 只恢复生产依赖
+  old8lang restore                                    # 恢复所有依赖
+  old8lang restore --production                       # 只恢复生产依赖
+  old8lang restore --registry http://localhost:5000   # 从自建私有仓库恢复
 ";
 
     public int Execute(string[] args)
     {
-        // 检查帮助
         if (args.Contains("-h") || args.Contains("--help"))
         {
             Console.WriteLine(Help);
             return 0;
         }
 
-        // 检查项目配置
         var projectRoot = CommandHelper.FindProjectRoot();
         if (projectRoot == null)
         {
@@ -56,14 +54,15 @@ public class RestoreCommand : ICommand
         }
 
         var productionOnly = args.Contains("--production");
+        var registryOverride = GetOptionValue(args, "-r", "--registry");
+        var apiKeyOverride = GetOptionValue(args, "-k", "--api-key");
+
+        using var packageService = new PackageService(projectRoot, config, registryOverride, apiKeyOverride);
 
         Console.WriteLine($"正在恢复 {config.ProjectName}@{config.Version} 的依赖...");
+        Console.WriteLine($"包仓库: {packageService.RegistryUrl}");
         Console.WriteLine();
 
-        // 创建包服务
-        var packageService = new PackageService(projectRoot, config);
-
-        // 显示要安装的包
         var totalDeps = productionOnly
             ? config.References.Count(r => !r.IsDevDependency)
             : config.References.Count;
@@ -76,10 +75,8 @@ public class RestoreCommand : ICommand
 
         Console.WriteLine($"将恢复 {totalDeps} 个依赖包...\n");
 
-        // 恢复依赖
         var result = packageService.RestorePackagesAsync(config, productionOnly).GetAwaiter().GetResult();
 
-        // 显示结果
         Console.WriteLine();
         Console.WriteLine("========================================");
 
@@ -117,5 +114,18 @@ public class RestoreCommand : ICommand
         Console.WriteLine("========================================");
 
         return result.Success ? 0 : 1;
+    }
+
+    private static string? GetOptionValue(string[] args, params string[] optionNames)
+    {
+        for (int i = 0; i < args.Length; i++)
+        {
+            if (optionNames.Contains(args[i]) && i + 1 < args.Length)
+            {
+                return args[i + 1];
+            }
+        }
+
+        return null;
     }
 }

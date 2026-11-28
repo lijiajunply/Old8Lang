@@ -24,7 +24,6 @@ public class ModuleSystemService
     private readonly ModuleLoader _loader = new();
     private readonly SymbolExtractor _symbolExtractor = new();
     private readonly SymbolRegistry _symbolRegistry = new();
-    private readonly NetworkModuleLoader _networkLoader = new();
 
     /// <summary>
     /// 导入模块的完整流程
@@ -56,13 +55,15 @@ public class ModuleSystemService
                 case ModuleType.StandardLibrary:
                     return HandleStandardLibraryImport(moduleName, manager, options, result);
 
-                case ModuleType.NetworkModule:
-                    return HandleNetworkModuleImport(resolution.ResolvedPath!, manager, options, result);
-
                 case ModuleType.LocalFile:
                 case ModuleType.ThirdPartyPackage:
                 case ModuleType.Submodule:
-                    return HandleLocalModuleImport(resolution.ResolvedPath!, manager, options, result);
+                    return HandleLocalModuleImport(
+                        resolution.ResolvedPath!,
+                        manager,
+                        options,
+                        result,
+                        resolution.PackageInfo?.PackageName);
 
                 default:
                     result.Error = new ImportError(default, moduleName, "未知的模块类型");
@@ -127,37 +128,20 @@ public class ModuleSystemService
     }
 
     /// <summary>
-    /// 处理网络模块导入
-    /// </summary>
-    private ModuleImportResult HandleNetworkModuleImport(
-        string url,
-        VariateManager manager,
-        ImportOptions options,
-        ModuleImportResult result)
-    {
-        // 下载模块
-        var localPath = _networkLoader.DownloadModule(url);
-        if (localPath is null)
-        {
-            result.Error = new ImportError(default, url, "网络模块下载失败");
-            return result;
-        }
-
-        // 作为本地文件加载
-        return HandleLocalModuleImport(localPath, manager, options, result);
-    }
-
-    /// <summary>
     /// 处理本地模块导入
     /// </summary>
     private ModuleImportResult HandleLocalModuleImport(
         string modulePath,
         VariateManager manager,
         ImportOptions options,
-        ModuleImportResult result)
+        ModuleImportResult result,
+        string? explicitModuleName = null)
     {
         // 获取绝对路径用于循环依赖检测
         var absolutePath = Path.GetFullPath(modulePath);
+        var effectiveModuleName = !string.IsNullOrWhiteSpace(explicitModuleName)
+            ? explicitModuleName
+            : Path.GetFileNameWithoutExtension(modulePath);
 
         // 先检查循环依赖（在加载前检查）
         if (manager.ImportStack.Contains(absolutePath))
@@ -182,7 +166,7 @@ public class ModuleSystemService
         // 结果反而是"符号不存在"（旧实现就是这么失败的）。
         if (manager.LoadedModuleExports.TryGetValue(absolutePath, out var knownExports))
         {
-            var cachedResult = RegisterKnownModuleSymbols(absolutePath, knownExports, manager, options, result);
+            var cachedResult = RegisterKnownModuleSymbols(absolutePath, knownExports, manager, options, result, effectiveModuleName);
             if (cachedResult is not null)
             {
                 return cachedResult;
@@ -279,8 +263,7 @@ public class ModuleSystemService
 
                 // 提取符号创建模块对象
                 var symbols = _symbolExtractor.ExtractSymbols(moduleManager);
-                var moduleName = Path.GetFileNameWithoutExtension(modulePath);
-                var moduleObj = UnifiedModule.FromSymbols(moduleName, symbols, default, moduleManager);
+                var moduleObj = UnifiedModule.FromSymbols(effectiveModuleName, symbols, default, moduleManager);
                 _symbolRegistry.RegisterModule(manager, options.ModuleAlias, moduleObj);
                 result.ModuleObject = moduleObj;
                 result.IsSuccess = true;
@@ -297,10 +280,9 @@ public class ModuleSystemService
                 UpdateFunctionCapturedScopes(moduleManager.ImportInfos.ToList(), moduleManager, bindUnboundFunctions: true);
 
                 // 提取符号创建模块对象
-                var moduleName = Path.GetFileNameWithoutExtension(modulePath);
                 var symbols = _symbolExtractor.ExtractSymbols(moduleManager);
-                var moduleObj = UnifiedModule.FromSymbols(moduleName, symbols, default, moduleManager);
-                _symbolRegistry.RegisterModule(manager, moduleName, moduleObj);
+                var moduleObj = UnifiedModule.FromSymbols(effectiveModuleName, symbols, default, moduleManager);
+                _symbolRegistry.RegisterModule(manager, effectiveModuleName, moduleObj);
                 RegisterPlainImportSymbols(manager, symbols);
                 result.ModuleObject = moduleObj;
                 result.IsSuccess = true;
@@ -324,9 +306,12 @@ public class ModuleSystemService
         Dictionary<string, LangValueType> knownExports,
         VariateManager manager,
         ImportOptions options,
-        ModuleImportResult result)
+        ModuleImportResult result,
+        string? explicitModuleName = null)
     {
-        var moduleName = Path.GetFileNameWithoutExtension(absolutePath);
+        var moduleName = !string.IsNullOrWhiteSpace(explicitModuleName)
+            ? explicitModuleName
+            : Path.GetFileNameWithoutExtension(absolutePath);
         var isWildcard = options.ImportSpecifiers is null || options.ImportSpecifiers.Count == 0;
 
         // 命名导入按指定符号取；通配符导入取模块的全部导出

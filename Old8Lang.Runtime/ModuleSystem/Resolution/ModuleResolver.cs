@@ -208,11 +208,6 @@ public enum ModuleType
     LocalFile,
 
     /// <summary>
-    /// 网络模块（URL）
-    /// </summary>
-    NetworkModule,
-
-    /// <summary>
     /// 子模块（module.submodule）
     /// </summary>
     Submodule,
@@ -265,21 +260,21 @@ public class ModuleResolver
         var result = new ModuleResolutionResult { StandardLibraries = _standardLibraries };
         int stepNumber = 0;
 
-        // 1. 检查是否为网络路径
-        stepNumber++;
-        result.ResolutionAttempts.Add(new ResolutionAttempt
-        {
-            StepNumber = stepNumber,
-            Description = "检查是否为网络路径 (http:// 或 https://)",
-            SearchPath = moduleName,
-            Result = _pathResolver.IsUrl(moduleName) ? "是网络路径" : "不是网络路径",
-            Success = _pathResolver.IsUrl(moduleName)
-        });
-
+        // 1. 拒绝直接通过 HTTP/HTTPS URL 导入模块（统一通过 Old8Lang 包管理器安装）
         if (_pathResolver.IsUrl(moduleName))
         {
-            result.ModuleType = ModuleType.NetworkModule;
-            result.ResolvedPath = moduleName;
+            stepNumber++;
+            result.ResolutionAttempts.Add(new ResolutionAttempt
+            {
+                StepNumber = stepNumber,
+                Description = "检查是否为禁止的远程 URL 导入",
+                SearchPath = moduleName,
+                Result = "已禁止直接从 HTTP/HTTPS URL 导入模块",
+                Success = false
+            });
+            result.ModuleType = ModuleType.Unknown;
+            result.ResolvedPath = null;
+            result.FailureReason = "不支持直接从 HTTP/HTTPS URL 导入模块，请使用 Old8Lang 包管理器安装（如: old8lang install <包名>）";
             return result;
         }
 
@@ -557,7 +552,10 @@ public class ModuleResolver
         {
             try
             {
-                var sourceDir = Path.GetDirectoryName(Path.GetFullPath(currentFilePath));
+                var fullCurrentPath = Path.GetFullPath(currentFilePath);
+                var sourceDir = Directory.Exists(fullCurrentPath)
+                    ? fullCurrentPath
+                    : Path.GetDirectoryName(fullCurrentPath);
                 if (!string.IsNullOrEmpty(sourceDir))
                 {
                     var localSearchPaths = new List<string>();
@@ -591,7 +589,7 @@ public class ModuleResolver
     }
 
     /// <summary>
-    /// 查找包的入口文件
+    /// 查找包的入口文件（优先读取 o8package.json 中的 main 字段）
     /// </summary>
     private string? FindPackageEntryFile(string packagePath, string packageName)
     {
@@ -600,7 +598,21 @@ public class ModuleResolver
             return null;
         }
 
-        // 优先级顺序
+        // 优先从 o8package.json 的 main 字段解析入口文件
+        var config = ProjectConfig.LoadFromDirectory(packagePath);
+        if (!string.IsNullOrWhiteSpace(config?.Main))
+        {
+            var mainCandidate = Path.GetFullPath(Path.Combine(packagePath, config.Main));
+            var fullPackageRoot = Path.GetFullPath(packagePath);
+            if ((mainCandidate.StartsWith(fullPackageRoot + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase) ||
+                 mainCandidate.Equals(fullPackageRoot, StringComparison.OrdinalIgnoreCase)) &&
+                File.Exists(mainCandidate))
+            {
+                return mainCandidate;
+            }
+        }
+
+        // 回退优先级顺序
         var candidates = new[]
         {
             Path.Combine(packagePath, "index.old8"),

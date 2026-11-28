@@ -133,10 +133,6 @@ public class DocumentLinkHandler(DocumentManager documentManager) : IDocumentLin
                     // 第三方包和本地文件：直接返回解析后的路径
                     return result.ResolvedPath;
 
-                case ModuleType.NetworkModule:
-                    // 网络模块：暂不支持链接（可以考虑打开浏览器）
-                    return null;
-
                 default:
                     return null;
             }

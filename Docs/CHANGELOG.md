@@ -21,6 +21,8 @@
 
 **API**
 
+- 统一远程包管理协议为 `Old8Lang.PackageManager.Server`：新增 `old8lang search` 与 `old8lang registry` 命令（支持通过 `--registry`、`OLD8LANG_REGISTRY`、`o8package.json` 的 `registry` 字段或 `~/.old8lang/config.json` 切换到自建私有服务器），`old8lang publish` 支持直接上传包及签名到远程仓库（`--local-only` 保留仅本地打包），安装包自动解压到 `{packagesDir}/{packageId}@{version}/` 并支持读取 `o8package.json` 的 `main` 入口。
+- 移除直接从 HTTP/HTTPS URL 导入模块（`import "https://..."`），统一改为通过 `old8lang install` 安装第三方包。
 - `Type` / `type` 与 `TypeOf` 在三种模式下统一返回语言类型名（如 `Int`、`Double`、`String`、`List`、`Array`、`Dictionary`、`Null`），枚举成员值统一返回 `Int`。
 - IL 与虚拟机模式补齐 `Math`/`Regex`/`Crypto`/`Csv`/`Time`/`Vector`/`Net` 等标准库的导入、别名、选择性导入与命名参数调用。
 

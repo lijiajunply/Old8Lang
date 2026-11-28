@@ -154,6 +154,8 @@ public abstract class Program
         CommandRegistry.Register(new RemoveCommand());
         CommandRegistry.Register(new RestoreCommand());
         CommandRegistry.Register(new ListCommand());
+        CommandRegistry.Register(new SearchCommand());
+        CommandRegistry.Register(new RegistryCommand());
 
         // 包打包和签名命令
         CommandRegistry.Register(new PackCommand());

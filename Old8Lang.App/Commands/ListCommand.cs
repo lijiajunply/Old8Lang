@@ -1,3 +1,4 @@
+using Old8Lang.App.Services;
 using Old8Lang.ProjectManagement;
 
 namespace Old8Lang.App.Commands;
@@ -14,20 +15,47 @@ public class ListCommand : ICommand
 用法: old8lang list [选项]
 
 选项:
-  --tree                 树形显示依赖关系（待实现）
+  --all                  列出全局已安装的所有包
   -h, --help             显示帮助信息
 
 示例:
-  old8lang list          # 列出项目依赖
+  old8lang list          # 列出项目依赖及安装状态
+  old8lang list --all    # 列出全局包目录中的所有已安装包
 ";
 
     public int Execute(string[] args)
     {
-        // 检查项目配置
+        if (args.Contains("-h") || args.Contains("--help"))
+        {
+            Console.WriteLine(Help);
+            return 0;
+        }
+
+        var showAll = args.Contains("--all");
         var projectRoot = CommandHelper.FindProjectRoot();
+
+        if (showAll && projectRoot == null)
+        {
+            using var globalService = new PackageService(Directory.GetCurrentDirectory());
+            var globalInstalled = globalService.GetInstalledPackagesAsync().GetAwaiter().GetResult().ToList();
+            if (globalInstalled.Count == 0)
+            {
+                CommandHelper.PrintInfo("全局目录中未安装任何包");
+                return 0;
+            }
+
+            Console.WriteLine($"全局已安装的包 ({globalService.PackagesDir}):");
+            foreach (var pkg in globalInstalled)
+            {
+                Console.WriteLine($"  - {pkg.Id}@{pkg.Version}");
+            }
+            return 0;
+        }
+
         if (projectRoot == null)
         {
             CommandHelper.PrintError("当前目录不是 Old8Lang 项目");
+            CommandHelper.PrintInfo("提示: 使用 'old8lang list --all' 可查看全局已安装的包");
             return 1;
         }
 
@@ -38,44 +66,44 @@ public class ListCommand : ICommand
             return 1;
         }
 
-        // 列出项目信息
+        using var service = new PackageService(projectRoot, config);
+
         Console.WriteLine();
         Console.WriteLine($"{config.ProjectName}@{config.Version} {projectRoot}");
+        Console.WriteLine($"包仓库: {service.RegistryUrl}");
         Console.WriteLine();
 
-        // 列出已安装的包
-        var packagesDir = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
-            ".old8lang",
-            "packages"
-        );
-        if (!Directory.Exists(packagesDir))
+        var installedPackages = service.GetInstalledPackagesAsync().GetAwaiter().GetResult().ToList();
+
+        if (showAll)
         {
-            CommandHelper.PrintInfo("未安装任何包");
-            CommandHelper.PrintInfo("运行 'old8lang install' 安装依赖");
-            return 0;
+            if (installedPackages.Count == 0)
+            {
+                CommandHelper.PrintInfo("未安装任何包");
+            }
+            else
+            {
+                Console.WriteLine($"全部已安装包 ({service.PackagesDir}):");
+                foreach (var pkg in installedPackages)
+                {
+                    Console.WriteLine($"  ├── {pkg.Id}@{pkg.Version}");
+                }
+                Console.WriteLine();
+            }
         }
 
-        var installedPackages = GetInstalledPackages(packagesDir);
-
-        if (installedPackages.Count == 0)
-        {
-            CommandHelper.PrintInfo("未安装任何包");
-            return 0;
-        }
-
-        // 显示依赖
         var prodDeps = config.References.Where(r => !r.IsDevDependency).ToList();
         if (prodDeps.Count > 0)
         {
             Console.WriteLine("依赖 (dependencies):");
             foreach (var dep in prodDeps)
             {
-                var installed = installedPackages.FirstOrDefault(p => p.name == dep.PackageId);
-                if (installed.name != null)
+                var installed = installedPackages.FirstOrDefault(p =>
+                    p.Id.Equals(dep.PackageId, StringComparison.OrdinalIgnoreCase));
+                if (installed != null)
                 {
                     Console.ForegroundColor = ConsoleColor.Green;
-                    Console.WriteLine($"├── {dep.PackageId}@{installed.version}");
+                    Console.WriteLine($"├── {dep.PackageId}@{installed.Version} (要求: {dep.Version})");
                     Console.ResetColor();
                 }
                 else
@@ -88,18 +116,18 @@ public class ListCommand : ICommand
             Console.WriteLine();
         }
 
-        // 显示开发依赖
         var devDeps = config.References.Where(r => r.IsDevDependency).ToList();
         if (devDeps.Count > 0)
         {
             Console.WriteLine("开发依赖 (devDependencies):");
             foreach (var dep in devDeps)
             {
-                var installed = installedPackages.FirstOrDefault(p => p.name == dep.PackageId);
-                if (installed.name != null)
+                var installed = installedPackages.FirstOrDefault(p =>
+                    p.Id.Equals(dep.PackageId, StringComparison.OrdinalIgnoreCase));
+                if (installed != null)
                 {
                     Console.ForegroundColor = ConsoleColor.Green;
-                    Console.WriteLine($"├── {dep.PackageId}@{installed.version}");
+                    Console.WriteLine($"├── {dep.PackageId}@{installed.Version} (要求: {dep.Version})");
                     Console.ResetColor();
                 }
                 else
@@ -112,58 +140,14 @@ public class ListCommand : ICommand
             Console.WriteLine();
         }
 
-        // 显示环境信息
+        if (prodDeps.Count == 0 && devDeps.Count == 0 && !showAll)
+        {
+            CommandHelper.PrintInfo("当前项目没有声明任何依赖");
+        }
+
         var langInfo = Apis.ReadJson();
         Console.WriteLine($"Old8Lang: {langInfo.Var}");
 
         return 0;
-    }
-
-    private List<(string name, string version)> GetInstalledPackages(string packagesDir)
-    {
-        var packages = new List<(string name, string version)>();
-
-        if (!Directory.Exists(packagesDir))
-            return packages;
-
-        var packageDirs = Directory.GetDirectories(packagesDir);
-
-        foreach (var packagePath in packageDirs)
-        {
-            var dirName = Path.GetFileName(packagePath);
-            var parts = dirName.Split('@');
-
-            if (parts.Length == 2)
-            {
-                packages.Add((parts[0], parts[1]));
-            }
-            else
-            {
-                // 非版本化目录
-                var packageJsonPath = Path.Combine(packagePath, "package.json");
-                string version = "unknown";
-
-                if (File.Exists(packageJsonPath))
-                {
-                    try
-                    {
-                        var json = File.ReadAllText(packageJsonPath);
-                        var match = System.Text.RegularExpressions.Regex.Match(json, @"""version""\s*:\s*""([^""]+)""");
-                        if (match.Success)
-                        {
-                            version = match.Groups[1].Value;
-                        }
-                    }
-                    catch
-                    {
-                        // 忽略解析错误
-                    }
-                }
-
-                packages.Add((dirName, version));
-            }
-        }
-
-        return packages;
     }
 }

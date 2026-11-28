@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Old8Lang.PackageManager.Core" Version="1.1.2" />
+    <PackageReference Include="Old8Lang.PackageManager.Core" Version="1.2.0" />
   </ItemGroup>
 
 </Project>

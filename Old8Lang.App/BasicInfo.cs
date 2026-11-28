@@ -34,10 +34,12 @@ public static class BasicInfo
 
   项目管理命令：
     init                   初始化 Old8Lang 项目
-    install                安装项目的所有依赖
+    install                安装项目的所有依赖或指定远程包
     restore                恢复项目的所有依赖（基于 o8package.json）
     remove <包名>          从项目移除依赖包
     list, ls               列出已安装的依赖包
+    search <关键词>        在远程 Old8Lang 包仓库搜索包
+    registry <子命令>      管理远程 Old8Lang.PackageManager.Server 地址与 API Key
 
   打包与发布命令：
     pack                   将包文件夹打包成 .o8pkg 文件

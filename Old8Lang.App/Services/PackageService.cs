@@ -7,71 +7,112 @@ using System.Security.Cryptography.X509Certificates;
 namespace Old8Lang.App.Services;
 
 /// <summary>
-/// 包管理服务 - 封装 Old8Lang.PackageManager.Core 功能
+/// 包管理服务 - 统一通过 Old8Lang.PackageManager.Core 对接唯一远程协议 Old8Lang.PackageManager.Server
 /// </summary>
-public class PackageService
+public class PackageService : IDisposable
 {
     private readonly string ProjectRoot;
-    private readonly string PackagesDir;
     private readonly PackageSourceManager SourceManager;
+    private readonly RemotePackageSource RemoteSource;
+    private readonly LocalPackageSource LocalCacheSource;
     private readonly IPackageResolver Resolver;
     private readonly IPackageInstaller Installer;
     private readonly IPackageArchiveService ArchiveService;
     private readonly IPackageSignatureService SignatureService;
     private readonly VersionManager VersionManager;
 
-    public PackageService(string projectRoot, ProjectConfig? projectConfig = null)
+    /// <summary>
+    /// 本地包安装目录（默认 ~/.old8lang/packages）
+    /// </summary>
+    public string PackagesDir { get; }
+
+    /// <summary>
+    /// 当前生效的唯一远程 Old8Lang.PackageManager.Server 地址
+    /// </summary>
+    public string RegistryUrl { get; }
+
+    public PackageService(
+        string projectRoot,
+        ProjectConfig? projectConfig = null,
+        string? registryOverride = null,
+        string? apiKeyOverride = null,
+        string? packagesDirOverride = null,
+        HttpClient? httpClient = null)
     {
         ProjectRoot = projectRoot;
-        // 使用全局包目录
-        PackagesDir = Path.Combine(
+        PackagesDir = packagesDirOverride ?? Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
             ".old8lang",
             "packages"
         );
 
-        // 初始化 Core 库的服务
+        RegistryUrl = GlobalPackageConfig.ResolveRegistryUrl(registryOverride, projectConfig);
+        var apiKey = GlobalPackageConfig.ResolveApiKey(apiKeyOverride);
+
         SourceManager = new PackageSourceManager();
         Resolver = new DefaultPackageResolver();
-        Installer = new DefaultPackageInstaller(SourceManager, Resolver);
-        new DefaultPackageConfigurationManager();
-        ArchiveService = new PackageArchiveService() { PackageMetadataFileName = "o8package.json" };
+        ArchiveService = new PackageArchiveService { PackageMetadataFileName = "o8package.json" };
+        Installer = new DefaultPackageInstaller(SourceManager, Resolver, ArchiveService);
         SignatureService = new PackageSignatureService();
         VersionManager = new VersionManager();
 
-        // 配置包源
-        ConfigurePackageSources(projectConfig);
+        // 唯一远程源：Old8Lang.PackageManager.Server（支持通过配置/环境变量/CLI 切换到自建实例）
+        RemoteSource = new RemotePackageSource(
+            name: "Old8Lang PackageManager",
+            source: RegistryUrl,
+            apiKey: apiKey,
+            timeout: 30,
+            language: "old8lang",
+            httpClient: httpClient);
+        SourceManager.AddSource(RemoteSource);
+
+        // 本地已安装包缓存源（用于离线回退与本地元数据查询）
+        LocalCacheSource = new LocalPackageSource(
+            name: "Local Cache",
+            sourcePath: PackagesDir);
+        SourceManager.AddSource(LocalCacheSource);
     }
 
     /// <summary>
-    /// 配置包源
+    /// 测试当前配置的远程 Old8Lang.PackageManager.Server 连通性
     /// </summary>
-    private void ConfigurePackageSources(ProjectConfig? projectConfig)
+    public Task<bool> TestRegistryConnectionAsync()
     {
-        // 添加全局包源
-        var globalPackagesDir = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
-            ".old8lang",
-            "packages"
-        );
-        var globalSource = new LocalPackageSource(
-            name: "Global Packages",
-            sourcePath: globalPackagesDir
-        );
-        SourceManager.AddSource(globalSource);
-
-        // 从项目配置中读取自定义包源
-        projectConfig?.Sources.ForEach(x => SourceManager.AddSource(new RemotePackageSource(x.Name, source: x.Source)));
-
-        // 添加远程包源支持
-        SourceManager.AddSource(new LocalPackageSource(
-            name: "Old8Lang Web",
-            sourcePath: "https://package.old8lang.site/v3"
-        ));
+        return RemoteSource.TestConnectionAsync();
     }
 
     /// <summary>
-    /// 安装包
+    /// 在远程包仓库搜索包
+    /// </summary>
+    public Task<IEnumerable<Package>> SearchPackagesAsync(string query, bool includePrerelease = false)
+    {
+        return RemoteSource.SearchPackagesAsync(query, includePrerelease);
+    }
+
+    /// <summary>
+    /// 发布 .o8pkg 包文件到当前配置的 Old8Lang.PackageManager.Server
+    /// </summary>
+    public Task<PackagePublishResult> PublishPackageAsync(
+        string packageFilePath,
+        PackagePublishOptions? options = null,
+        CancellationToken cancellationToken = default)
+    {
+        return RemoteSource.PublishPackageAsync(packageFilePath, options, cancellationToken);
+    }
+
+    /// <summary>
+    /// 从远程包仓库删除指定版本的包
+    /// </summary>
+    public Task<bool> DeleteRemotePackageAsync(
+        string packageId,
+        string version,
+        CancellationToken cancellationToken = default)
+    {
+        return RemoteSource.DeletePackageAsync(packageId, version, cancellationToken);
+    }
+
+    /// <summary>
+    /// 安装包（自动通过远程包源解析 SemVer 范围，下载并解压到 {PackagesDir}/{packageId}@{version}）
     /// </summary>
     public async Task<InstallPackageResult> InstallPackageAsync(
         string packageId,
@@ -80,10 +121,18 @@ public class PackageService
     {
         try
         {
-            // 解析版本
-            var version = ResolveVersion(versionRange);
+            var version = await ResolveVersionAsync(packageId, versionRange);
+            if (string.IsNullOrWhiteSpace(version))
+            {
+                return new InstallPackageResult
+                {
+                    Success = false,
+                    PackageId = packageId,
+                    Version = versionRange,
+                    Message = $"在包源 '{RegistryUrl}' 中未找到满足版本范围 '{versionRange}' 的包 '{packageId}'"
+                };
+            }
 
-            // 检查包是否已安装
             var isInstalled = await Installer.IsPackageInstalledAsync(packageId, version, PackagesDir);
             if (isInstalled)
             {
@@ -97,7 +146,6 @@ public class PackageService
                 };
             }
 
-            // 安装包
             var installResult = await Installer.InstallPackageAsync(packageId, version, PackagesDir);
 
             if (!installResult.Success)
@@ -131,7 +179,7 @@ public class PackageService
     }
 
     /// <summary>
-    /// 安装所有依赖
+    /// 恢复项目的所有依赖
     /// </summary>
     public async Task<RestoreResult> RestorePackagesAsync(
         ProjectConfig projectConfig,
@@ -141,13 +189,10 @@ public class PackageService
 
         try
         {
-            // 安装生产依赖
             var prodDeps = projectConfig.References.Where(r => !r.IsDevDependency).ToList();
             foreach (var dep in prodDeps)
             {
-                var version = ResolveVersion(dep.Version);
-
-                var installResult = await InstallPackageAsync(dep.PackageId, version);
+                var installResult = await InstallPackageAsync(dep.PackageId, dep.Version);
 
                 if (installResult.Success)
                 {
@@ -158,20 +203,17 @@ public class PackageService
                 }
                 else
                 {
-                    result.FailedPackages.Add(dep.PackageId);
+                    result.FailedPackages.Add($"{dep.PackageId} ({installResult.Message})");
                     result.FailedCount++;
                 }
             }
 
-            // 安装开发依赖
             if (!productionOnly)
             {
                 var devDeps = projectConfig.References.Where(r => r.IsDevDependency).ToList();
                 foreach (var dep in devDeps)
                 {
-                    var version = ResolveVersion(dep.Version);
-
-                    var installResult = await InstallPackageAsync(dep.PackageId, version, true);
+                    var installResult = await InstallPackageAsync(dep.PackageId, dep.Version, isDevelopmentDependency: true);
 
                     if (installResult.Success)
                     {
@@ -182,7 +224,7 @@ public class PackageService
                     }
                     else
                     {
-                        result.FailedPackages.Add(dep.PackageId);
+                        result.FailedPackages.Add($"{dep.PackageId} ({installResult.Message})");
                         result.FailedCount++;
                     }
                 }
@@ -200,7 +242,7 @@ public class PackageService
     }
 
     /// <summary>
-    /// 卸载包
+    /// 卸载指定版本的包
     /// </summary>
     public async Task<bool> UninstallPackageAsync(string packageId, string version)
     {
@@ -212,6 +254,27 @@ public class PackageService
         {
             return false;
         }
+    }
+
+    /// <summary>
+    /// 卸载指定包的所有已安装版本
+    /// </summary>
+    public async Task<int> UninstallAllVersionsAsync(string packageId)
+    {
+        var installed = (await GetInstalledPackagesAsync())
+            .Where(p => p.Id.Equals(packageId, StringComparison.OrdinalIgnoreCase))
+            .ToList();
+
+        var removedCount = 0;
+        foreach (var pkg in installed)
+        {
+            if (await UninstallPackageAsync(pkg.Id, pkg.Version))
+            {
+                removedCount++;
+            }
+        }
+
+        return removedCount;
     }
 
     /// <summary>
@@ -244,206 +307,152 @@ public class PackageService
     }
 
     /// <summary>
-    /// 解析版本范围为具体版本
+    /// 根据远程和本地可用版本列表解析版本范围为具体版本号
     /// </summary>
-    /// <param name="versionRange">版本范围字符串（支持 ^, ~, *, >, &lt;, >=, &lt;=, 精确版本, 范围）</param>
-    /// <returns>解析后的版本字符串</returns>
-    private string ResolveVersion(string versionRange)
+    public async Task<string?> ResolveVersionAsync(string packageId, string versionRange)
     {
-        if (string.IsNullOrWhiteSpace(versionRange))
+        var normalizedRange = string.IsNullOrWhiteSpace(versionRange) ? "*" : versionRange.Trim();
+        var includePrerelease = normalizedRange.Contains('-') &&
+                                !VersionRangeLooksLikeInterval(normalizedRange);
+
+        var availableVersions = new List<string>();
+
+        try
         {
-            return "1.0.0"; // 默认版本
+            var remoteVersions = await RemoteSource.GetPackageVersionsAsync(packageId, includePrerelease: true);
+            availableVersions.AddRange(remoteVersions);
+        }
+        catch
+        {
+            // 远程不可达时允许回退到本地缓存版本
         }
 
-        versionRange = versionRange.Trim();
-
-        // 处理通配符 * - 返回默认版本
-        if (versionRange == "*")
+        try
         {
-            return "1.0.0";
+            var localVersions = await LocalCacheSource.GetPackageVersionsAsync(packageId, includePrerelease: true);
+            availableVersions.AddRange(localVersions);
+        }
+        catch
+        {
+            // 忽略本地缓存异常
         }
 
-        // 处理 npm 风格的版本范围
-        // ^1.2.3 - 兼容 1.x.x 版本（主版本相同）
-        if (versionRange.StartsWith("^"))
-        {
-            var baseVersion = versionRange[1..].Trim();
-            var parsed = VersionManager.ParseVersion(baseVersion);
-            // 对于 ^ 语义，返回基准版本
-            return parsed.ToString();
-        }
+        var distinctVersions = availableVersions
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
 
-        // ~1.2.3 - 兼容 1.2.x 版本（主版本和次版本相同）
-        if (versionRange.StartsWith("~"))
+        if (distinctVersions.Count > 0)
         {
-            var baseVersion = versionRange[1..].Trim();
-            var parsed = VersionManager.ParseVersion(baseVersion);
-            // 对于 ~ 语义，返回基准版本
-            return parsed.ToString();
-        }
-
-        // 处理比较运算符版本范围 (>=, <=, >, <)
-        if (versionRange.StartsWith(">=") || versionRange.StartsWith("<=") ||
-            versionRange.StartsWith(">") || versionRange.StartsWith("<"))
-        {
-            var range = VersionManager.ParseVersionRange(versionRange);
-            // 如果有最小版本，返回最小版本；否则返回最大版本
-            if (!string.IsNullOrEmpty(range.MinVersion))
+            var matched = VersionManager.GetLatestVersionInRange(distinctVersions, normalizedRange, includePrerelease)
+                          ?? VersionManager.GetLatestVersionInRange(distinctVersions, normalizedRange, includePrerelease: true);
+            if (!string.IsNullOrWhiteSpace(matched))
             {
-                return range.MinVersion;
-            }
-
-            if (!string.IsNullOrEmpty(range.MaxVersion))
-            {
-                return range.MaxVersion;
-            }
-
-            return "1.0.0";
-        }
-
-        // 处理范围版本 (1.0.0-2.0.0)
-        if (versionRange.Contains('-') && !versionRange.StartsWith("-"))
-        {
-            var parts = versionRange.Split('-', 2);
-            if (parts.Length == 2)
-            {
-                var first = parts[0].Trim();
-                var second = parts[1].Trim();
-
-                // 检查是否是版本范围（两部分都是版本号）
-                var firstParsed = VersionManager.ParseVersion(first);
-                var secondParsed = VersionManager.ParseVersion(second);
-
-                if (firstParsed.Major > 0 || firstParsed.Minor > 0 || firstParsed.Patch > 0)
-                {
-                    // 返回范围的最小版本
-                    return firstParsed.ToString();
-                }
+                return matched;
             }
         }
 
-        // 处理通配符版本 (1.2.*)
-        if (versionRange.Contains("*"))
+        // 如果传入的是精确版本号，允许直接尝试该精确版本（兼容仅支持单版本元数据查询的服务端或本地缓存）
+        if (IsExactVersion(normalizedRange))
         {
-            var range = VersionManager.ParseVersionRange(versionRange);
-            return range.MinVersion;
+            return normalizedRange;
         }
 
-        // 精确版本 - 直接解析并返回
-        var version = VersionManager.ParseVersion(versionRange);
-        return version.ToString();
+        return null;
+    }
+
+    private static bool IsExactVersion(string versionSpec)
+    {
+        if (string.IsNullOrWhiteSpace(versionSpec))
+            return false;
+
+        if (versionSpec == "*" ||
+            versionSpec.Equals("latest", StringComparison.OrdinalIgnoreCase) ||
+            versionSpec.StartsWith('^') ||
+            versionSpec.StartsWith('~') ||
+            versionSpec.StartsWith('>') ||
+            versionSpec.StartsWith('<') ||
+            versionSpec.Contains('*') ||
+            VersionRangeLooksLikeInterval(versionSpec))
+        {
+            return false;
+        }
+
+        return char.IsDigit(versionSpec[0]) && versionSpec.Contains('.');
+    }
+
+    private static bool VersionRangeLooksLikeInterval(string versionRange)
+    {
+        if (versionRange.Contains(" - ", StringComparison.Ordinal))
+            return true;
+
+        var dashIndex = versionRange.IndexOf('-');
+        if (dashIndex > 0 && dashIndex < versionRange.Length - 1)
+        {
+            var right = versionRange[(dashIndex + 1)..].Trim();
+            return right.Length > 0 && char.IsDigit(right[0]) && right.Contains('.');
+        }
+
+        return false;
     }
 
     #region 打包功能
 
-    /// <summary>
-    /// 打包包文件夹为 .o8pkg 文件
-    /// </summary>
-    /// <param name="sourcePath">包文件夹路径</param>
-    /// <param name="outputPath">输出文件路径（可选）</param>
-    /// <param name="cancellationToken">取消令牌</param>
-    /// <returns>生成的包文件路径</returns>
-    public async Task<string> PackAsync(
+    public Task<string> PackAsync(
         string sourcePath,
         string? outputPath = null,
         CancellationToken cancellationToken = default)
     {
-        return await ArchiveService.PackAsync(sourcePath, outputPath, cancellationToken);
+        return ArchiveService.PackAsync(sourcePath, outputPath, cancellationToken);
     }
 
-    /// <summary>
-    /// 解包 .o8pkg 文件
-    /// </summary>
-    /// <param name="packagePath">包文件路径</param>
-    /// <param name="destinationPath">目标文件夹路径</param>
-    /// <param name="cancellationToken">取消令牌</param>
-    public async Task UnpackAsync(
+    public Task UnpackAsync(
         string packagePath,
         string destinationPath,
         CancellationToken cancellationToken = default)
     {
-        await ArchiveService.UnpackAsync(packagePath, destinationPath, cancellationToken);
+        return ArchiveService.UnpackAsync(packagePath, destinationPath, cancellationToken);
     }
 
-    /// <summary>
-    /// 验证包文件夹结构
-    /// </summary>
-    /// <param name="sourcePath">包文件夹路径</param>
-    /// <returns>验证结果（是否有效，错误消息）</returns>
-    public async Task<(bool IsValid, string Message)> ValidatePackageStructureAsync(string sourcePath)
+    public Task<(bool IsValid, string Message)> ValidatePackageStructureAsync(string sourcePath)
     {
-        return await ArchiveService.ValidatePackageStructureAsync(sourcePath);
+        return ArchiveService.ValidatePackageStructureAsync(sourcePath);
     }
 
-    /// <summary>
-    /// 从包文件夹读取包元数据
-    /// </summary>
-    /// <param name="sourcePath">包文件夹路径</param>
-    /// <returns>包元数据</returns>
-    public async Task<Package?> ReadPackageMetadataAsync(string sourcePath)
+    public Task<Package?> ReadPackageMetadataAsync(string sourcePath)
     {
-        return await ArchiveService.ReadPackageMetadataAsync(sourcePath);
+        return ArchiveService.ReadPackageMetadataAsync(sourcePath);
     }
 
     #endregion
 
     #region 签名功能
 
-    /// <summary>
-    /// 签名包文件
-    /// </summary>
-    /// <param name="packagePath">包文件路径</param>
-    /// <param name="certificate">用于签名的证书</param>
-    /// <returns>包签名信息</returns>
-    public async Task<PackageSignature> SignPackageAsync(
+    public Task<PackageSignature> SignPackageAsync(
         string packagePath,
         X509Certificate2 certificate)
     {
-        return await SignatureService.SignPackageAsync(packagePath, certificate);
+        return SignatureService.SignPackageAsync(packagePath, certificate);
     }
 
-    /// <summary>
-    /// 验证包签名
-    /// </summary>
-    /// <param name="packagePath">包文件路径</param>
-    /// <param name="signature">签名信息</param>
-    /// <returns>签名是否有效</returns>
-    public async Task<bool> VerifySignatureAsync(
+    public Task<bool> VerifySignatureAsync(
         string packagePath,
         PackageSignature signature)
     {
-        return await SignatureService.VerifySignatureAsync(packagePath, signature);
+        return SignatureService.VerifySignatureAsync(packagePath, signature);
     }
 
-    /// <summary>
-    /// 从文件读取签名
-    /// </summary>
-    /// <param name="signatureFilePath">签名文件路径</param>
-    /// <returns>包签名信息</returns>
-    public async Task<PackageSignature?> ReadSignatureAsync(string signatureFilePath)
+    public Task<PackageSignature?> ReadSignatureAsync(string signatureFilePath)
     {
-        return await SignatureService.ReadSignatureAsync(signatureFilePath);
+        return SignatureService.ReadSignatureAsync(signatureFilePath);
     }
 
-    /// <summary>
-    /// 将签名写入文件
-    /// </summary>
-    /// <param name="signature">签名信息</param>
-    /// <param name="signatureFilePath">签名文件路径</param>
-    public async Task WriteSignatureAsync(
+    public Task WriteSignatureAsync(
         PackageSignature signature,
         string signatureFilePath)
     {
-        await SignatureService.WriteSignatureAsync(signature, signatureFilePath);
+        return SignatureService.WriteSignatureAsync(signature, signatureFilePath);
     }
 
-    /// <summary>
-    /// 生成自签名证书
-    /// </summary>
-    /// <param name="subjectName">证书主题名称</param>
-    /// <param name="email">电子邮件（可选）</param>
-    /// <param name="validityYears">有效期（年）</param>
-    /// <returns>生成的证书</returns>
     public X509Certificate2 GenerateSelfSignedCertificate(
         string subjectName,
         string? email = null,
@@ -452,44 +461,32 @@ public class PackageService
         return SignatureService.GenerateSelfSignedCertificate(subjectName, email, validityYears);
     }
 
-    /// <summary>
-    /// 从文件加载证书
-    /// </summary>
-    /// <param name="certPath">证书文件路径</param>
-    /// <param name="password">证书密码（可选）</param>
-    /// <returns>证书</returns>
-    public async Task<X509Certificate2> LoadCertificateAsync(
+    public Task<X509Certificate2> LoadCertificateAsync(
         string certPath,
         string? password = null)
     {
-        return await SignatureService.LoadCertificateAsync(certPath, password);
+        return SignatureService.LoadCertificateAsync(certPath, password);
     }
 
-    /// <summary>
-    /// 导出证书到文件
-    /// </summary>
-    /// <param name="certificate">证书</param>
-    /// <param name="outputPath">输出文件路径</param>
-    /// <param name="password">密码（可选）</param>
-    public async Task ExportCertificateAsync(
+    public Task ExportCertificateAsync(
         X509Certificate2 certificate,
         string outputPath,
         string? password = null)
     {
-        await SignatureService.ExportCertificateAsync(certificate, outputPath, password);
+        return SignatureService.ExportCertificateAsync(certificate, outputPath, password);
     }
 
-    /// <summary>
-    /// 获取证书信息
-    /// </summary>
-    /// <param name="certificate">证书</param>
-    /// <returns>证书信息字符串</returns>
     public string GetCertificateInfo(X509Certificate2 certificate)
     {
         return SignatureService.GetCertificateInfo(certificate);
     }
 
     #endregion
+
+    public void Dispose()
+    {
+        RemoteSource.Dispose();
+    }
 }
 
 /// <summary>

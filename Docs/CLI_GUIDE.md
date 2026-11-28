@@ -224,15 +224,24 @@ Old8Lang 提供了完整的包管理 CLI 命令，支持包打包、签名、验
 3. 全局第三方包
 4. 相对路径文件
 
-**全局包目录**默认为 `~/.old8lang/packages/`，结构如下：
+**全局包目录**默认为 `~/.old8lang/packages/`，统一使用版本化解压目录结构：
 
 ```
 ~/.old8lang/packages/
-├── TestGlobalLib/
-│   └── index.old8
-└── SomeOtherLib/
-    └── main.old8
+├── demo_math@1.0.0/
+│   ├── o8package.json     # 可通过 main 字段指定入口文件（如 src/index.old8）
+│   └── src/index.old8
+└── SomeOtherLib@2.1.0/
+    └── index.old8
 ```
+
+**唯一远程包管理器**：Old8Lang 远程包协议唯一绑定 `Old8Lang.PackageManager.Server`（默认 `https://package.old8lang.site`），支持通过以下优先级切换到自建私有实例：
+
+1. CLI 参数 `--registry <地址>`
+2. 环境变量 `OLD8LANG_REGISTRY`
+3. 项目 `o8package.json` 的 `registry` 字段
+4. 全局配置 `~/.old8lang/config.json`（通过 `old8lang registry set <地址>` 设置）
+5. 官方默认地址 `https://package.old8lang.site`
 
 包本身的结构要求、`o8package.json` 字段说明见下文 `pack` 命令与 [ADVANCED_TOPICS.md](./ADVANCED_TOPICS.md)。
 
@@ -240,7 +249,7 @@ Old8Lang 提供了完整的包管理 CLI 命令，支持包打包、签名、验
 
 ### 🚀 推荐：`publish` - 一键发布命令
 
-**最简单的发布方式！** 自动完成打包、签名和准备发布的全部流程。
+**最简单的发布方式！** 自动完成验证、打包、签名并推送到当前配置的 `Old8Lang.PackageManager.Server`。
 
 #### 用法
 ```bash
@@ -248,7 +257,12 @@ old8lang publish [选项]
 ```
 
 #### 选项
-- `-o, --output <目录>` - 输出目录（默认 `./dist`）
+- `-o, --output <目录>` - 本地产物输出目录（默认 `./dist`）
+- `-r, --registry <地址>` - 指定目标 `Old8Lang.PackageManager.Server` 地址
+- `-k, --api-key <密钥>` - 指定发布用 API Key（也可使用 `OLD8LANG_API_KEY` 或 `old8lang registry set-key`）
+- `--local-only` - 仅在本地打包和签名，不上传到远程包仓库
+- `--prerelease` - 标记为预发布版本
+- `-f, --force` - 覆盖已有本地产物时不提示确认
 - `-c, --cert <路径>` - 证书文件路径
 - `-p, --password <密码>` - 证书密码
 - `--auto-cert` - 自动生成自签名证书（仅用于开发/测试）
@@ -259,33 +273,43 @@ old8lang publish [选项]
 - `-h, --help` - 显示帮助信息
 
 #### 发布流程
-1. 读取项目配置（o8package.json）
+1. 读取项目配置（`o8package.json`）
 2. 验证包结构和元数据
-3. 打包为 .o8pkg 文件
+3. 打包为 `.o8pkg` 文件
 4. 签名包文件（可选）
-5. 输出发布文件到目标目录
+5. 上传包及签名到 `Old8Lang.PackageManager.Server`（除非指定 `--local-only`）
 
 #### 示例
 ```bash
-# 基本发布（使用现有证书）
+# 基本发布（签名并上传到当前配置的包仓库）
 old8lang publish -c my-cert.pfx -p mypassword
 
-# 发布到指定目录
-old8lang publish -o ./release -c my-cert.pfx
+# 推送到自建私有包仓库
+old8lang publish --no-sign --registry http://localhost:5000 --api-key <KEY>
 
-# 使用自动生成的证书（开发环境）
-old8lang publish --auto-cert --cert-name "Dev Publisher"
-
-# 不签名发布（不推荐）
-old8lang publish --no-sign
+# 仅本地打包签名，不上传
+old8lang publish --local-only --auto-cert --cert-name "Dev Publisher"
 ```
 
-#### 优势
-- ✅ **一键完成** - 无需手动执行多个命令
-- ✅ **自动验证** - 确保包结构正确
-- ✅ **智能提示** - 交互式引导完成发布
-- ✅ **证书管理** - 自动生成或使用现有证书
-- ✅ **完整摘要** - 清晰展示发布结果
+### `search` - 搜索远程包
+
+在当前配置的 `Old8Lang.PackageManager.Server` 中按关键词搜索包。
+
+```bash
+old8lang search math
+old8lang search utils --prerelease --registry http://localhost:5000
+```
+
+### `registry` - 管理远程仓库地址与 API Key
+
+```bash
+old8lang registry get                                  # 查看当前生效仓库与配置来源
+old8lang registry set http://localhost:5000            # 设置全局私有仓库地址
+old8lang registry set https://pkg.example.com --project # 仅对当前项目生效（写入 o8package.json）
+old8lang registry set-key <YOUR_API_KEY>               # 保存 API Key 到 ~/.old8lang/config.json
+old8lang registry test                                 # 测试连通性 (/v3/index.json)
+old8lang registry reset                                # 重置为官方默认仓库
+```
 
 ---
 

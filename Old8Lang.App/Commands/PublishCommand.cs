@@ -1,22 +1,27 @@
 using Old8Lang.App.Services;
+using Old8Lang.PackageManager.Core.Interfaces;
 using Old8Lang.ProjectManagement;
 
 namespace Old8Lang.App.Commands;
 
 /// <summary>
-/// old8lang publish - 发布命令
-/// 自动打包、签名并准备发布
+/// old8lang publish - 打包、签名并推送到 Old8Lang.PackageManager.Server
 /// </summary>
 public class PublishCommand : ICommand
 {
     public string Name => "publish";
-    public string Description => "打包、签名并发布包";
+    public string Description => "打包、签名并发布包到 Old8Lang 包仓库";
 
     public string Help => @"
 用法: old8lang publish [选项]
 
 选项:
-  -o, --output <目录>    输出目录（默认 ./dist）
+  -o, --output <目录>    本地产物输出目录（默认 ./dist）
+  -r, --registry <地址>  指定目标 Old8Lang.PackageManager.Server 地址（覆盖默认/项目配置）
+  -k, --api-key <密钥>   指定发布用 API 密钥（也可通过 OLD8LANG_API_KEY 或 registry set-key 设置）
+  --local-only           仅本地打包和签名，不上传到远程包仓库
+  --prerelease           标记为预发布版本
+  -f, --force            覆盖已有本地产物时不提示确认
   -c, --cert <路径>      证书文件路径
   -p, --password <密码>  证书密码
   --auto-cert            自动生成自签名证书（仅用于开发/测试）
@@ -27,34 +32,25 @@ public class PublishCommand : ICommand
   -h, --help             显示帮助信息
 
 发布流程:
-  1. 读取项目配置（o8packages.json）
+  1. 读取项目配置（o8package.json）
   2. 验证包结构和元数据
   3. 打包为 .o8pkg 文件
   4. 签名包文件（可选）
-  5. 输出发布文件到目标目录
+  5. 上传到远程 Old8Lang.PackageManager.Server（除非指定 --local-only）
 
 示例:
-  # 基本发布（使用现有证书）
+  # 打包、签名并推送到当前配置的包仓库
   old8lang publish -c my-cert.pfx -p mypassword
 
-  # 发布到指定目录
-  old8lang publish -o ./release -c my-cert.pfx
+  # 推送到自建私有包仓库（不签名）
+  old8lang publish --no-sign --registry http://localhost:5000 --api-key <KEY>
 
-  # 使用自动生成的证书（开发环境）
-  old8lang publish --auto-cert --cert-name ""Dev Publisher""
-
-  # 不签名发布（不推荐）
-  old8lang publish --no-sign
-
-注意:
-  - 生产环境发布建议始终签名
-  - 自动生成的证书仅适用于开发/测试
-  - 发布前请确保项目配置正确
+  # 仅本地打包签名，不上传
+  old8lang publish --local-only --auto-cert --cert-name ""Dev Publisher""
 ";
 
     public int Execute(string[] args)
     {
-        // 解析参数
         if (args.Contains("-h") || args.Contains("--help"))
         {
             Console.WriteLine(Help);
@@ -62,6 +58,11 @@ public class PublishCommand : ICommand
         }
 
         var outputDir = GetOptionValue(args, "-o", "--output") ?? "dist";
+        var registryOverride = GetOptionValue(args, "-r", "--registry");
+        var apiKeyOverride = GetOptionValue(args, "-k", "--api-key");
+        var localOnly = args.Contains("--local-only");
+        var isPrerelease = args.Contains("--prerelease");
+        var force = args.Contains("-f") || args.Contains("--force");
         var certPath = GetOptionValue(args, "-c", "--cert");
         var password = GetOptionValue(args, "-p", "--password");
         var autoCert = args.Contains("--auto-cert");
@@ -70,9 +71,10 @@ public class PublishCommand : ICommand
         var noSign = args.Contains("--no-sign");
         var skipValidation = args.Contains("--skip-validation");
 
+        var totalSteps = localOnly ? 5 : 6;
+
         try
         {
-            // 1. 查找项目根目录
             var projectRoot = CommandHelper.FindProjectRoot();
             if (projectRoot == null)
             {
@@ -87,8 +89,8 @@ public class PublishCommand : ICommand
 
             CommandHelper.PrintInfo($"项目根目录: {projectRoot}");
 
-            // 2. 读取项目配置
-            CommandHelper.PrintInfo("\n[步骤 1/5] 读取项目配置...");
+            // 1. 读取项目配置
+            CommandHelper.PrintInfo($"\n[步骤 1/{totalSteps}] 读取项目配置...");
             var projectConfig = ProjectConfig.LoadFromDirectory(projectRoot);
             if (projectConfig == null)
             {
@@ -96,16 +98,21 @@ public class PublishCommand : ICommand
                 return 1;
             }
 
+            using var service = new PackageService(projectRoot, projectConfig, registryOverride, apiKeyOverride);
+
             Console.WriteLine($"  项目名称: {projectConfig.ProjectName}");
             Console.WriteLine($"  项目版本: {projectConfig.Version}");
             Console.WriteLine($"  作者: {projectConfig.Author}");
+            if (!localOnly)
+            {
+                Console.WriteLine($"  目标仓库: {service.RegistryUrl}");
+            }
             CommandHelper.PrintSuccess("✓ 配置读取完成");
 
-            // 3. 验证包结构（如果没有跳过）
+            // 2. 验证包结构
             if (!skipValidation)
             {
-                CommandHelper.PrintInfo("\n[步骤 2/5] 验证包结构...");
-                var service = new PackageService(projectRoot, projectConfig);
+                CommandHelper.PrintInfo($"\n[步骤 2/{totalSteps}] 验证包结构...");
                 var (isValid, message) = service.ValidatePackageStructureAsync(projectRoot).GetAwaiter().GetResult();
 
                 if (!isValid)
@@ -118,11 +125,11 @@ public class PublishCommand : ICommand
             }
             else
             {
-                CommandHelper.PrintWarning("\n[步骤 2/5] 跳过包结构验证");
+                CommandHelper.PrintWarning($"\n[步骤 2/{totalSteps}] 跳过包结构验证");
             }
 
-            // 4. 创建输出目录
-            CommandHelper.PrintInfo("\n[步骤 3/5] 准备输出目录...");
+            // 3. 准备输出目录
+            CommandHelper.PrintInfo($"\n[步骤 3/{totalSteps}] 准备输出目录...");
             var fullOutputDir = Path.GetFullPath(outputDir);
             if (!Directory.Exists(fullOutputDir))
             {
@@ -131,43 +138,44 @@ public class PublishCommand : ICommand
             Console.WriteLine($"  输出目录: {fullOutputDir}");
             CommandHelper.PrintSuccess("✓ 输出目录准备完成");
 
-            // 5. 打包
-            CommandHelper.PrintInfo("\n[步骤 4/5] 打包项目...");
-            var service2 = new PackageService(projectRoot, projectConfig);
+            // 4. 打包
+            CommandHelper.PrintInfo($"\n[步骤 4/{totalSteps}] 打包项目...");
             var packageFileName = $"{projectConfig.ProjectName}.{projectConfig.Version}.o8pkg";
             var packagePath = Path.Combine(fullOutputDir, packageFileName);
 
-            // 如果文件已存在，询问是否覆盖
             if (File.Exists(packagePath))
             {
-                Console.Write($"  包文件已存在: {packageFileName}\n  是否覆盖？(y/N): ");
-                var response = Console.ReadLine()?.Trim().ToLower();
-                if (response != "y" && response != "yes")
+                if (!force)
                 {
-                    CommandHelper.PrintInfo("已取消发布");
-                    return 0;
+                    Console.Write($"  包文件已存在: {packageFileName}\n  是否覆盖？(y/N): ");
+                    var response = Console.ReadLine()?.Trim().ToLower();
+                    if (response != "y" && response != "yes")
+                    {
+                        CommandHelper.PrintInfo("已取消发布");
+                        return 0;
+                    }
                 }
                 File.Delete(packagePath);
             }
 
-            service2.PackAsync(projectRoot, packagePath).GetAwaiter().GetResult();
+            service.PackAsync(projectRoot, packagePath).GetAwaiter().GetResult();
             var packageInfo = new FileInfo(packagePath);
             Console.WriteLine($"  包文件: {packageFileName}");
             Console.WriteLine($"  文件大小: {FormatFileSize(packageInfo.Length)}");
             CommandHelper.PrintSuccess("✓ 打包完成");
 
-            // 6. 签名（如果需要）
+            // 5. 签名
+            string? signaturePath = null;
             if (noSign)
             {
-                CommandHelper.PrintWarning("\n[步骤 5/5] 跳过签名（不推荐用于生产环境）");
+                CommandHelper.PrintWarning($"\n[步骤 5/{totalSteps}] 跳过签名（不推荐用于生产环境）");
             }
             else
             {
-                CommandHelper.PrintInfo("\n[步骤 5/5] 签名包文件...");
+                CommandHelper.PrintInfo($"\n[步骤 5/{totalSteps}] 签名包文件...");
 
-                // 获取或生成证书
                 var certificate = GetOrGenerateCertificate(
-                    service2,
+                    service,
                     autoCert,
                     certPath,
                     password,
@@ -181,7 +189,6 @@ public class PublishCommand : ICommand
                     return 1;
                 }
 
-                // 检查证书有效期
                 if (certificate.NotAfter < DateTime.UtcNow)
                 {
                     CommandHelper.PrintWarning("⚠ 警告: 证书已过期！");
@@ -194,10 +201,9 @@ public class PublishCommand : ICommand
                     }
                 }
 
-                // 签名
-                var signature = service2.SignPackageAsync(packagePath, certificate).GetAwaiter().GetResult();
-                var signaturePath = packagePath + ".sig";
-                service2.WriteSignatureAsync(signature, signaturePath).GetAwaiter().GetResult();
+                var signature = service.SignPackageAsync(packagePath, certificate).GetAwaiter().GetResult();
+                signaturePath = packagePath + ".sig";
+                service.WriteSignatureAsync(signature, signaturePath).GetAwaiter().GetResult();
 
                 Console.WriteLine($"  签名者: {signature.Signer.Name}");
                 Console.WriteLine($"  签名时间: {signature.Timestamp:yyyy-MM-dd HH:mm:ss} UTC");
@@ -205,28 +211,56 @@ public class PublishCommand : ICommand
                 CommandHelper.PrintSuccess("✓ 签名完成");
             }
 
-            // 7. 显示发布摘要
-            Console.WriteLine("\n========================================");
-            Console.WriteLine("  发布完成！");
-            Console.WriteLine("========================================\n");
-            Console.WriteLine("发布文件:");
-            Console.WriteLine($"  📦 {packagePath}");
-            if (!noSign)
+            // 6. 上传到远程 Old8Lang.PackageManager.Server
+            if (!localOnly)
             {
-                Console.WriteLine($"  ✍️  {packagePath}.sig");
+                CommandHelper.PrintInfo($"\n[步骤 6/{totalSteps}] 上传包到 {service.RegistryUrl}...");
+                var publishOptions = new PackagePublishOptions
+                {
+                    Language = "old8lang",
+                    Author = projectConfig.Author,
+                    Description = projectConfig.Description,
+                    License = projectConfig.License,
+                    ProjectUrl = projectConfig.ProjectUrl,
+                    Tags = projectConfig.Tags,
+                    IsPrerelease = isPrerelease || projectConfig.Version.Contains('-'),
+                    SignatureFilePath = signaturePath
+                };
+
+                var publishResult = service.PublishPackageAsync(packagePath, publishOptions).GetAwaiter().GetResult();
+                if (!publishResult.Success)
+                {
+                    CommandHelper.PrintError($"✗ 上传失败 (HTTP {publishResult.StatusCode}): {publishResult.Message}");
+                    if (publishResult.StatusCode is 401 or 403)
+                    {
+                        CommandHelper.PrintInfo("提示: 请检查 API Key 配置（old8lang registry set-key <KEY> 或传入 --api-key <KEY>）");
+                    }
+                    return 1;
+                }
+
+                Console.WriteLine($"  已发布包: {publishResult.PackageId}@{publishResult.Version}");
+                if (!string.IsNullOrEmpty(publishResult.Checksum))
+                {
+                    Console.WriteLine($"  服务端校验和: {publishResult.Checksum}");
+                }
+                CommandHelper.PrintSuccess("✓ 上传发布完成");
             }
 
-            Console.WriteLine("\n下一步:");
-            Console.WriteLine("  1. 测试包: old8lang verify " + packageFileName);
-            if (!noSign)
+            Console.WriteLine("\n========================================");
+            Console.WriteLine(localOnly ? "  本地打包完成！" : "  发布完成！");
+            Console.WriteLine("========================================\n");
+            Console.WriteLine("产物文件:");
+            Console.WriteLine($"  📦 {packagePath}");
+            if (signaturePath != null)
             {
-                Console.WriteLine("  2. 分发包和签名文件到用户");
+                Console.WriteLine($"  ✍️  {signaturePath}");
             }
-            else
+
+            if (!localOnly)
             {
-                Console.WriteLine("  2. 分发包文件到用户（⚠️ 未签名）");
+                Console.WriteLine($"\n其他项目现在可以通过以下命令安装:");
+                Console.WriteLine($"  old8lang install {projectConfig.ProjectName}@{projectConfig.Version}");
             }
-            Console.WriteLine("  3. 或上传到包仓库");
 
             return 0;
         }
@@ -249,7 +283,6 @@ public class PublishCommand : ICommand
         string? certEmail,
         ProjectConfig projectConfig)
     {
-        // 自动生成证书
         if (autoCert)
         {
             CommandHelper.PrintInfo("  正在生成自签名证书...");
@@ -261,7 +294,6 @@ public class PublishCommand : ICommand
             Console.WriteLine($"  证书主题: {name}");
             CommandHelper.PrintSuccess("  ✓ 证书生成完成");
 
-            // 询问是否保存证书
             Console.Write("\n  是否保存生成的证书以供将来使用？(Y/n): ");
             var response = Console.ReadLine()?.Trim().ToLower();
             if (response != "n" && response != "no")
@@ -285,7 +317,6 @@ public class PublishCommand : ICommand
             return certificate;
         }
 
-        // 从文件加载证书
         if (!string.IsNullOrEmpty(certPath))
         {
             if (!File.Exists(certPath))
@@ -294,7 +325,6 @@ public class PublishCommand : ICommand
                 return null;
             }
 
-            // 如果没有提供密码，询问用户
             if (string.IsNullOrEmpty(password) && certPath.EndsWith(".pfx", StringComparison.OrdinalIgnoreCase))
             {
                 Console.Write("  请输入证书密码（按回车跳过）: ");
@@ -308,14 +338,13 @@ public class PublishCommand : ICommand
             return certificate;
         }
 
-        // 没有指定证书
         CommandHelper.PrintError("  ✗ 错误: 必须指定证书文件（-c）或使用自动生成（--auto-cert）");
         CommandHelper.PrintInfo("  或者使用 --no-sign 跳过签名（不推荐）");
         Console.WriteLine("\n  使用 old8lang publish -h 查看帮助");
         return null;
     }
 
-    private string? GetOptionValue(string[] args, params string[] optionNames)
+    private static string? GetOptionValue(string[] args, params string[] optionNames)
     {
         for (int i = 0; i < args.Length; i++)
         {
@@ -328,7 +357,7 @@ public class PublishCommand : ICommand
         return null;
     }
 
-    private string? ReadPassword()
+    private static string? ReadPassword()
     {
         var password = string.Empty;
         ConsoleKeyInfo key;

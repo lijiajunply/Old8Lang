@@ -5,7 +5,7 @@ using Old8Lang.App.Services;
 namespace Old8Lang.App.Commands;
 
 /// <summary>
-/// old8lang install - 安装依赖包命令（合并了原 add 和 install 功能）
+/// old8lang install - 从 Old8Lang.PackageManager.Server 安装依赖包命令
 /// </summary>
 public class InstallCommand : ICommand
 {
@@ -22,44 +22,46 @@ public class InstallCommand : ICommand
 选项:
   --dev                  添加为开发依赖
   --production           只安装生产依赖（跳过 devDependencies）
+  -r, --registry <地址>  指定远程 Old8Lang.PackageManager.Server 地址
+  -k, --api-key <密钥>   指定访问私有仓库的 API 密钥
   -h, --help             显示帮助信息
 
 示例:
-  old8lang install                     # 安装所有依赖
-  old8lang install Logger              # 添加并安装最新版本
-  old8lang install Logger@1.2.0        # 添加并安装指定版本
-  old8lang install Logger@^1.2.0       # 添加并安装兼容版本
-  old8lang install --dev TestFramework # 添加为开发依赖
-  old8lang install --production        # 只安装生产依赖
+  old8lang install                                      # 安装所有依赖
+  old8lang install Logger                               # 添加并安装最新版本
+  old8lang install Logger@1.2.0                         # 添加并安装指定版本
+  old8lang install Logger@^1.2.0                        # 添加并安装兼容版本
+  old8lang install --dev TestFramework                  # 添加为开发依赖
+  old8lang install --registry http://localhost:5000 pkg # 从自建私有仓库安装
 ";
 
     public int Execute(string[] args)
     {
-        // 过滤选项，获取包名
-        var isDev = args.Contains("--dev");
-        var productionOnly = args.Contains("--production");
-
-        var packageSpec = args.FirstOrDefault(a => !a.StartsWith("--") && !a.StartsWith("-"));
-
-        // 如果指定了包名，执行添加包的逻辑
-        if (!string.IsNullOrEmpty(packageSpec))
+        if (args.Contains("-h") || args.Contains("--help"))
         {
-            return InstallSinglePackage(packageSpec, isDev);
+            Console.WriteLine(Help);
+            return 0;
         }
 
-        // 否则，执行安装所有依赖的逻辑
-        return InstallAllDependencies(productionOnly);
+        var isDev = args.Contains("--dev");
+        var productionOnly = args.Contains("--production");
+        var registryOverride = GetOptionValue(args, "-r", "--registry");
+        var apiKeyOverride = GetOptionValue(args, "-k", "--api-key");
+
+        var packageSpec = GetPositionalPackageSpec(args);
+
+        if (!string.IsNullOrEmpty(packageSpec))
+        {
+            return InstallSinglePackage(packageSpec, isDev, registryOverride, apiKeyOverride);
+        }
+
+        return InstallAllDependencies(productionOnly, registryOverride, apiKeyOverride);
     }
 
-    /// <summary>
-    /// 安装单个包（原 add 命令的功能）
-    /// </summary>
-    private int InstallSinglePackage(string packageSpec, bool isDev)
+    private int InstallSinglePackage(string packageSpec, bool isDev, string? registryOverride, string? apiKeyOverride)
     {
-        // 解析包名和版本
-        var (packageName, version) = ParsePackageSpec(packageSpec);
+        var (packageName, requestedVersion) = ParsePackageSpec(packageSpec);
 
-        // 检查项目配置
         var projectRoot = CommandHelper.FindProjectRoot();
         if (projectRoot == null)
         {
@@ -75,7 +77,6 @@ public class InstallCommand : ICommand
             return 1;
         }
 
-        // 检查包是否已存在
         var existingDep = config.References.FirstOrDefault(d => d.PackageId == packageName);
         if (existingDep != null)
         {
@@ -85,37 +86,50 @@ public class InstallCommand : ICommand
             {
                 return 0;
             }
-            // 移除旧的依赖
             config.References.Remove(existingDep);
         }
 
-        // 安装包
-        Console.WriteLine($"正在安装 {packageName}@{version}...");
+        using var packageService = new PackageService(projectRoot, config, registryOverride, apiKeyOverride);
+        Console.WriteLine($"正在从 {packageService.RegistryUrl} 安装 {packageName}@{requestedVersion}...");
 
-        var success = InstallPackageToDirectory(projectRoot, config, packageName, version);
+        var result = packageService.InstallPackageAsync(packageName, requestedVersion, isDev).GetAwaiter().GetResult();
 
-        if (!success)
+        if (!result.Success)
         {
-            CommandHelper.PrintError($"安装包 '{packageName}' 失败");
+            CommandHelper.PrintError($"安装包 '{packageName}' 失败: {result.Message}");
             return 1;
         }
 
-        // 更新项目配置
-        config.References.Add(new PackageReference { PackageId = packageName, Version = version, IsDevDependency = isDev });
+        if (result.Skipped)
+        {
+            CommandHelper.PrintInfo(result.Message);
+        }
+        else
+        {
+            CommandHelper.PrintSuccess($"✓ {result.Message}");
+        }
+
+        // 若用户未指定版本范围（*），记录实际解析到的兼容范围 ^<version>
+        var versionToSave = requestedVersion == "*" && !string.IsNullOrWhiteSpace(result.Version)
+            ? $"^{result.Version}"
+            : requestedVersion;
+
+        config.References.Add(new PackageReference
+        {
+            PackageId = packageName,
+            Version = versionToSave,
+            IsDevDependency = isDev
+        });
         config.SaveToDirectory(projectRoot);
 
-        CommandHelper.PrintSuccess($"已添加 {packageName}@{version}");
+        CommandHelper.PrintSuccess($"已添加 {packageName}@{versionToSave}");
         CommandHelper.PrintInfo(isDev ? "已保存到 devDependencies" : "已保存到 dependencies");
 
         return 0;
     }
 
-    /// <summary>
-    /// 安装所有依赖（原 install 命令的功能）
-    /// </summary>
-    private int InstallAllDependencies(bool productionOnly)
+    private int InstallAllDependencies(bool productionOnly, string? registryOverride, string? apiKeyOverride)
     {
-        // 检查项目配置
         var projectRoot = CommandHelper.FindProjectRoot();
         if (projectRoot == null)
         {
@@ -131,36 +145,30 @@ public class InstallCommand : ICommand
             return 1;
         }
 
+        using var packageService = new PackageService(projectRoot, config, registryOverride, apiKeyOverride);
+
         Console.WriteLine($"安装 {config.ProjectName}@{config.Version} 的依赖...");
+        Console.WriteLine($"包仓库: {packageService.RegistryUrl}");
         Console.WriteLine();
 
-        var packagesDir = GetPackagesDirectory();
-        Directory.CreateDirectory(packagesDir);
+        Directory.CreateDirectory(packageService.PackagesDir);
 
         int installedCount = 0;
         int skippedCount = 0;
         int failedCount = 0;
 
-        // 安装生产依赖
         var prodDeps = config.References.Where(r => !r.IsDevDependency).ToList();
         foreach (var dep in prodDeps)
         {
-            var result = InstallPackage(packagesDir, dep.PackageId, dep.Version, config, projectRoot);
+            var result = InstallSingleDependency(packageService, dep.PackageId, dep.Version, isDev: false);
             switch (result)
             {
-                case InstallResult.Success:
-                    installedCount++;
-                    break;
-                case InstallResult.Skipped:
-                    skippedCount++;
-                    break;
-                case InstallResult.Failed:
-                    failedCount++;
-                    break;
+                case InstallOutcome.Success: installedCount++; break;
+                case InstallOutcome.Skipped: skippedCount++; break;
+                case InstallOutcome.Failed: failedCount++; break;
             }
         }
 
-        // 安装开发依赖
         var devDeps = config.References.Where(r => r.IsDevDependency).ToList();
         if (!productionOnly && devDeps.Count > 0)
         {
@@ -169,18 +177,12 @@ public class InstallCommand : ICommand
 
             foreach (var dep in devDeps)
             {
-                var result = InstallPackage(packagesDir, dep.PackageId, dep.Version, config, projectRoot);
+                var result = InstallSingleDependency(packageService, dep.PackageId, dep.Version, isDev: true);
                 switch (result)
                 {
-                    case InstallResult.Success:
-                        installedCount++;
-                        break;
-                    case InstallResult.Skipped:
-                        skippedCount++;
-                        break;
-                    case InstallResult.Failed:
-                        failedCount++;
-                        break;
+                    case InstallOutcome.Success: installedCount++; break;
+                    case InstallOutcome.Skipped: skippedCount++; break;
+                    case InstallOutcome.Failed: failedCount++; break;
                 }
             }
         }
@@ -201,125 +203,82 @@ public class InstallCommand : ICommand
         return failedCount > 0 ? 1 : 0;
     }
 
-    /// <summary>
-    /// 解析包规格（包名@版本）
-    /// </summary>
-    private (string name, string version) ParsePackageSpec(string spec)
+    private static (string name, string version) ParsePackageSpec(string spec)
     {
         var parts = spec.Split('@', 2);
-        if (parts.Length == 2)
-        {
-            return (parts[0], parts[1]);
-        }
-
-        return (parts[0], "*");
+        return parts.Length == 2 ? (parts[0], parts[1]) : (parts[0], "*");
     }
 
-    /// <summary>
-    /// 安装包到指定目录
-    /// </summary>
-    private bool InstallPackageToDirectory(string projectRoot, ProjectConfig config, string packageName, string version)
-    {
-        try
-        {
-            // 使用 PackageService 安装包
-            var packageService = new PackageService(projectRoot, config);
-
-            Console.WriteLine($"  正在从包源下载 {packageName}@{version}...");
-
-            var installTask = packageService.InstallPackageAsync(packageName, version);
-            installTask.Wait();
-
-            var result = installTask.Result;
-
-            if (!result.Success)
-            {
-                if (result.Skipped)
-                {
-                    CommandHelper.PrintInfo(result.Message);
-                    return true;
-                }
-
-                CommandHelper.PrintError(result.Message);
-                return false;
-            }
-
-            Console.WriteLine("  安装完成");
-            return true;
-        }
-        catch (Exception ex)
-        {
-            CommandHelper.PrintError($"安装失败: {ex.Message}");
-            return false;
-        }
-    }
-
-    /// <summary>
-    /// 安装包（异步）- 被 PackageService 调用
-    /// </summary>
-    private async Task<InstallPackageResult> InstallPackageAsync(
-        string packageName,
-        string version,
-        ProjectConfig config,
-        string projectRoot)
-    {
-        var packageService = new PackageService(projectRoot, config);
-        return await packageService.InstallPackageAsync(packageName, version);
-    }
-
-    private enum InstallResult
+    private enum InstallOutcome
     {
         Success,
         Skipped,
         Failed
     }
 
-    private InstallResult InstallPackage(
-        string packagesDir,
+    private static InstallOutcome InstallSingleDependency(
+        PackageService packageService,
         string packageName,
         string versionRange,
-        ProjectConfig config,
-        string projectRoot)
+        bool isDev)
     {
         try
         {
             Console.Write($"  安装 {packageName}@{versionRange}...");
-
-            // 使用 PackageService 安装包
-            var packageService = new PackageService(projectRoot, config);
-            var installTask = packageService.InstallPackageAsync(packageName, versionRange);
-            installTask.Wait();
-
-            var result = installTask.Result;
+            var result = packageService.InstallPackageAsync(packageName, versionRange, isDev).GetAwaiter().GetResult();
 
             if (!result.Success)
             {
-                if (result.Skipped)
-                {
-                    Console.WriteLine(" 已存在");
-                    return InstallResult.Skipped;
-                }
-
                 Console.WriteLine($" 失败: {result.Message}");
-                return InstallResult.Failed;
+                return InstallOutcome.Failed;
             }
 
-            Console.WriteLine(" 完成");
-            return InstallResult.Success;
+            if (result.Skipped)
+            {
+                Console.WriteLine($" 已存在 ({result.Version})");
+                return InstallOutcome.Skipped;
+            }
+
+            Console.WriteLine($" 完成 ({result.Version})");
+            return InstallOutcome.Success;
         }
         catch (Exception ex)
         {
             Console.WriteLine($" 失败: {ex.Message}");
-            return InstallResult.Failed;
+            return InstallOutcome.Failed;
         }
     }
 
-    private static string GetPackagesDirectory()
+    private static string? GetOptionValue(string[] args, params string[] optionNames)
     {
-        return Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
-            ".old8lang",
-            "packages"
-        );
+        for (int i = 0; i < args.Length; i++)
+        {
+            if (optionNames.Contains(args[i]) && i + 1 < args.Length)
+            {
+                return args[i + 1];
+            }
+        }
+
+        return null;
+    }
+
+    private static string? GetPositionalPackageSpec(string[] args)
+    {
+        for (int i = 0; i < args.Length; i++)
+        {
+            var arg = args[i];
+            if (arg is "-r" or "--registry" or "-k" or "--api-key")
+            {
+                i++;
+                continue;
+            }
+
+            if (!arg.StartsWith('-'))
+            {
+                return arg;
+            }
+        }
+
+        return null;
     }
 }
