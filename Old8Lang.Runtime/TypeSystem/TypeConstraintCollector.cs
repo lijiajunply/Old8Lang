@@ -18,11 +18,12 @@ public class TypeConstraintCollector(TypeInferenceContext context, LocalManager 
     /// </summary>
     public void CollectFromFunction(FuncInit funcInit)
     {
-        if (funcInit.GetFuncValue().Ids is null)
+        var funcValue = funcInit.GetFuncValue();
+        if (funcValue.Ids is null)
             return;
 
-        var funcName = funcInit.GetFuncValue().Id?.IdName ?? "anonymous";
-        var parameters = funcInit.GetFuncValue().Ids;
+        var funcName = funcValue.Id?.IdName ?? "anonymous";
+        var parameters = funcValue.Ids;
 
         // 1. 收集参数约束
         for (int i = 0; i < parameters.Count; i++)
@@ -77,9 +78,10 @@ public class TypeConstraintCollector(TypeInferenceContext context, LocalManager 
         var returnTypeName = $"{funcName}$return";
 
         // 显式返回类型注解
-        if (!string.IsNullOrEmpty(funcInit.GetFuncValue().Id?.AssumptionType))
+        var funcId = funcValue.Id;
+        if (funcId is not null && !string.IsNullOrEmpty(funcId.AssumptionType))
         {
-            var returnType = ParseTypeAnnotation(funcInit.GetFuncValue().Id.AssumptionType);
+            var returnType = ParseTypeAnnotation(funcId.AssumptionType);
             if (returnType is not null)
             {
                 context.AddConstraint(new TypeConstraint(

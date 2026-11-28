@@ -224,10 +224,10 @@ public class TypeInferenceEngine
         // 查找函数并更新参数类型
         if (_functionRegistry.TryGetValue(funcName, out var funcInit))
         {
-            if (funcInit.GetFuncValue().Ids is not null &&
-                paramIndex < funcInit.GetFuncValue().Ids.Count)
+            var ids = funcInit.GetFuncValue().Ids;
+            if (ids is not null && paramIndex < ids.Count)
             {
-                var param = funcInit.GetFuncValue().Ids[paramIndex];
+                var param = ids[paramIndex];
 
                 // 如果参数没有显式类型注解，应用推断类型
                 if (string.IsNullOrEmpty(param.AssumptionType))
@@ -327,9 +327,10 @@ public class TypeInferenceEngine
             return false;
 
         // 检查是否有参数缺少类型注解
-        if (funcInit.GetFuncValue().Ids is not null)
+        var ids = funcInit.GetFuncValue().Ids;
+        if (ids is not null)
         {
-            foreach (var param in funcInit.GetFuncValue().Ids)
+            foreach (var param in ids)
             {
                 if (string.IsNullOrEmpty(param.AssumptionType) && param.DefaultValue is null)
                 {

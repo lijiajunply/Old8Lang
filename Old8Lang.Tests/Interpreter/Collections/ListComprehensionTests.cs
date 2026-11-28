@@ -410,7 +410,7 @@ result <- [x for x in []]";
         // Assert
         var result = interpreter.Manager.GetValue(new LangId("result"));
         Assert.IsType<ListLangValue>(result);
-        Assert.Equal(0, ((ListLangValue)result).Values.Count);
+        Assert.Empty(((ListLangValue)result).Values);
     }
 
     /// <summary>
@@ -431,7 +431,7 @@ result <- [x for x in [1~10] if x > 100]";
         // Assert
         var result = interpreter.Manager.GetValue(new LangId("result"));
         Assert.IsType<ListLangValue>(result);
-        Assert.Equal(0, ((ListLangValue)result).Values.Count);
+        Assert.Empty(((ListLangValue)result).Values);
     }
 
     /// <summary>
@@ -454,7 +454,7 @@ result <- [x * 10 for x in [42]]";
         Assert.IsType<ListLangValue>(result);
 
         var list = (ListLangValue)result;
-        Assert.Equal(1, list.Values.Count);
+        Assert.Single(list.Values);
         Assert.Equal(420, ((IntLangValue)list.Values[0]).Value);
     }
 

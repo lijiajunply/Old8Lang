@@ -103,7 +103,7 @@ public class GenericTypeInferenceTests
         // Assert
         var result = interpreter.Manager.GetValue(new LangId("result"));
         Assert.IsType<BoolLangValue>(result);
-        Assert.Equal(true, ((BoolLangValue)result!).Value);
+        Assert.True(((BoolLangValue)result!).Value);
     }
 
     [Fact]

@@ -230,9 +230,10 @@ public partial class CompilerVisitor
         }
 
         // 先处理参数，将它们添加到funcLocal中，这样GetItemType才能正确推断返回类型
-        for (var i = 0; i < node.GetAsyncFuncValue().Ids!.Count; i++)
+        var asyncIds = node.GetAsyncFuncValue().Ids!;
+        for (var i = 0; i < asyncIds.Count; i++)
         {
-            var id = node.GetAsyncFuncValue().Ids[i];
+            var id = asyncIds[i];
             var paramType = parameterTypes[i];
             // 存储参数类型，用于后续推断返回类型
             funcLocal.LocalVarTypes[id.IdName] = paramType!;
@@ -336,11 +337,8 @@ public partial class CompilerVisitor
         }
 
         // 同时存储函数的参数列表信息
-        if (node.GetAsyncFuncValue().Ids is not null)
-        {
-            local.FuncParameters.TryAdd(delegateKey, node.GetAsyncFuncValue().Ids);
-            funcLocal.FuncParameters.TryAdd(delegateKey, node.GetAsyncFuncValue().Ids);
-        }
+        local.FuncParameters.TryAdd(delegateKey, asyncIds);
+        funcLocal.FuncParameters.TryAdd(delegateKey, asyncIds);
 
         return null;
     
@@ -1223,8 +1221,9 @@ public partial class CompilerVisitor
             typeAttributes = TypeAttributes.Public | TypeAttributes.BeforeFieldInit;
 
             // 定义基类
-            if (node.GetTypeTemplate().ParentClassName is not null &&
-                local.ClassVar.TryGetValue(node.GetTypeTemplate().ParentClassName, out var parentType))
+            var parentClassName = node.GetTypeTemplate().ParentClassName;
+            if (parentClassName is not null &&
+                local.ClassVar.TryGetValue(parentClassName, out var parentType))
             {
                 baseType = parentType;
             }
@@ -1308,7 +1307,7 @@ public partial class CompilerVisitor
         // 在 IL 模式下，我们需要在编译时应用装饰器
         // 策略：使用解释器执行装饰器函数，获取包装后的函数，然后编译包装后的函数
         var funcToCompile = node.GetFuncValue();
-        if (node.GetFuncValue().Decorators is not null && node.GetFuncValue().Decorators.Count > 0)
+        if (funcToCompile.Decorators is { Count: > 0 })
         {
             // 需要一个 VariateManager 来执行装饰器
             // 从 LocalManager 的 Interpreter 获取 VariateManager
@@ -1453,9 +1452,10 @@ public partial class CompilerVisitor
                 forwarderIl.Emit(OpCodes.Dup);
                 forwarderIl.Emit(OpCodes.Ldc_I4, index);
                 forwarderIl.Emit(OpCodes.Ldarg, index);
-                if (parameterTypes[index].IsValueType)
+                var parameterType = parameterTypes[index]!;
+                if (parameterType.IsValueType)
                 {
-                    forwarderIl.Emit(OpCodes.Box, parameterTypes[index]);
+                    forwarderIl.Emit(OpCodes.Box, parameterType);
                 }
 
                 forwarderIl.Emit(OpCodes.Stelem_Ref);
@@ -1474,7 +1474,7 @@ public partial class CompilerVisitor
             var forwarderKey = methodName;
             if (funcToCompile.Ids is not null)
             {
-                forwarderKey = $"{methodName}${string.Join("_", parameterTypes.Select(t => t.Name))}";
+                forwarderKey = $"{methodName}${string.Join("_", parameterTypes.Select(t => t!.Name))}";
             }
 
             local.DelegateVar.TryAdd(forwarderKey, forwarder);

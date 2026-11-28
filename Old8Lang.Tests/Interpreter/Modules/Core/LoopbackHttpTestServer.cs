@@ -66,7 +66,7 @@ public sealed class LoopbackHttpTestServer : IDisposable
                 {
                     var read = await stream.ReadAsync(buffer, ct).ConfigureAwait(false);
                     if (read == 0) return;
-                    headerBuilder.Write(buffer, 0, read);
+                    await headerBuilder.WriteAsync(buffer.AsMemory(0, read), ct).ConfigureAwait(false);
                     headerEndIndex = FindHeaderEnd(headerBuilder.GetBuffer(), (int)headerBuilder.Length);
                     if (headerBuilder.Length > 64 * 1024) return;
                 }
@@ -94,7 +94,7 @@ public sealed class LoopbackHttpTestServer : IDisposable
                 var bodyStream = new MemoryStream();
                 if (bodyBytesReceived > 0)
                 {
-                    bodyStream.Write(rawBytes, bodyStart, bodyBytesReceived);
+                    await bodyStream.WriteAsync(rawBytes.AsMemory(bodyStart, bodyBytesReceived), ct).ConfigureAwait(false);
                 }
 
                 while (bodyStream.Length < contentLength)
@@ -103,7 +103,7 @@ public sealed class LoopbackHttpTestServer : IDisposable
                     var read = await stream.ReadAsync(buffer.AsMemory(0, Math.Min(buffer.Length, remaining)), ct)
                         .ConfigureAwait(false);
                     if (read == 0) break;
-                    bodyStream.Write(buffer, 0, read);
+                    await bodyStream.WriteAsync(buffer.AsMemory(0, read), ct).ConfigureAwait(false);
                 }
 
                 var (statusLine, responseBody) = BuildResponse(method, path, Encoding.UTF8.GetString(bodyStream.ToArray()));
@@ -165,7 +165,11 @@ public sealed class LoopbackHttpTestServer : IDisposable
 
         try
         {
+            // Dispose 只能是同步的；测试桩已在上面 Cancel + Stop，
+            // 接受循环会很快退出，这里同步等待只为确保端口资源释放完成。
+#pragma warning disable VSTHRD002 // Dispose 无法异步，且该测试桩不运行在 UI 线程上
             _acceptLoop.Wait(TimeSpan.FromSeconds(1));
+#pragma warning restore VSTHRD002
         }
         catch
         {

@@ -85,13 +85,13 @@ result2 <- test_math.multiply(4.0, 5.0)
     }
 
     [Theory]
-    [InlineData("nonexistent_module", "import \"nonexistent_module\"")]
-    [InlineData("invalid/path/module", "import \"invalid/path/module\"")]
-    public void Import_NonExistentModule_ShouldThrowException(string moduleName, string importStatement)
+    [InlineData("nonexistent_module")]
+    [InlineData("invalid/path/module")]
+    public void Import_NonExistentModule_ShouldThrowException(string moduleName)
     {
         // Arrange
         var testContent = $"""
-                           {importStatement}
+                           import "{moduleName}"
                            result <- 42
                            """;
         CreateTempModuleFile("test_error.old8", testContent);

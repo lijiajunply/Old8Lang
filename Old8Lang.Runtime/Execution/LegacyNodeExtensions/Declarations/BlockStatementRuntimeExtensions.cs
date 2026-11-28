@@ -207,10 +207,11 @@ public static class BlockStatementRuntimeExtensions
                 // 直接使用 ClassFieldSetStatement 中的 ClassMemberId
                 return (id: classFieldSet.Id, Expr: classFieldSet.Value);
             case FuncInit init:
-                if (init.GetFuncValue().Id is null) return (null, null);
+                var funcValue = init.GetFuncValue();
+                if (funcValue.Id is null) return (null, null);
                 // 如果是 ClassMemberId 直接使用，否则转换
-                var memberId2 = init.GetFuncValue().Id as ClassMemberId ?? new ClassMemberId(init.GetFuncValue().Id);
-                return (memberId2, Expr: init.GetFuncValue());
+                var memberId2 = funcValue.Id as ClassMemberId ?? new ClassMemberId(funcValue.Id);
+                return (memberId2, Expr: funcValue);
             case ClassFuncInitStatement classFuncInit:
                 // 直接使用 ClassFuncInitStatement 中的 ClassMemberId
                 return (id: classFuncInit.Id, Expr: classFuncInit.GetFuncValue());

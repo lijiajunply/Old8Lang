@@ -155,7 +155,7 @@ public class PerformanceAnalyzerTests
         // Assert
         Assert.NotNull(summary);
         Assert.Equal(session, summary.Session);
-        Assert.Equal(0, summary.Bottlenecks.Count); // 没有明显瓶颈
+        Assert.Empty(summary.Bottlenecks); // 没有明显瓶颈
         Assert.Equal(100.0, summary.OverallScore); // 没有瓶颈，应该是100分
         Assert.Equal(PerformanceGrade.A, summary.Grade);
     }

@@ -36,7 +36,6 @@ func test() -> void {
 
         // Assert
         Assert.NotNull(result);
-        Assert.NotNull(result.Data);
 
         testOutputHelper.WriteLine($"Semantic tokens count: {result.Data.Length}");
         testOutputHelper.WriteLine("Semantic tokens generated successfully");
@@ -67,7 +66,6 @@ func calculate(x:int) -> int {
 
         // Assert
         Assert.NotNull(result);
-        Assert.NotNull(result.Data);
 
         testOutputHelper.WriteLine($"Generated {result.Data.Length} semantic tokens for function and variables");
     }
@@ -99,7 +97,6 @@ class Person {
 
         // Assert
         Assert.NotNull(result);
-        Assert.NotNull(result.Data);
 
         testOutputHelper.WriteLine($"Generated {result.Data.Length} semantic tokens for class");
     }

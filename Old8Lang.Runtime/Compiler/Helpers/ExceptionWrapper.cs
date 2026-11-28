@@ -41,9 +41,9 @@ public class ExceptionWrapper
     {
         // 反射/委托调用会把语言异常再包一层 TargetInvocationException，
         // 逐层剥掉，否则 catch 变量拿到的是通用 reflection 消息。
-        while (exception is System.Reflection.TargetInvocationException { InnerException: not null } invocation)
+        while (exception is System.Reflection.TargetInvocationException { InnerException: { } innerException })
         {
-            exception = invocation.InnerException;
+            exception = innerException;
         }
 
         if (exception is LangThrownException thrown)

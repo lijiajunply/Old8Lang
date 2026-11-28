@@ -411,6 +411,11 @@ public static class ReflectionHelper
             // 将 LangValueType 转换为 LangExpression
             var arguments = argsList.Values.Select(v => new ValueExpression(v)).Cast<LangExpression>().ToList();
 
+            if (manager is null)
+            {
+                throw new InvalidOperationException("调用语言层方法需要变量管理器");
+            }
+
             return anyValue.ReflectionInvokeMethod(methodName, arguments, manager);
         }
 

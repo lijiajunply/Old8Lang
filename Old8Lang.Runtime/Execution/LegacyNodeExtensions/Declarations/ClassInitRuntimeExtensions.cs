@@ -66,8 +66,9 @@ public static partial class ClassInitRuntimeExtensions
         var fieldBuilders = new List<(FieldBuilder, LangExpression)>();
 
         // 首先，如果有父类，将父类的字段信息复制到当前类的FieldVar中
-        if (node.GetTypeTemplate().ParentClassName is not null &&
-            local.ClassVar.TryGetValue(node.GetTypeTemplate().ParentClassName, out var parentType))
+        var parentClassName = node.GetTypeTemplate().ParentClassName;
+        if (parentClassName is not null &&
+            local.ClassVar.TryGetValue(parentClassName, out var parentType))
         {
             // 继承字段（含 protected）需要在子类方法中参与类型推断与直接访问。
             var parentFields = parentType.GetFields(

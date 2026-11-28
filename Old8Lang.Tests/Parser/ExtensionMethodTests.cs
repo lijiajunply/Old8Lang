@@ -37,7 +37,7 @@ public class ExtensionMethodTests
 
         var extension = (ExtensionDeclaration)program[0];
         Assert.Equal("int", extension.TargetTypeName);
-        Assert.Equal(1, extension.ExtensionMethods.Count);
+        Assert.Single(extension.ExtensionMethods);
         Assert.Equal("double", extension.ExtensionMethods[0].Id?.IdName);
     }
 
@@ -113,7 +113,7 @@ public class ExtensionMethodTests
 
         var extension = (ExtensionDeclaration)program[0];
         Assert.Equal("list", extension.TargetTypeName);
-        Assert.Equal(1, extension.ExtensionMethods.Count);
+        Assert.Single(extension.ExtensionMethods);
         Assert.Equal("sum", extension.ExtensionMethods[0].Id?.IdName);
     }
 
@@ -179,7 +179,7 @@ public class ExtensionMethodTests
         Assert.Equal(2, extension.ExtensionMethods.Count);
 
         // 检查第一个方法的参数
-        Assert.Equal(1, extension.ExtensionMethods[0].Parameters.Count);
+        Assert.Single(extension.ExtensionMethods[0].Parameters);
         Assert.Equal("n", extension.ExtensionMethods[0].Parameters[0].IdName);
 
         // 检查第二个方法的参数

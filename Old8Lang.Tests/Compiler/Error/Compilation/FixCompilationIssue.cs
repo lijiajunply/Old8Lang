@@ -30,7 +30,7 @@ public static class FixCompilationIssue
         }
         catch (Exception ex)
         {
-            Assert.True(false, $"Unexpected error during {name}: {ex.Message}\nCode:\n{code}");
+            Assert.Fail($"Unexpected error during {name}: {ex.Message}\nCode:\n{code}");
         }
     }
     
@@ -48,7 +48,7 @@ public static class FixCompilationIssue
         }
         catch (Exception ex)
         {
-            Assert.True(false, $"Type annotation verification failed for {name}: {ex.Message}\nCode:\n{code}");
+            Assert.Fail($"Type annotation verification failed for {name}: {ex.Message}\nCode:\n{code}");
         }
     }
     
@@ -65,7 +65,7 @@ public static class FixCompilationIssue
         }
         catch (Exception ex)
         {
-            Assert.True(false, $"Error handling verification failed for {name}: {ex.Message}\nCode:\n{code}");
+            Assert.Fail($"Error handling verification failed for {name}: {ex.Message}\nCode:\n{code}");
         }
     }
     
@@ -82,7 +82,7 @@ public static class FixCompilationIssue
         }
         catch (Exception ex)
         {
-            Assert.True(false, $"Function compilation verification failed for {name}: {ex.Message}\nCode:\n{code}");
+            Assert.Fail($"Function compilation verification failed for {name}: {ex.Message}\nCode:\n{code}");
         }
     }
     
@@ -99,7 +99,7 @@ public static class FixCompilationIssue
         }
         catch (Exception ex)
         {
-            Assert.True(false, $"Collection compilation verification failed for {name}: {ex.Message}\nCode:\n{code}");
+            Assert.Fail($"Collection compilation verification failed for {name}: {ex.Message}\nCode:\n{code}");
         }
     }
     
@@ -116,7 +116,7 @@ public static class FixCompilationIssue
         }
         catch (Exception ex)
         {
-            Assert.True(false, $"Async compilation verification failed for {name}: {ex.Message}\nCode:\n{code}");
+            Assert.Fail($"Async compilation verification failed for {name}: {ex.Message}\nCode:\n{code}");
         }
     }
     
@@ -133,7 +133,7 @@ public static class FixCompilationIssue
         }
         catch (Exception ex)
         {
-            Assert.True(false, $"Edge case compilation verification failed for {name}: {ex.Message}\nCode:\n{code}");
+            Assert.Fail($"Edge case compilation verification failed for {name}: {ex.Message}\nCode:\n{code}");
         }
     }
     
@@ -150,7 +150,7 @@ public static class FixCompilationIssue
         }
         catch (Exception ex)
         {
-            Assert.True(false, $"Generic compilation verification failed for {name}: {ex.Message}\nCode:\n{code}");
+            Assert.Fail($"Generic compilation verification failed for {name}: {ex.Message}\nCode:\n{code}");
         }
     }
 }
