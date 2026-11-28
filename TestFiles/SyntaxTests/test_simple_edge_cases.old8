@@ -142,7 +142,7 @@ try {
 }
 
 // 使用类型注解的变量声明
-var_with_type <- 10:int
+var_with_type:int <- 10
 PrintLine(var_with_type)
 
 // 使用类型注解的函数声明

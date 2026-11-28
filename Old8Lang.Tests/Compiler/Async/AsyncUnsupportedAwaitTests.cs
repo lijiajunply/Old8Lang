@@ -199,19 +199,27 @@ public class AsyncUnsupportedAwaitTests
     }
 
     [Fact]
-    public void AwaitInsideExpression_ReportsClearErrorInsteadOfInvalidIl()
+    public void AwaitInsideExpression_LiftsTemporariesAndExecutesCorrectly()
     {
-        // 函数实参求值前已经构造了实参数组，栈上非空；挂起会生成无效 IL。
+        // 表达式内部 await 现通过 AST 临时变量提升支持，挂起前求值栈为空。
         var code = @"
-            async func work() {
-                PrintLine(await Task.FromResult(1))
+            async func getNum(n:int) -> int {
+                await Task.Delay(5)
+                return n
             }
 
-            work()
+            async func work() -> int {
+                PrintLine(await Task.FromResult(1))
+                sum <- 10 + (await getNum(5)) + (await getNum(7))
+                items <- {await getNum(1), await getNum(2)}
+                return sum + items[0] + items[1]
+            }
+
+            res <- await work()
+            Assert.Equal(25, res)
         ";
 
-        var message = CompileExpectingError(code);
-        Assert.Contains("表达式内部的 await", message);
+        Assert.Null(CompileAndRun(code));
     }
 
     private static Exception? CompileAndRun(string code)

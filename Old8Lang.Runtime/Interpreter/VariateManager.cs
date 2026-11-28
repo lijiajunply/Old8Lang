@@ -122,7 +122,12 @@ public class VariateManager
     /// 模块只应执行一次；再次导入同一模块时从这里取符号，避免重复执行模块体。
     /// 同一路径的模块在不同解释器实例之间互不共享，保证测试隔离。
     /// </remarks>
-    internal Dictionary<string, Dictionary<string, LangValueType>> LoadedModuleExports { get; } = new();
+    internal Dictionary<string, Dictionary<string, LangValueType>> LoadedModuleExports { get; set; } = new();
+
+    /// <summary>
+    /// 当前正在执行的类方法/构造函数所属的类名（用于多级继承中 <c>super</c> 沿声明类向上解析父类）。
+    /// </summary>
+    internal string? CurrentExecutingClassName { get; set; }
 
     /// <summary>
     /// COW（Copy-On-Write）标记数组，记录每个作用域是否共享
@@ -453,20 +458,21 @@ public class VariateManager
     }
 
     /// <summary>
-    /// 最大递归深度限制,防止栈溢出
+    /// 最大递归深度限制,防止栈溢出（每层解释器调用会消耗多层 CLR 栈帧，阈值需保守以保证先触发语言级 RecursionError）
     /// </summary>
-    private const int MaxRecursionDepth = 1000;
+    private const int MaxRecursionDepth = 200;
 
     /// <summary>
     /// 当前递归深度
     /// </summary>
-    /// <exception cref="RecursionError">当递归深度超过最大值时抛出</exception>
+    /// <exception cref="RecursionError">当递归深度超过最大值或托管栈空间不足时抛出</exception>
     public int RecursionDepth
     {
         get;
         set
         {
-            if (value > MaxRecursionDepth)
+            if (value > MaxRecursionDepth ||
+                (value > field && !System.Runtime.CompilerServices.RuntimeHelpers.TryEnsureSufficientExecutionStack()))
             {
                 throw new RecursionError(
                     new SourcePosition(0, 0),

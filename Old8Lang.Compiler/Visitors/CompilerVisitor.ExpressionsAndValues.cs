@@ -116,6 +116,11 @@ public partial class CompilerVisitor
         // 动态对象（如通过 Delegate 返回的 Task）在运行期规范化为 Task<object?>
         if (exprType == typeof(object) || exprType?.GetMethod("GetAwaiter") is null)
         {
+            if (exprType is { IsValueType: true })
+            {
+                ilGenerator.Emit(OpCodes.Box, exprType);
+            }
+
             ilGenerator.Emit(OpCodes.Call,
                 typeof(IlRuntimeFunctions).GetMethod(nameof(IlRuntimeFunctions.ToAwaitableTask))!);
             exprType = typeof(Task<object>);

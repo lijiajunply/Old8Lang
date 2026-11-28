@@ -88,7 +88,7 @@ public sealed class CountDownLatchCountDownFunction : BaseGlobalFunction
         SourcePosition position)
     {
         // 加载 latchId 参数
-        parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        ConcurrencyIlHelpers.EmitLoadIntArgument(parameters[0], ilGenerator, local);
 
         // 调用 ResourceManager.CountDown(int)
         var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.CountDown));
@@ -136,7 +136,7 @@ public sealed class CountDownLatchWaitFunction : BaseGlobalFunction
         SourcePosition position)
     {
         // 加载 latchId 参数
-        parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        ConcurrencyIlHelpers.EmitLoadIntArgument(parameters[0], ilGenerator, local);
 
         // 调用 ResourceManager.WaitCountDownLatch(int)
         var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.WaitCountDownLatch));
@@ -185,10 +185,10 @@ public sealed class CountDownLatchWaitTimeoutFunction : BaseGlobalFunction
         SourcePosition position)
     {
         // 加载 latchId 参数
-        parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        ConcurrencyIlHelpers.EmitLoadIntArgument(parameters[0], ilGenerator, local);
 
         // 加载 timeoutMs 参数
-        parameters[1].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        ConcurrencyIlHelpers.EmitLoadIntArgument(parameters[1], ilGenerator, local);
 
         // 调用 ResourceManager.WaitCountDownLatchTimeout(int, int)
         var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.WaitCountDownLatchTimeout));
@@ -236,7 +236,7 @@ public sealed class CountDownLatchGetCountFunction : BaseGlobalFunction
         SourcePosition position)
     {
         // 加载 latchId 参数
-        parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        ConcurrencyIlHelpers.EmitLoadIntArgument(parameters[0], ilGenerator, local);
 
         // 调用 ResourceManager.GetCountDownLatchCount(int)
         var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.GetCountDownLatchCount));

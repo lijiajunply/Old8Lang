@@ -29,8 +29,10 @@ PrintLine(nested_ternary)
 complex_arith <- (1 + 2) * 3 / 4 - 5 % 2 + 1
 PrintLine(complex_arith)
 
-// 连续赋值
-a <- b <- c <- 10
+// 连续赋值（Old8Lang 赋值是语句，分步赋值）
+c <- 10
+b <- c
+a <- b
 PrintLine(a, b, c)
 
 // 各种括号嵌套
@@ -52,7 +54,8 @@ PrintLine(mixed_array)
 // 字符串模板中的复杂表达式
 name <- "Old8Lang"
 version <- 1.0
-info <- $"名称: {name}, 版本: {version}, 状态: {version > 0 ? "活跃" : "未发布"}"
+status <- version > 0 ? "活跃" : "未发布"
+info <- $"名称: {name}, 版本: {version}, 状态: {status}"
 PrintLine(info)
 
 // 列表推导式的复杂形式
@@ -155,7 +158,7 @@ complex_cond <- (a > 5 and b < 10) or (c == 15 and d != 20) xor (e <= 25)
 PrintLine(complex_cond)
 
 // 多种操作符的组合
-type x <- 10
+x <- 10
 result <- x++ + ++x
 PrintLine(result)
 
@@ -220,14 +223,14 @@ try {
 }
 
 // 使用类型注解的变量声明
-var_with_type <- 10:int
+var_with_type:int <- 10
 PrintLine(var_with_type)
 
-var_with_double <- 3.14:double
+var_with_double:double <- 3.14
 PrintLine(var_with_double)
 
 // 使用类型注解的函数声明
-func add_with_types(x:int, y:int):int {
+func add_with_types(x:int, y:int) -> int {
     return x + y
 }
 

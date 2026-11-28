@@ -385,6 +385,12 @@ public class LinqParser(ParserContext context, Func<ExpressionParser> expression
             }
         }
 
-        return new QueryContinuation(variable, bodyClauses, terminationClause, position);
+        QueryContinuation? nextContinuation = null;
+        if (CurrentToken.Type == LangTokenType.Into)
+        {
+            nextContinuation = ParseQueryContinuation();
+        }
+
+        return new QueryContinuation(variable, bodyClauses, terminationClause, position, nextContinuation);
     }
 }

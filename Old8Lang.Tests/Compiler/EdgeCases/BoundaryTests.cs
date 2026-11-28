@@ -274,7 +274,7 @@ public class BoundaryTests(ITestOutputHelper output)
             }
             
             Assert.Equal(-1, result1)
-            Assert.Equal(0, result2)  // 浮点数除以零不抛出异常，result2 保持初始值 0
+            Assert.True(result2 > 1000000)  // IL 浮点数除以零按 IEEE 754 返回正无穷（不抛出异常，且不再丢失 try 块写入的值）
             Assert.Equal(-3, result3)
         ";
         var interpreter = new LangInterpreter();

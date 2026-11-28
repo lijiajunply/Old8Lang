@@ -680,11 +680,47 @@ public partial class CompilerVisitor
             if (local.AsyncStateMachineGenerator != null)
             {
                 node.Value.Accept(this);
-                var valueType = node.Value.Accept(new TypeInferenceVisitor(local));
+                var valueType = node.Value.Accept(new TypeInferenceVisitor(local)) ?? typeof(object);
                 // 确保 void 类型被视为 object (null)
                 if (valueType == typeof(void)) valueType = typeof(object);
 
-                if (valueType != null) local.DefineVariable(ilGenerator, node.Id.IdName, valueType);
+                local.DefineVariable(ilGenerator, node.Id.IdName, valueType);
+                var targetType = local.AsyncStateMachineGenerator.GetVariableType(node.Id.IdName) ?? valueType;
+                if (targetType != valueType)
+                {
+                    if (targetType == typeof(object))
+                    {
+                        if (valueType.IsValueType)
+                        {
+                            ilGenerator.Emit(OpCodes.Box, valueType);
+                        }
+                    }
+                    else if (valueType == typeof(object))
+                    {
+                        ilGenerator.Emit(OpCodes.Ldtoken, targetType);
+                        ilGenerator.Emit(OpCodes.Call,
+                            typeof(Type).GetMethod(nameof(Type.GetTypeFromHandle))!);
+                        ilGenerator.Emit(OpCodes.Call,
+                            typeof(IlValueBridge).GetMethod(nameof(IlValueBridge.CoerceDynamic))!);
+                        if (targetType.IsValueType)
+                        {
+                            ilGenerator.Emit(OpCodes.Unbox_Any, targetType);
+                        }
+                        else
+                        {
+                            ilGenerator.Emit(OpCodes.Castclass, targetType);
+                        }
+                    }
+                    else if (targetType == typeof(double) && valueType == typeof(int))
+                    {
+                        ilGenerator.Emit(OpCodes.Conv_R8);
+                    }
+                    else if (targetType == typeof(int) && valueType == typeof(double))
+                    {
+                        ilGenerator.Emit(OpCodes.Conv_I4);
+                    }
+                }
+
                 local.StoreVariable(ilGenerator, node.Id.IdName, node.Position);
                 return null;
             }

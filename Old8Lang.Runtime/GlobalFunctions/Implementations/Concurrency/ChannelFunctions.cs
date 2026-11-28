@@ -129,7 +129,7 @@ public sealed class ChannelSendFunction : BaseGlobalFunction
         SourcePosition position)
     {
         // 加载 channelId 参数
-        parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        ConcurrencyIlHelpers.EmitLoadIntArgument(parameters[0], ilGenerator, local);
 
         // 加载 value 参数并转换为 object
         parameters[1].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
@@ -188,7 +188,7 @@ public sealed class ChannelTrySendFunction : BaseGlobalFunction
         SourcePosition position)
     {
         // 加载 channelId 参数
-        parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        ConcurrencyIlHelpers.EmitLoadIntArgument(parameters[0], ilGenerator, local);
 
         // 加载 value 参数并转换为 object
         parameters[1].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
@@ -199,7 +199,7 @@ public sealed class ChannelTrySendFunction : BaseGlobalFunction
         }
 
         // 加载 timeoutMs 参数
-        parameters[2].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        ConcurrencyIlHelpers.EmitLoadIntArgument(parameters[2], ilGenerator, local);
 
         // 调用 ResourceManager.TrySendChannel(int, object, int)
         var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.TrySendChannel));
@@ -248,7 +248,7 @@ public sealed class ChannelReceiveFunction : BaseGlobalFunction
         SourcePosition position)
     {
         // 加载 channelId 参数
-        parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        ConcurrencyIlHelpers.EmitLoadIntArgument(parameters[0], ilGenerator, local);
 
         // 调用 ResourceManager.ReceiveChannel(int)
         var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.ReceiveChannel));
@@ -296,13 +296,13 @@ public sealed class ChannelTryReceiveFunction : BaseGlobalFunction
         SourcePosition position)
     {
         // 加载 channelId 参数
-        parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        ConcurrencyIlHelpers.EmitLoadIntArgument(parameters[0], ilGenerator, local);
 
         // 加载 timeoutMs 参数
-        parameters[1].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        ConcurrencyIlHelpers.EmitLoadIntArgument(parameters[1], ilGenerator, local);
 
-        // 调用 ResourceManager.TryReceiveChannel(int, int)
-        var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.TryReceiveChannel));
+        // 调用 ConcurrencyIlHelpers.TryReceiveChannelValue(int, int)，将 ChannelReceiveResult 结构体展开为 object?
+        var method = typeof(ConcurrencyIlHelpers).GetMethod(nameof(ConcurrencyIlHelpers.TryReceiveChannelValue))!;
         ilGenerator.Emit(OpCodes.Call, method);
     }
 
@@ -349,7 +349,7 @@ public sealed class ChannelCloseFunction : BaseGlobalFunction
         SourcePosition position)
     {
         // 加载 channelId 参数
-        parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        ConcurrencyIlHelpers.EmitLoadIntArgument(parameters[0], ilGenerator, local);
 
         // 调用 ResourceManager.CloseChannel(int)
         var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.CloseChannel));

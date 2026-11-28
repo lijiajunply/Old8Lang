@@ -104,11 +104,9 @@ func recurseForever(n:int) -> int {
 res <- recurseForever(1)
 ";
         var interpreter = new LangInterpreter();
-        // 预设接近上限（1000）以避免在触发语言层递归守卫前先耗尽托管线程栈
-        interpreter.Manager.RecursionDepth = 990;
         var ast = interpreter.Build(code);
 
-        var ex = Assert.ThrowsAny<Old8Exception>(() => ast.Run(interpreter.Manager));
+        var ex = Assert.Throws<RecursionError>(() => ast.Run(interpreter.Manager));
         Assert.NotNull(ex);
     }
 
@@ -142,10 +140,9 @@ func pong(n:int) -> int {
 res <- ping(1)
 ";
         var infInterp = new LangInterpreter();
-        infInterp.Manager.RecursionDepth = 990;
         var ast = infInterp.Build(infCode);
 
-        var ex = Assert.ThrowsAny<Old8Exception>(() => ast.Run(infInterp.Manager));
+        var ex = Assert.Throws<RecursionError>(() => ast.Run(infInterp.Manager));
         Assert.NotNull(ex);
     }
 

@@ -29,30 +29,25 @@ public partial class InterpreterVisitor
     public LangValueType VisitRangeLiteralExpression(RangeLiteralExpression node) =>
         VisitRangeLangValue(LiteralCollectionRuntimeFactory.CreateRange(node));
 
-    // 旧 AST 在解析时创建值，同一节点重复求值返回同一实例；弱引用缓存保留这一语义。
+    // 标量字面量不可变，可按语法节点缓存；可变集合与元组每次求值必须创建独立实例，
+    // 避免循环或 LINQ 中多次迭代复用同一容器导致元素互相覆写。
     private static readonly ConditionalWeakTable<ScalarLiteralExpression, LangValueType> LiteralValues = new();
-    private static readonly ConditionalWeakTable<ArrayLiteralExpression, ArrayLangValue> ArrayLiteralValues = new();
-    private static readonly ConditionalWeakTable<ListLiteralExpression, ListLangValue> ListLiteralValues = new();
-    private static readonly ConditionalWeakTable<DictionaryLiteralExpression, DictionaryLangValue> DictionaryLiteralValues = new();
-    private static readonly ConditionalWeakTable<TupleLiteralExpression, TupleLangValue> TupleLiteralValues = new();
 
-    /// <summary>求值元组并保持同一节点的既有对象身份。</summary>
+    /// <summary>求值元组字面量（每次返回独立实例）。</summary>
     public LangValueType VisitTupleLiteralExpression(TupleLiteralExpression node) =>
-        VisitTupleLangValue(TupleLiteralValues.GetValue(node, LiteralCollectionRuntimeFactory.CreateTuple));
+        VisitTupleLangValue(LiteralCollectionRuntimeFactory.CreateTuple(node));
 
-    /// <summary>按原顺序求值字典条目并保持同一节点的既有对象身份。</summary>
+    /// <summary>按原顺序求值字典字面量（每次返回独立实例）。</summary>
     public LangValueType VisitDictionaryLiteralExpression(DictionaryLiteralExpression node) =>
-        VisitDictionaryLangValue(DictionaryLiteralValues.GetValue(node, LiteralCollectionRuntimeFactory.CreateDictionary));
+        VisitDictionaryLangValue(LiteralCollectionRuntimeFactory.CreateDictionary(node));
 
-    /// <summary>求值列表字面量并保持同一节点的既有对象身份。</summary>
+    /// <summary>求值列表字面量（每次返回独立实例）。</summary>
     public LangValueType VisitListLiteralExpression(ListLiteralExpression node) =>
-        VisitListLangValue(ListLiteralValues.GetValue(node,
-            static n => new ListLangValue(n.Elements.ToList(), position: n.Position)));
+        VisitListLangValue(new ListLangValue(node.Elements.ToList(), position: node.Position));
 
-    /// <summary>求值数组字面量并保持同一节点的既有对象身份。</summary>
+    /// <summary>求值数组字面量（每次返回独立实例）。</summary>
     public LangValueType VisitArrayLiteralExpression(ArrayLiteralExpression node) =>
-        VisitArrayLangValue(ArrayLiteralValues.GetValue(node,
-            static n => new ArrayLangValue(n.Elements, position: n.Position)));
+        VisitArrayLangValue(new ArrayLangValue(node.Elements, position: node.Position));
 
     /// <summary>求值标量字面量。</summary>
     public LangValueType VisitScalarLiteralExpression(ScalarLiteralExpression node) =>

@@ -129,7 +129,8 @@ internal static class ComparisonOpHelper
         var gtLeftType = left?.Accept(new TypeInferenceVisitor(local));
         var gtRightType = right?.Accept(new TypeInferenceVisitor(local));
         RejectBooleanOrderingOperands(left, right, gtLeftType, gtRightType);
-        if (gtLeftType == typeof(object) && gtRightType == typeof(object))
+        if ((gtLeftType == typeof(object) && gtRightType == typeof(object)) ||
+            IsObjectVsNumericComparison(gtLeftType, gtRightType))
         {
             EmitDynamicComparison(">", left, right, gtLeftType, gtRightType, ilGenerator, local);
             return typeof(bool);
@@ -211,7 +212,8 @@ internal static class ComparisonOpHelper
         var ltLeftType = left?.Accept(new TypeInferenceVisitor(local));
         var ltRightType = right?.Accept(new TypeInferenceVisitor(local));
         RejectBooleanOrderingOperands(left, right, ltLeftType, ltRightType);
-        if (ltLeftType == typeof(object) && ltRightType == typeof(object))
+        if ((ltLeftType == typeof(object) && ltRightType == typeof(object)) ||
+            IsObjectVsNumericComparison(ltLeftType, ltRightType))
         {
             EmitDynamicComparison("<", left, right, ltLeftType, ltRightType, ilGenerator, local);
             return typeof(bool);
@@ -435,7 +437,8 @@ internal static class ComparisonOpHelper
         var rightType = right?.Accept(new TypeInferenceVisitor(local));
 
         RejectBooleanOrderingOperands(left, right, leftType, rightType);
-        if (leftType == typeof(object) && rightType == typeof(object))
+        if ((leftType == typeof(object) && rightType == typeof(object)) ||
+            IsObjectVsNumericComparison(leftType, rightType))
         {
             EmitDynamicComparison("<=", left, right, leftType, rightType, ilGenerator, local);
             return typeof(bool);
@@ -519,7 +522,8 @@ internal static class ComparisonOpHelper
         var rightType = right?.Accept(new TypeInferenceVisitor(local));
 
         RejectBooleanOrderingOperands(left, right, leftType, rightType);
-        if (leftType == typeof(object) && rightType == typeof(object))
+        if ((leftType == typeof(object) && rightType == typeof(object)) ||
+            IsObjectVsNumericComparison(leftType, rightType))
         {
             EmitDynamicComparison(">=", left, right, leftType, rightType, ilGenerator, local);
             return typeof(bool);

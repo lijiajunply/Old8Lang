@@ -6,11 +6,51 @@ namespace Old8Lang.Tests.Compiler.Async;
 /// <summary>
 /// IL 模式下的异步编程功能测试 - spawn 关键字
 /// </summary>
+[Collection("Sequential")]
 public class SpawnTests(ITestOutputHelper output)
 {
     private readonly ITestOutputHelper _output = output;
 
+    private static void CompileAndRun(string code)
+    {
+        var interpreter = new LangInterpreter();
+        var ast = interpreter.Build(code);
+        var prevVerification = Old8Lang.Compiler.Compiler.IlVerificationEnabled;
+        Old8Lang.Compiler.Compiler.IlVerificationEnabled = false;
+        Action compiledAction;
+        try
+        {
+            compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+        }
+        finally
+        {
+            Old8Lang.Compiler.Compiler.IlVerificationEnabled = prevVerification;
+        }
+
+        var exception = Record.Exception(() => compiledAction());
+        Assert.Null(exception);
+    }
+
+    /// <summary>
+    /// 默认档无 Sleep 冒烟用例：验证基础 spawn + 参数 + 返回值 + 异常捕获
+    /// </summary>
     [Fact]
+    public void Spawn_FastSmokeWithoutSleep_CompilesAndExecutesCorrectly()
+    {
+        var code = @"
+            func doubleIt(v:int) -> int {
+                return v * 2
+            }
+
+            t <- spawn(doubleIt, 21)
+            t.Start()
+            Assert.Equal(42, t.Join())
+        ";
+        CompileAndRun(code);
+    }
+
+    [Fact]
+    [Trait("Category", "Performance")]
     public void BasicSpawn_CompilesAndExecutesCorrectly()
     {
         var code = @"
@@ -25,18 +65,11 @@ public class SpawnTests(ITestOutputHelper output)
             
             Assert.Equal(42, result)
         ";
-        var interpreter = new LangInterpreter();
-
-        var ast = interpreter.Build(code);
-        Old8Lang.Compiler.Compiler.IlVerificationEnabled = false;
-        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
-        Old8Lang.Compiler.Compiler.IlVerificationEnabled = true;
-
-        var exception = Record.Exception(() => compiledAction());
-        Assert.Null(exception);
+        CompileAndRun(code);
     }
 
     [Fact]
+    [Trait("Category", "Performance")]
     public void MultipleSpawn_CompilesAndExecutesCorrectly()
     {
         var code = @"
@@ -70,18 +103,11 @@ public class SpawnTests(ITestOutputHelper output)
             Assert.Equal(20, result2)
             Assert.Equal(30, result3)
         ";
-        var interpreter = new LangInterpreter();
-
-        var ast = interpreter.Build(code);
-        Old8Lang.Compiler.Compiler.IlVerificationEnabled = false;
-        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
-        Old8Lang.Compiler.Compiler.IlVerificationEnabled = true;
-
-        var exception = Record.Exception(() => compiledAction());
-        Assert.Null(exception);
+        CompileAndRun(code);
     }
 
     [Fact]
+    [Trait("Category", "Performance")]
     public void SpawnWithReturnValue_CompilesAndExecutesCorrectly()
     {
         var code = @"
@@ -96,18 +122,11 @@ public class SpawnTests(ITestOutputHelper output)
             
             Assert.Equal(25, result)
         ";
-        var interpreter = new LangInterpreter();
-
-        var ast = interpreter.Build(code);
-        Old8Lang.Compiler.Compiler.IlVerificationEnabled = false;
-        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
-        Old8Lang.Compiler.Compiler.IlVerificationEnabled = true;
-
-        var exception = Record.Exception(() => compiledAction());
-        Assert.Null(exception);
+        CompileAndRun(code);
     }
 
     [Fact]
+    [Trait("Category", "Performance")]
     public void SpawnWithParameters_CompilesAndExecutesCorrectly()
     {
         var code = @"
@@ -123,18 +142,11 @@ public class SpawnTests(ITestOutputHelper output)
             
             Assert.Equal(""test: 25"", result)
         ";
-        var interpreter = new LangInterpreter();
-
-        var ast = interpreter.Build(code);
-        Old8Lang.Compiler.Compiler.IlVerificationEnabled = false;
-        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
-        Old8Lang.Compiler.Compiler.IlVerificationEnabled = true;
-
-        var exception = Record.Exception(() => compiledAction());
-        Assert.Null(exception);
+        CompileAndRun(code);
     }
 
     [Fact]
+    [Trait("Category", "Performance")]
     public void SpawnWithCollections_CompilesAndExecutesCorrectly()
     {
         var code = @"
@@ -156,18 +168,11 @@ public class SpawnTests(ITestOutputHelper output)
             Assert.Equal(5, result.Count())
             Assert.Equal({2, 4, 6, 8, 10}, result)
         ";
-        var interpreter = new LangInterpreter();
-
-        var ast = interpreter.Build(code);
-        Old8Lang.Compiler.Compiler.IlVerificationEnabled = false;
-        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
-        Old8Lang.Compiler.Compiler.IlVerificationEnabled = true;
-
-        var exception = Record.Exception(() => compiledAction());
-        Assert.Null(exception);
+        CompileAndRun(code);
     }
 
     [Fact]
+    [Trait("Category", "Performance")]
     public void SpawnWithErrorHandling_CompilesAndExecutesCorrectly()
     {
         var code = @"
@@ -186,22 +191,13 @@ public class SpawnTests(ITestOutputHelper output)
                 caughtError <- e
             }
             
-            // 线程异常在三种模式下分别被包装成 CustomError / LangThrownException / 原始值，
-            // 统一按错误消息内容断言。
-            Assert.Contains(caughtError.ToStr(), ""Task failed"")
+            Assert.Equal(""Task failed"", caughtError.ToStr())
         ";
-        var interpreter = new LangInterpreter();
-
-        var ast = interpreter.Build(code);
-        Old8Lang.Compiler.Compiler.IlVerificationEnabled = false;
-        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
-        Old8Lang.Compiler.Compiler.IlVerificationEnabled = true;
-
-        var exception = Record.Exception(() => compiledAction());
-        Assert.Null(exception);
+        CompileAndRun(code);
     }
 
     [Fact]
+    [Trait("Category", "Performance")]
     public void SpawnWithComplexLogic_CompilesAndExecutesCorrectly()
     {
         var code = @"
@@ -229,18 +225,11 @@ public class SpawnTests(ITestOutputHelper output)
             
             Assert.Equal(88, result)
         ";
-        var interpreter = new LangInterpreter();
-
-        var ast = interpreter.Build(code);
-        Old8Lang.Compiler.Compiler.IlVerificationEnabled = false;
-        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
-        Old8Lang.Compiler.Compiler.IlVerificationEnabled = true;
-
-        var exception = Record.Exception(() => compiledAction());
-        Assert.Null(exception);
+        CompileAndRun(code);
     }
 
     [Fact]
+    [Trait("Category", "Performance")]
     public void SpawnWithSharedState_CompilesAndExecutesCorrectly()
     {
         var code = @"
@@ -270,18 +259,11 @@ public class SpawnTests(ITestOutputHelper output)
             
             MutexDispose(mutex)
         ";
-        var interpreter = new LangInterpreter();
-
-        var ast = interpreter.Build(code);
-        Old8Lang.Compiler.Compiler.IlVerificationEnabled = false;
-        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
-        Old8Lang.Compiler.Compiler.IlVerificationEnabled = true;
-
-        var exception = Record.Exception(() => compiledAction());
-        Assert.Null(exception);
+        CompileAndRun(code);
     }
 
     [Fact]
+    [Trait("Category", "Performance")]
     public void SpawnWithConditional_CompilesAndExecutesCorrectly()
     {
         var code = @"
@@ -306,18 +288,11 @@ public class SpawnTests(ITestOutputHelper output)
             Assert.Equal(""fast result"", result1)
             Assert.Equal(""slow result"", result2)
         ";
-        var interpreter = new LangInterpreter();
-
-        var ast = interpreter.Build(code);
-        Old8Lang.Compiler.Compiler.IlVerificationEnabled = false;
-        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
-        Old8Lang.Compiler.Compiler.IlVerificationEnabled = true;
-
-        var exception = Record.Exception(() => compiledAction());
-        Assert.Null(exception);
+        CompileAndRun(code);
     }
 
     [Fact]
+    [Trait("Category", "Performance")]
     public void SpawnWithLoops_CompilesAndExecutesCorrectly()
     {
         var code = @"
@@ -338,18 +313,11 @@ public class SpawnTests(ITestOutputHelper output)
             
             Assert.Equal(10, result)
         ";
-        var interpreter = new LangInterpreter();
-
-        var ast = interpreter.Build(code);
-        Old8Lang.Compiler.Compiler.IlVerificationEnabled = false;
-        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
-        Old8Lang.Compiler.Compiler.IlVerificationEnabled = true;
-
-        var exception = Record.Exception(() => compiledAction());
-        Assert.Null(exception);
+        CompileAndRun(code);
     }
 
     [Fact]
+    [Trait("Category", "Performance")]
     public void SpawnWithClassMethods_CompilesAndExecutesCorrectly()
     {
         var code = @"
@@ -373,18 +341,11 @@ public class SpawnTests(ITestOutputHelper output)
             
             Assert.Equal(10, result)
         ";
-        var interpreter = new LangInterpreter();
-
-        var ast = interpreter.Build(code);
-        Old8Lang.Compiler.Compiler.IlVerificationEnabled = false;
-        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
-        Old8Lang.Compiler.Compiler.IlVerificationEnabled = true;
-
-        var exception = Record.Exception(() => compiledAction());
-        Assert.Null(exception);
+        CompileAndRun(code);
     }
 
     [Fact]
+    [Trait("Category", "Performance")]
     public void SpawnWithLambda_CompilesAndExecutesCorrectly()
     {
         var code = @"
@@ -398,18 +359,11 @@ public class SpawnTests(ITestOutputHelper output)
             
             Assert.Equal(42, result)
         ";
-        var interpreter = new LangInterpreter();
-
-        var ast = interpreter.Build(code);
-        Old8Lang.Compiler.Compiler.IlVerificationEnabled = false;
-        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
-        Old8Lang.Compiler.Compiler.IlVerificationEnabled = true;
-
-        var exception = Record.Exception(() => compiledAction());
-        Assert.Null(exception);
+        CompileAndRun(code);
     }
 
     [Fact]
+    [Trait("Category", "Performance")]
     public void SpawnParallelExecution_CompilesAndExecutesCorrectly()
     {
         var code = @"
@@ -439,14 +393,6 @@ public class SpawnTests(ITestOutputHelper output)
             isParallel <- measureParallelExecution()
             Assert.True(isParallel)
         ";
-        var interpreter = new LangInterpreter();
-
-        var ast = interpreter.Build(code);
-        Old8Lang.Compiler.Compiler.IlVerificationEnabled = false;
-        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
-        Old8Lang.Compiler.Compiler.IlVerificationEnabled = true;
-
-        var exception = Record.Exception(() => compiledAction());
-        Assert.Null(exception);
+        CompileAndRun(code);
     }
 }

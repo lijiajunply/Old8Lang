@@ -130,10 +130,10 @@ public sealed class MutexTryLockFunction : BaseGlobalFunction
         SourcePosition position)
     {
         // 加载 mutexId 参数
-        parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        ConcurrencyIlHelpers.EmitLoadIntArgument(parameters[0], ilGenerator, local);
 
         // 加载 timeoutMs 参数
-        parameters[1].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        ConcurrencyIlHelpers.EmitLoadIntArgument(parameters[1], ilGenerator, local);
 
         // 调用 ResourceManager.TryLockMutex(int, int)
         var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.TryLockMutex));
@@ -181,7 +181,7 @@ public sealed class MutexUnlockFunction : BaseGlobalFunction
         SourcePosition position)
     {
         // 加载 mutexId 参数
-        parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        ConcurrencyIlHelpers.EmitLoadIntArgument(parameters[0], ilGenerator, local);
 
         // 调用 ResourceManager.UnlockMutex(int)
         var method = GlobalMethodInfoCache.GetMethod(typeof(ResourceManager), nameof(ResourceManager.UnlockMutex));

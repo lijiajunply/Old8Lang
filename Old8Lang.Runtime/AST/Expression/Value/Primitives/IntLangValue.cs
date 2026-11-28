@@ -26,6 +26,8 @@ public partial class IntLangValue(int intValue = 0, SourcePosition position = de
 
     public override LangValueType Plus(LangValueType otherLangValueType)
     {
+        if (otherLangValueType is EnumLangValue enumVal)
+            otherLangValueType = Create(enumVal.Value);
         if (otherLangValueType is StringLangValue s)
             return StringLangValue.Create(Value + s.Value);
         if (otherLangValueType is CharLangValue c)
@@ -53,6 +55,8 @@ public partial class IntLangValue(int intValue = 0, SourcePosition position = de
 
     public override LangValueType Minus(LangValueType otherLangValueType)
     {
+        if (otherLangValueType is EnumLangValue enumVal)
+            otherLangValueType = Create(enumVal.Value);
         if (otherLangValueType is DoubleLangValue)
         {
             return DoubleLangValue.Create(Value - otherLangValueType.GetValue<double>());
@@ -79,6 +83,8 @@ public partial class IntLangValue(int intValue = 0, SourcePosition position = de
 
     public override LangValueType Times(LangValueType otherLangValueType)
     {
+        if (otherLangValueType is EnumLangValue enumVal)
+            otherLangValueType = Create(enumVal.Value);
         if (otherLangValueType is StringLangValue)
             return otherLangValueType.Times(this);
         if (otherLangValueType is CharLangValue)
@@ -106,6 +112,8 @@ public partial class IntLangValue(int intValue = 0, SourcePosition position = de
 
     public override LangValueType Divide(LangValueType otherLangValueType)
     {
+        if (otherLangValueType is EnumLangValue enumVal)
+            otherLangValueType = Create(enumVal.Value);
         if (otherLangValueType is DoubleLangValue)
             return otherLangValueType.Divide(this);
         if (otherLangValueType is IntLangValue otherInt)
@@ -124,6 +132,8 @@ public partial class IntLangValue(int intValue = 0, SourcePosition position = de
 
     public override LangValueType Mod(LangValueType otherLangValueType)
     {
+        if (otherLangValueType is EnumLangValue enumVal)
+            otherLangValueType = Create(enumVal.Value);
         if (otherLangValueType is DoubleLangValue)
             return otherLangValueType.Mod(this);
         if (otherLangValueType is IntLangValue otherInt)
@@ -142,6 +152,8 @@ public partial class IntLangValue(int intValue = 0, SourcePosition position = de
 
     public override LangValueType Power(LangValueType otherLangValueType)
     {
+        if (otherLangValueType is EnumLangValue enumVal)
+            otherLangValueType = Create(enumVal.Value);
         if (otherLangValueType is DoubleLangValue doubleValue)
         {
             // 直接计算，不调用 doubleValue.Power(this)，避免顺序颠倒

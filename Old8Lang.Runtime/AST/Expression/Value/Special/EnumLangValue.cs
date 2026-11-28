@@ -48,46 +48,49 @@ public partial class EnumLangValue(
 
     #region 算术运算（委托给底层整数值）
 
+    private static LangValueType UnwrapEnumOperand(LangValueType operand) =>
+        operand is EnumLangValue otherEnum ? IntLangValue.Create(otherEnum.Value) : operand;
+
     public override LangValueType Plus(LangValueType otherLangValueType)
     {
         // 枚举值的加法运算：转换为整数后运算
         var intValue = IntLangValue.Create(Value);
-        return intValue.Plus(otherLangValueType);
+        return intValue.Plus(UnwrapEnumOperand(otherLangValueType));
     }
 
     public override LangValueType Minus(LangValueType otherLangValueType)
     {
         // 枚举值的减法运算：转换为整数后运算
         var intValue = IntLangValue.Create(Value);
-        return intValue.Minus(otherLangValueType);
+        return intValue.Minus(UnwrapEnumOperand(otherLangValueType));
     }
 
     public override LangValueType Times(LangValueType otherLangValueType)
     {
         // 枚举值的乘法运算：转换为整数后运算
         var intValue = IntLangValue.Create(Value);
-        return intValue.Times(otherLangValueType);
+        return intValue.Times(UnwrapEnumOperand(otherLangValueType));
     }
 
     public override LangValueType Divide(LangValueType otherLangValueType)
     {
         // 枚举值的除法运算：转换为整数后运算
         var intValue = IntLangValue.Create(Value);
-        return intValue.Divide(otherLangValueType);
+        return intValue.Divide(UnwrapEnumOperand(otherLangValueType));
     }
 
     public override LangValueType Mod(LangValueType otherLangValueType)
     {
         // 枚举值的取模运算：转换为整数后运算
         var intValue = IntLangValue.Create(Value);
-        return intValue.Mod(otherLangValueType);
+        return intValue.Mod(UnwrapEnumOperand(otherLangValueType));
     }
 
     public override LangValueType Power(LangValueType otherLangValueType)
     {
         // 枚举值的幂运算：转换为整数后运算
         var intValue = IntLangValue.Create(Value);
-        return intValue.Power(otherLangValueType);
+        return intValue.Power(UnwrapEnumOperand(otherLangValueType));
     }
 
     #endregion

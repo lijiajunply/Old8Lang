@@ -17,23 +17,22 @@ namespace Old8Lang.AST.Statement;
 internal static class CatchAssignmentScanner
 {
     /// <summary>
-    /// 收集同时出现在 try 块与 catch 块赋值目标里的变量名。
+    /// 收集既在 catch 块内被赋值、又在 catch 块外（try 块内或 try 块之前/之后）被赋值的变量名。
     /// </summary>
     public static HashSet<string> Collect(OldStatement? statement)
     {
-        var tryAssigned = new HashSet<string>(StringComparer.Ordinal);
+        var outsideCatchAssigned = new HashSet<string>(StringComparer.Ordinal);
         var catchAssigned = new HashSet<string>(StringComparer.Ordinal);
-        Walk(statement, tryAssigned, catchAssigned, inTry: false, inCatch: false);
+        Walk(statement, outsideCatchAssigned, catchAssigned, inCatch: false);
 
-        tryAssigned.IntersectWith(catchAssigned);
-        return tryAssigned;
+        outsideCatchAssigned.IntersectWith(catchAssigned);
+        return outsideCatchAssigned;
     }
 
     private static void Walk(
         OldStatement? statement,
-        HashSet<string> tryAssigned,
+        HashSet<string> outsideCatchAssigned,
         HashSet<string> catchAssigned,
-        bool inTry,
         bool inCatch)
     {
         if (statement is null)
@@ -43,32 +42,31 @@ internal static class CatchAssignmentScanner
 
         if (statement is SetStatement { Id: not null } set)
         {
-            if (inTry)
-            {
-                tryAssigned.Add(set.Id.IdName);
-            }
-
             if (inCatch)
             {
                 catchAssigned.Add(set.Id.IdName);
+            }
+            else
+            {
+                outsideCatchAssigned.Add(set.Id.IdName);
             }
         }
 
         if (statement is TryStatement tryStatement)
         {
-            Walk(tryStatement.TryBlock, tryAssigned, catchAssigned, inTry: true, inCatch);
+            Walk(tryStatement.TryBlock, outsideCatchAssigned, catchAssigned, inCatch);
             foreach (var (_, _, _, catchBlock) in tryStatement.CatchBlocks)
             {
-                Walk(catchBlock, tryAssigned, catchAssigned, inTry: false, inCatch: true);
+                Walk(catchBlock, outsideCatchAssigned, catchAssigned, inCatch: true);
             }
 
-            Walk(tryStatement.FinallyBlock, tryAssigned, catchAssigned, inTry, inCatch);
+            Walk(tryStatement.FinallyBlock, outsideCatchAssigned, catchAssigned, inCatch);
             return;
         }
 
         for (var i = 0; i < statement.Count; i++)
         {
-            Walk(statement[i], tryAssigned, catchAssigned, inTry, inCatch);
+            Walk(statement[i], outsideCatchAssigned, catchAssigned, inCatch);
         }
     }
 }

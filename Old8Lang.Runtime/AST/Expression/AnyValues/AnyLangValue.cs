@@ -280,6 +280,7 @@ public partial class AnyLangValue : LangValueType
         // 1. 基于外部 manager（可以访问外部变量，用于访问类型定义）
         // 2. 添加实例字段和 this（可以在方法中访问实例成员）
         var executionManager = manager.NewManger();
+        executionManager.CurrentExecutingClassName = methodInfo.OriginClassName ?? Metadata.ClassName;
         executionManager.AddChildren();
 
         try
@@ -631,22 +632,22 @@ public partial class AnyLangValue : LangValueType
     /// <param name="arguments">构造函数参数</param>
     /// <param name="manager">变量管理器</param>
     /// <returns>匹配的 init 方法，如果不存在则返回 null</returns>
-    internal FuncLangValue? GetInitMethod(List<LangExpression> arguments, VariateManager manager)
+    internal LangMethodInfo? GetInitMethodInfo(List<LangExpression> arguments, VariateManager manager)
     {
-        // 首先查找名为 "init" 的方法
         var methods = Metadata.MethodTable.LookupMethod("init");
 
         if (methods is null || methods.Count == 0)
             return null;
 
-        // 如果只有一个 init 方法，直接返回
         if (methods.Count == 1)
-            return methods[0].Implementation;
+            return methods[0];
 
-        // 如果有多个 init 方法，进行重载解析
-        // init 方法目前不支持命名参数，所以传递空列表
-        var selectedMethod = ResolveMethodOverload(methods, arguments, [], manager);
-        return selectedMethod.Implementation;
+        return ResolveMethodOverload(methods, arguments, [], manager);
+    }
+
+    internal FuncLangValue? GetInitMethod(List<LangExpression> arguments, VariateManager manager)
+    {
+        return GetInitMethodInfo(arguments, manager)?.Implementation;
     }
 
     /// <summary>
@@ -659,7 +660,8 @@ public partial class AnyLangValue : LangValueType
         // 清空SetField修改标记（开始新的方法执行）
         FieldsModifiedBySetField.Clear();
 
-        var initMethod = GetInitMethod(arguments, manager);
+        var initMethodInfo = GetInitMethodInfo(arguments, manager);
+        var initMethod = initMethodInfo?.Implementation;
         if (initMethod is null)
         {
             return;
@@ -674,6 +676,7 @@ public partial class AnyLangValue : LangValueType
         // 1. 基于外部 manager（可以访问外部变量，用于访问类型定义）
         // 2. 添加实例字段和 this（可以在 init 中访问实例成员）
         var initManager = manager.NewManger();
+        initManager.CurrentExecutingClassName = initMethodInfo!.OriginClassName ?? Metadata.ClassName;
 
         // 1. 创建基础作用域用于字段
         initManager.AddChildren();

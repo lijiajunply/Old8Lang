@@ -61,6 +61,16 @@ public static class ConcurrencyIlHelpers
             }
         }
     }
+
+    /// <summary>
+    /// IL 模式下调用 <see cref="Old8Lang.Concurrency.ResourceManager.TryReceiveChannel"/> 并展开
+    /// <see cref="Old8Lang.Concurrency.ChannelReceiveResult"/>，与解释器/VM 返回实际值或 null 保持一致。
+    /// </summary>
+    public static object? TryReceiveChannelValue(int channelId, int timeoutMs)
+    {
+        var result = Old8Lang.Concurrency.ResourceManager.TryReceiveChannel(channelId, timeoutMs);
+        return result.Success ? result.Value : null;
+    }
 }
 
 /// <summary>
@@ -91,7 +101,7 @@ public sealed class SleepFunction : BaseGlobalFunction
         SourcePosition position)
     {
         // 加载 milliseconds 参数
-        parameters[0].Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
+        ConcurrencyIlHelpers.EmitLoadIntArgument(parameters[0], ilGenerator, local);
 
         // 调用 Thread.Sleep(int)
         var method = typeof(Thread).GetMethod(nameof(Thread.Sleep), [typeof(int)]);

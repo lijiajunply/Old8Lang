@@ -47,22 +47,26 @@ PrintLine($""MessagePack serialized, bytes length: {len(bytes)}"")
     [Fact]
     public void MsgPackSerializeToFile_ShouldSerializeToFile()
     {
-        var code = @"
+        var tempFile = Path.Combine(Path.GetTempPath(), $"old8_compiler_msgpack_{Guid.NewGuid():N}.bin")
+            .Replace("\\", "/");
+        var code = $@"
 import Serialization
 import File
 
-testPath <- ""./test_msgpack_data.bin""
+testPath <- ""{tempFile}""
 
-data <- {""name"": ""Bob"", ""age"": 25}
+data <- {{""name"": ""Bob"", ""age"": 25}}
 Serialization.MsgPackSerializeToFile(data, testPath)
-PrintLine($""MessagePack serialized to file: {testPath}"")
+PrintLine($""MessagePack serialized to file: {{testPath}}"")
 
 // Verify file exists
 exists <- File.FileExists(testPath)
-PrintLine($""File exists: {exists}"")
+PrintLine($""File exists: {{exists}}"")
 
 // Clean up
-File.DeleteFile(testPath)
+if File.FileExists(testPath) {{
+    File.DeleteFile(testPath)
+}}
 ";
         CreateTempModuleFile("./StandardLibrary/msgpack_serialize_file_test.old8", code);
         var (_, exception) = ExecuteCodeFile("./StandardLibrary/msgpack_serialize_file_test.old8");

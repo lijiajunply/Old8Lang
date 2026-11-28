@@ -1,7 +1,7 @@
 using Old8Lang.AST.Expression;
-using Old8Lang.AST.Expression.Value;
 using Old8Lang.AST.Statement;
 using Old8Lang.Interpreter;
+using Old8Lang.Syntax;
 
 namespace Old8Lang.Tests.EdgeCases;
 
@@ -31,8 +31,9 @@ public class EdgeCaseTests
         Assert.NotNull(result);
         Assert.Equal(1, result.Count);
         var setStmt = Assert.IsType<SetStatement>(result[0]);
-        var stringValue = Assert.IsType<StringLangValue>(setStmt.Value);
-        Assert.Equal("", stringValue.Value);
+        var stringLiteral = Assert.IsType<ScalarLiteralExpression>(setStmt.Value);
+        Assert.Equal(LiteralKind.String, stringLiteral.Kind);
+        Assert.Equal("", stringLiteral.LiteralValue);
     }
 
     /// <summary>
@@ -77,8 +78,9 @@ public class EdgeCaseTests
         Assert.NotNull(result);
         Assert.Equal(1, result.Count);
         var setStmt = Assert.IsType<SetStatement>(result[0]);
-        var intValue = Assert.IsType<IntLangValue>(setStmt.Value);
-        Assert.Equal(int.MaxValue, intValue.Value);
+        var intLiteral = Assert.IsType<ScalarLiteralExpression>(setStmt.Value);
+        Assert.Equal(LiteralKind.Int, intLiteral.Kind);
+        Assert.Equal(int.MaxValue, intLiteral.LiteralValue);
     }
 
     /// <summary>
@@ -120,8 +122,9 @@ public class EdgeCaseTests
         Assert.NotNull(result);
         Assert.Equal(1, result.Count);
         var setStmt = Assert.IsType<SetStatement>(result[0]);
-        var intValue = Assert.IsType<IntLangValue>(setStmt.Value);
-        Assert.Equal(0, intValue.Value);
+        var intLiteral = Assert.IsType<ScalarLiteralExpression>(setStmt.Value);
+        Assert.Equal(LiteralKind.Int, intLiteral.Kind);
+        Assert.Equal(0, intLiteral.LiteralValue);
     }
 
     /// <summary>
@@ -161,8 +164,9 @@ public class EdgeCaseTests
         Assert.NotNull(result);
         Assert.Equal(1, result.Count);
         var setStmt = Assert.IsType<SetStatement>(result[0]);
-        var doubleValue = Assert.IsType<DoubleLangValue>(setStmt.Value);
-        Assert.Equal(0.0000000001, doubleValue.Value, 15);
+        var doubleLiteral = Assert.IsType<ScalarLiteralExpression>(setStmt.Value);
+        Assert.Equal(LiteralKind.Double, doubleLiteral.Kind);
+        Assert.Equal(0.0000000001, Assert.IsType<double>(doubleLiteral.LiteralValue), 15);
     }
 
     #endregion
@@ -216,7 +220,7 @@ if true {
         Assert.NotNull(result);
         Assert.Equal(1, result.Count);
         var setStmt = Assert.IsType<SetStatement>(result[0]);
-        Assert.IsType<ArrayLangValue>(setStmt.Value);
+        Assert.IsType<ArrayLiteralExpression>(setStmt.Value);
     }
 
     /// <summary>
@@ -282,8 +286,9 @@ if true {
         Assert.NotNull(result);
         Assert.Equal(1, result.Count);
         var setStmt = Assert.IsType<SetStatement>(result[0]);
-        var stringValue = Assert.IsType<StringLangValue>(setStmt.Value);
-        Assert.Equal(10000, stringValue.Value.Length);
+        var stringLiteral = Assert.IsType<ScalarLiteralExpression>(setStmt.Value);
+        Assert.Equal(LiteralKind.String, stringLiteral.Kind);
+        Assert.Equal(10000, Assert.IsType<string>(stringLiteral.LiteralValue).Length);
     }
 
     /// <summary>
@@ -328,7 +333,7 @@ if true {
         Assert.NotNull(result);
         Assert.Equal(1, result.Count);
         var setStmt = Assert.IsType<SetStatement>(result[0]);
-        Assert.IsType<ArrayLangValue>(setStmt.Value);
+        Assert.IsType<ArrayLiteralExpression>(setStmt.Value);
     }
 
     #endregion
@@ -410,8 +415,9 @@ if true {
         Assert.NotNull(result);
         Assert.Equal(1, result.Count);
         var setStmt = Assert.IsType<SetStatement>(result[0]);
-        var stringValue = Assert.IsType<StringLangValue>(setStmt.Value);
-        Assert.Contains("你好", stringValue.Value);
+        var stringLiteral = Assert.IsType<ScalarLiteralExpression>(setStmt.Value);
+        Assert.Equal(LiteralKind.String, stringLiteral.Kind);
+        Assert.Contains("你好", Assert.IsType<string>(stringLiteral.LiteralValue));
     }
 
     #endregion
@@ -436,8 +442,9 @@ if true {
         Assert.NotNull(result);
         Assert.Equal(1, result.Count);
         var setStmt = Assert.IsType<SetStatement>(result[0]);
-        var doubleValue = Assert.IsType<DoubleLangValue>(setStmt.Value);
-        Assert.Equal(0.123456789012345, doubleValue.Value, 15);
+        var doubleLiteral = Assert.IsType<ScalarLiteralExpression>(setStmt.Value);
+        Assert.Equal(LiteralKind.Double, doubleLiteral.Kind);
+        Assert.Equal(0.123456789012345, Assert.IsType<double>(doubleLiteral.LiteralValue), 15);
     }
 
     /// <summary>

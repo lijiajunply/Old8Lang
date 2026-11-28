@@ -171,7 +171,7 @@ public partial class BytecodeVisitor
         Emit(OpCode.StoreLocal, temporary);
         var next = new LinqExpression(
             new FromClause(continuation.Variable, new LangId(temporaryName)),
-            continuation.BodyClauses, continuation.TerminationClause);
+            continuation.BodyClauses, continuation.TerminationClause, continuation.Continuation);
         VisitLinqExpression(next);
         _compiler.FreeLocal(temporary);
     }

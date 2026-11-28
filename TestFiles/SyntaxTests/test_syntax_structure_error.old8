@@ -127,3 +127,4 @@ var a <- 10 // 注释后的内容 10
 // 无效的标签语句
 label: PrintLine("不支持标签语句")
 goto label // 不支持goto语句
+// error

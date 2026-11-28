@@ -1,4 +1,4 @@
-# Test generic syntax
+// Test generic syntax
 func identity<T>(value:T) -> T {
     return value
 }

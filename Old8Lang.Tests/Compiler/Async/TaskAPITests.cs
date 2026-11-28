@@ -271,16 +271,12 @@ public class TaskAPITests(ITestOutputHelper output)
     public void TaskWaitAny_CompilesAndExecutesCorrectly()
     {
         var code = @"
-            async func fastTask() -> void {
-                await Task.Delay(20)
-            }
-            
             async func slowTask() -> void {
-                await Task.Delay(100)
+                await Task.Delay(500)
             }
             
             async func testWaitAny() {
-                tasks <- {fastTask(), slowTask()}
+                tasks <- {Task.Completed(), slowTask()}
                 index <- Task.WaitAny(tasks)
                 
                 Assert.Equal(0, index)

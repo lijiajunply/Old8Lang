@@ -206,9 +206,9 @@ result <- result_list[0]  // 应该只有日志信息
         // Act
         var (interpreter, exception) = ExecuteCodeFile("complex_conditional_test.old8");
 
-        // Assert
+        // Assert: "1.5" < "2.0" 按字典序成立，走旧版本分支
         Assert.Null(exception);
-        AssertVariableValue(interpreter, "result", "Using latest version: Advanced functionality v2.0");
+        AssertVariableValue(interpreter, "result", "Using old version: Advanced functionality");
     }
 
     [Fact]

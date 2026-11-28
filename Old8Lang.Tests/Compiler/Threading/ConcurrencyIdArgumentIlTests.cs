@@ -59,6 +59,124 @@ public class ConcurrencyIdArgumentIlTests
         CompileAndRun(code);
     }
 
+    [Fact]
+    public void AllConcurrencyPrimitives_WithObjectTypedIdsAndNumericArgs_CompileAndExecute()
+    {
+        const string code = @"
+            timeouts <- {10, 20}
+            for t in timeouts {
+                Sleep(t)
+                break
+            }
+
+            // Mutex
+            mutexIds <- {MutexCreate()}
+            for m in mutexIds {
+                MutexLock(m)
+                MutexUnlock(m)
+                ok <- MutexTryLock(m, t)
+                Assert.True(ok)
+                MutexUnlock(m)
+                MutexDispose(m)
+            }
+
+            // Semaphore
+            counts <- {2}
+            for c in counts {
+                semId <- SemaphoreCreate(c, c)
+                semIds <- {semId}
+                for s in semIds {
+                    SemaphoreAcquire(s)
+                    SemaphoreRelease(s)
+                    ok <- SemaphoreTryAcquire(s, t)
+                    Assert.True(ok)
+                    SemaphoreRelease(s)
+                    SemaphoreDispose(s)
+                }
+            }
+
+            // AtomicInt
+            atomicIds <- {AtomicIntCreate(0)}
+            vals <- {10}
+            deltas <- {5}
+            expected <- {15}
+            replacement <- {20}
+            for a in atomicIds {
+                for v in vals {
+                    AtomicIntSet(a, v)
+                }
+                Assert.Equal(10, AtomicIntGet(a))
+                Assert.Equal(11, AtomicIntIncrement(a))
+                Assert.Equal(10, AtomicIntDecrement(a))
+                for d in deltas {
+                    Assert.Equal(15, AtomicIntAdd(a, d))
+                }
+                for e in expected {
+                    for r in replacement {
+                        Assert.True(AtomicIntCompareAndSet(a, e, r))
+                    }
+                }
+                Assert.Equal(20, AtomicIntGet(a))
+                AtomicIntDispose(a)
+            }
+
+            // ReadWriteLock
+            rwIds <- {ReadWriteLockCreate()}
+            for rw in rwIds {
+                ReadLockAcquire(rw)
+                ReadLockRelease(rw)
+                WriteLockAcquire(rw)
+                WriteLockRelease(rw)
+                Assert.True(ReadLockTryAcquire(rw, t))
+                ReadLockRelease(rw)
+                Assert.True(WriteLockTryAcquire(rw, t))
+                WriteLockRelease(rw)
+                ReadWriteLockDispose(rw)
+            }
+
+            // CountDownLatch
+            latchIds <- {CountDownLatchCreate(1)}
+            for l in latchIds {
+                Assert.Equal(1, CountDownLatchGetCount(l))
+                CountDownLatchCountDown(l)
+                CountDownLatchWait(l)
+                Assert.True(CountDownLatchWaitTimeout(l, t))
+                CountDownLatchDispose(l)
+            }
+
+            // CyclicBarrier
+            barrierIds <- {CyclicBarrierCreate(1)}
+            for b in barrierIds {
+                Assert.Equal(1, CyclicBarrierGetParticipantCount(b))
+                Assert.Equal(0, CyclicBarrierGetWaitingCount(b))
+                CyclicBarrierAwait(b)
+                Assert.True(CyclicBarrierAwaitTimeout(b, t))
+                CyclicBarrierDispose(b)
+            }
+
+            // Channel
+            chanIds <- {ChannelCreateBounded(2)}
+            for ch in chanIds {
+                ChannelSend(ch, ""hello"")
+                Assert.Equal(""hello"", ChannelReceive(ch))
+                Assert.True(ChannelTrySend(ch, 42, t))
+                rec <- ChannelTryReceive(ch, t)
+                Assert.Equal(42, rec)
+                ChannelClose(ch)
+                ChannelDispose(ch)
+            }
+
+            // CancellationTokenSource
+            ctsIds <- {CreateCancellationTokenSource()}
+            for cts in ctsIds {
+                CancelAfter(cts, t)
+                Cancel(cts)
+                DisposeCancellationTokenSource(cts)
+            }
+        ";
+        CompileAndRun(code);
+    }
+
     private static void CompileAndRun(string code)
     {
         var interpreter = new LangInterpreter();

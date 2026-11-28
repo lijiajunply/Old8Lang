@@ -10,7 +10,8 @@ public class QueryContinuation(
     string variable,
     List<LinqClause> bodyClauses,
     LinqClause terminationClause,
-    SourcePosition position = default)
+    SourcePosition position = default,
+    QueryContinuation? continuation = null)
     : IOldLangTree
 {
     /// <summary>
@@ -27,6 +28,11 @@ public class QueryContinuation(
     /// 延续后的终止子句
     /// </summary>
     public LinqClause TerminationClause { get; set; } = terminationClause;
+
+    /// <summary>
+    /// 可选的下一级查询延续（支持链式 into ... into ...）
+    /// </summary>
+    public QueryContinuation? Continuation { get; set; } = continuation;
 
     public SourcePosition Position { get; set; } = position;
 

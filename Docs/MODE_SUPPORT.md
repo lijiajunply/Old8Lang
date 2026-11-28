@@ -1,6 +1,6 @@
 # Old8Lang 三种模式支持矩阵
 
-**最后更新**: 2026-10-10
+**最后更新**: 2026-11-28
 
 本文档是 Old8Lang 三种执行模式下**各特性可用性的唯一权威说明**。
 原先分散在 `MODE_COMPLETION_STATUS.md` 与 `Mode_Support_Summary.md` 两份文档里，
@@ -45,6 +45,18 @@
 >   「因环境而失败」的项已单独标注，未直接判为 ❌。
 
 ## 本次复核修正的条目
+
+### 2026-11-28（测试与工程问题全面清理与跨模式语义对齐）
+
+- **IL 表达式内部 `await`**：新增 `AsyncExpressionAwaitLowerer` 将二元运算、调用参数、集合/字典/元组/模板字面量、短路逻辑及三元表达式中的 `await` 预降级提升为状态机临时字段，挂起点保持栈空，消除 `InvalidProgramException`（仅 `catch` 过滤器、`defer` 及非异步生成器 `yield` 保留编译期拒绝）。
+- **IL `object` 操作数动态算术**：`NumericBinaryOpHelper`（`+ - * / % ^`）与 `IlDynamicArithmetic` 在任一操作数为 `object` 时按运行期实际数值/字符串类型分派，并在写入已定型局部变量/状态机字段时走 `CoerceDynamic` 写回；`ComparisonOpHelper` 同步补齐 `object` 与数值的动态比较。
+- **IL 值类型变量在 `catch` 赋值保留成功分支值**：`CatchAssignmentScanner` 扩展至所有在 `catch` 内被赋值的外层局部变量，统一使用 `object` 槽位并在写入值类型时装箱。
+- **三模式线程异常口径统一**：`ThreadLangValue` 在 `Join()` / `Result` 解包 `TargetInvocationException` 并直接重抛原始 `Old8Exception` / `LangThrownException`，不再额外包装「线程执行异常」。
+- **既定 IL 边界明确化**：
+  - 未定义变量/成员在 IL 下为**编译期报错**（保留静态拼写与成员检查，解释器/VM 为运行期报错）。
+  - IL 的 `int` 固定映射 CLR 32 位 `unchecked Int32`（`2147483647 + 2147483646` 回绕为 `-3`；超过 32 位范围请使用 `double` 字面量），解释器与 VM 溢出时提升为 `double`。
+- **并发与运行时稳定性**：并发全局函数全部 `int` 实参补齐 `ConcurrencyIlHelpers.EmitLoadIntArgument` 拆箱与 `ChannelTryReceive` 结果展开；`Old8Exception` 异步调用栈改为不可变持久化链表避免多线程/并发任务共享可变 `List`；`PythonProvider` 初始化后调用 `BeginAllowThreads()` 消除多线程测试宿主 GIL 死锁；`RuntimeGlobals` 改用 `ConcurrentDictionary`。
+- **全量验证基线（2026-11-28）**：默认档 **7,256 通过 / 0 失败 / 26 跳过**（47s，无挂起）；Architecture **73/73**；性能档 `SpawnTests` **13/13**；`run_syntax_tests.sh` **89/89**；`run_vm_tests.sh` **79/79**。报告见 `changes/2026-11-28-测试与工程问题清理/test.md`。
 
 ### 2026-11-15（IL 缺陷修复轮次复核）
 
@@ -316,7 +328,8 @@
 
 | 场景 | 解释器 | IL | 虚拟机 | 说明 |
 |------|--------|-----|--------|------|
-| `obj + 1`（`obj` 静态类型 `object`，运行期是 `double`） | 正确 | `InvalidCastException` | 正确 | IL 的 `LoadAndConvertOperands` 一律按 `int` 拆箱 |
+| `obj + 1`（`obj` 静态类型 `object`，运行期是 `double`） | 正确 | ✅（2026-11-28 起走 `IlDynamicArithmetic`） | 正确 | 六种算术运算均支持动态 `object` 操作数并在赋值回写已定型变量时做动态转换 |
+| 32 位 `int` 溢出（`2147483647 + 2147483646`） | 提升为 `double`（`4294967293`） | 32 位 `unchecked` 回绕（`-3`） | 提升为 `double`（`4294967293`） | IL 刻意保持 `int` 静态映射 CLR `Int32` 以保性能；超范围计算请使用 `double` 字面量 |
 | 数组 / 列表 `+` 拼接 | ✅（2026-11-15 起） | ✅（2026-11-15 起） | ✅ | 同类型拼接；数组 + 列表混合仍报错 |
 | 集合的 `.Length` 属性（无括号） | ✅（2026-11-15 起） | ✅ | ✅ | 数组/列表/字符串/字典均支持，等价 `len(x)`；字典键名 `"Length"` 用 `d["Length"]` |
 | `PrintLine(null)` 与集合里的 `null` 元素 | `null` | `null` | `null` | 2026-11-15 起统一为小写；类型名仍是 `Null` |
@@ -324,8 +337,9 @@
 | 字典缺失键 `d["missing"]` | `KEY_ERROR` | `KEY_ERROR` | `KEY_ERROR` | 2026-11-15 统一；安全访问用 `GetOrElse` / `TryGet` |
 | `(-1.0).Sqrt()` | ❌ 没有该方法（用 `Math.Sqrt`） | 抛「平方根函数的参数必须是非负数」 | 抛同样的错 | 2026-11-15 与 `Math.Sqrt` 统一；有效值仍返回 `2` |
 | `int?` / `string?` 联合类型的返回值 | ✅ | ✅（2026-11-15 起用 `object` 承载） | ✅ | |
-| 集合注解的元素类型不匹配（`list<int> <- {1, "x"}`） | 接受 | ❌ 编译期报错 | ❌ 编译期报错 | |
-| `try { } catch (e) { x <- e }` 之后读 `x` | 保持 `1` | ✅（2026-11-15 修复槽位替换） | 保持 | 值类型变量在 IL 下仍会按新类型重绑定 |
+| 集合注解的元素类型不匹配（`list<int> <- {1, "x"}`） | ❌ 运行期 `TYPE_ERROR`（2026-11-28 统一） | ❌ 编译期报错 | ❌ 编译期报错 | 三模式均拒绝不匹配元素（含嵌套集合） |
+| `try { } catch (e) { x <- e }` 之后读 `x` | 保持 `1` | ✅ 保持 `1`（2026-11-28 覆盖值类型与引用类型） | 保持 `1` | 三模式一致 |
+| 线程内 `throw` 后 `Join()` | 保留原始语言错误（2026-11-28 统一） | 保留原始语言错误（2026-11-28 统一） | 保留原始语言错误 | 三模式 `catch (e)` 均获得原始抛出的错误消息 |
 | `join` 后引用内层范围变量（`... let z <- y where z > 2 select z`） | `[3]` | `[4, 4, 4]` | `[3, 4]` | join 结果只保留外层元素，内层变量是循环残留值，三模式配对语义都未统一 |
 | `join ... into g` 分组结果 | `[[1, 1], [2, 2, 2], [3]]` | `[[3], [3], [3]]` | 同解释器 | IL 的 group join 没有按外层元素分别收集匹配项 |
 | 字符串拼接的 bool / 集合显示（`"x" + true`、`"x" + {1, 2}`） | `xtrue` / `x[1, 2]` | `xtrue` / `x[1, 2]` | `xtrue` / `x[1, 2]` | 2026-11-15 起三模式统一走语言显示规则 |
@@ -348,15 +362,14 @@
    否则生成的委托形参是 `object`。
    **2026-11-15 更新**：lambda 参数注解的白名单已补上 `array` / `dictionary` / `object` / `function`；
    lambda 现在也能捕获外层局部变量、函数形参以及外层闭包已捕获的变量。
-   `object` 静态类型的操作数参与算术时仍按 `int` 拆箱，装箱的 `double` 会抛
-   `InvalidCastException`（见「三种模式共同的跨模式差异」第 1 条）。
+   `object` 静态类型的操作数参与算术运算已于 2026-11-28 起走 `IlDynamicArithmetic` 运行期分派。
 2. 不支持泛型函数、泛型类、运算符重载、装饰器。
 3. 不支持 C/C++ P/Invoke、Python 互操作与托管库导入。
-4. **异步功能支持不完整**（2026-11-23 更新）：异步状态机在 `try` / `catch` / `finally` / `using` 区域内的
-   `await` 均已支持，含 `yield` 的异步生成器与 `async for-in` 迭代也已可用；用户 `finally` 与
-   using 的 Dispose 只在函数真正退出时执行一次。仍不支持的位置会在编译期给出明确错误：
-   `catch` 过滤器中的 `await`、`defer` 中的 `await`，以及表达式内部的 `await`
-   （如 `1 + await f()`、`PrintLine(await f())`，请先把结果赋给变量）。
+4. **异步功能支持边界**（2026-11-28 更新）：异步状态机在 `try` / `catch` / `finally` / `using` 区域以及
+   复合表达式内部（如 `1 + await f()`、`PrintLine(await f())`、集合/字典/元组/模板字面量、短路逻辑与三元表达式）的
+   `await` 均已通过 `AsyncExpressionAwaitLowerer` 支持；含 `yield` 的异步生成器与 `async for-in` 迭代也已可用；
+   用户 `finally` 与 using 的 Dispose 只在函数真正退出时执行一次。仍不支持的位置会在编译期给出明确错误：
+   `catch` 过滤器中的 `await`、`defer` 中的 `await`，以及非异步生成器内的 `yield` 中的 `await`。
    `Task.Completed` / `Task.WaitAll` / `Task.WaitAny` 已于 2026-11-23 在三种模式下统一实现。
 5. **IL 校验失败已清空（2026-11-15）**：`Common Language Runtime detected an invalid program`
    在 `TestFiles/CompilerTests/` 的 157 个用例里已不再出现。**2026-11-15 实测**：
@@ -456,11 +469,13 @@
 
 ## 测试覆盖情况
 
-| 模式 | 测试文件数 | 实测结果 |
-|------|-----------|---------|
-| 解释器 | 134（2026-10-08） | 通过 |
-| IL | 138（2026-10-08） | **738 失败 / 2666 通过 / 28 跳过**（2026-10-10 全量档），见「已知限制」 |
-| 虚拟机 | 97（2026-10-08） | 非 IL 模式全量 **4782 通过 / 0 失败 / 3 跳过**（2026-10-10） |
+| 套件 | 2026-11-28 实测结果 | 说明 |
+|------|--------------------|------|
+| `Old8Lang.Tests` 全量默认档 | **7,256 通过 / 0 失败 / 26 跳过**（总计 7,282，耗时 47 s） | 覆盖解释器、IL、VM、Parser、LSP 与 Architecture，无挂起 |
+| `Old8Lang.Tests.Architecture` | **73 通过 / 0 失败 / 0 跳过** | 程序集边界、宿主模块隔离与语法节点规范 |
+| `SpawnTests`（`performance.runsettings` 性能档） | **13 通过 / 0 失败 / 0 跳过** | 含线程 `Sleep` 的并发用例分档隔离 |
+| `TestFiles/run_syntax_tests.sh` | **89 通过 / 0 失败** | 全部语法正反例 |
+| `TestFiles/run_vm_tests.sh` | **79 通过 / 0 失败** | 全部 VM 与字节码脚本用例 |
 
 测试覆盖待复核事项见 [统一待办清单](../changes/Todo.md)。
 

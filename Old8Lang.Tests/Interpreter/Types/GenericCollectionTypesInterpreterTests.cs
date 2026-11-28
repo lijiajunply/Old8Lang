@@ -322,8 +322,8 @@ secondArraySecondElement <- arrays[1][1]
     #region 向后兼容性测试
 
     /// <summary>
-    /// 测试混合类型集合（向后兼容）
-    /// 解释器模式下，类型注解不强制类型检查
+    /// <summary>
+    /// 测试混合类型集合：无注解集合允许混合类型，带泛型元素类型注解时按三模式统一语义在运行期报错。
     /// </summary>
     [Fact]
     public void Run_MixedTypeCollections_ExecutesSuccessfully()
@@ -333,10 +333,6 @@ secondArraySecondElement <- arrays[1][1]
 // 不带类型注解的混合类型列表（传统方式）
 mixed <- {1, ""hello"", 3.14, true}
 result1 <- len(mixed)
-
-// 带类型注解的混合类型列表（解释器模式下也允许）
-typedMixed:list<int> <- {1, ""world"", 2, false}
-result2 <- len(typedMixed)
 
 // 混合类型数组
 arr <- [1, ""test"", true]
@@ -350,17 +346,19 @@ result3 <- arr.Count()
 
         // Assert
         var result1 = interpreter.Manager.GetValue(new LangId("result1"));
-        var result2 = interpreter.Manager.GetValue(new LangId("result2"));
         var result3 = interpreter.Manager.GetValue(new LangId("result3"));
 
         Assert.NotNull(result1);
         Assert.Equal(4, ((IntLangValue)result1).Value);
 
-        Assert.NotNull(result2);
-        Assert.Equal(4, ((IntLangValue)result2).Value);
-
         Assert.NotNull(result3);
         Assert.Equal(3, ((IntLangValue)result3).Value);
+
+        // 带泛型类型注解的混合类型列表应抛出 TypeError
+        var typedMismatchCode = @"typedMixed:list<int> <- {1, ""world"", 2, false}";
+        var typedInterpreter = new LangInterpreter();
+        var typedAst = typedInterpreter.Build(typedMismatchCode);
+        Assert.Throws<Old8Lang.Error.TypeError>(() => typedAst.Run(typedInterpreter.Manager));
     }
 
     /// <summary>

@@ -958,7 +958,7 @@ public class LinqQueryExecutor(VariateManager manager)
         // 避免 let 变量只保留最后一次求值。
         var input = ConvertToLangList(source);
         var query = new LinqExpression(new FromClause(continuation.Variable, input),
-            continuation.BodyClauses, continuation.TerminationClause);
+            continuation.BodyClauses, continuation.TerminationClause, continuation.Continuation);
         var result = ExecuteQuery(query);
         return ConvertToEnumerable(result);
     }

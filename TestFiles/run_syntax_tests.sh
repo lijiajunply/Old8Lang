@@ -3,6 +3,9 @@
 # 语法测试脚本
 echo "Running syntax tests..."
 
+# 先统一构建一次，避免逐文件 dotnet run 重复触发 MSBuild 争用导致超时
+dotnet build ../Old8Lang.App --nologo -v q || exit 1
+
 success=0
 failed=0
 failed_files=()
@@ -20,7 +23,7 @@ for file in $test_files; do
     
     # 运行测试，添加10秒超时限制
     # 使用兼容bash 3.2的方式实现超时
-    dotnet run --project ../Old8Lang.App -- -s "$file" &
+    dotnet run --no-build --project ../Old8Lang.App -- -s "$file" &
     DOTNET_PID=$!
     
     # 设置超时时间（秒）

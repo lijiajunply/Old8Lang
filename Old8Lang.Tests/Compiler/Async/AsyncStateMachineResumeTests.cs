@@ -29,8 +29,7 @@ public class AsyncStateMachineResumeTests
                 await Task.Delay(10)
             }
 
-            work()
-            Thread.Sleep(300)
+            await work()
             Assert.Equal(2, Counter.value)
         ";
 
@@ -58,8 +57,7 @@ public class AsyncStateMachineResumeTests
                 }
             }
 
-            work()
-            Thread.Sleep(400)
+            await work()
             Assert.Equal(3, Counter.value)
         ";
 
@@ -88,8 +86,7 @@ public class AsyncStateMachineResumeTests
                 }
             }
 
-            work()
-            Thread.Sleep(300)
+            await work()
             Assert.Equal(111, Counter.value)
         ";
 
@@ -119,8 +116,7 @@ public class AsyncStateMachineResumeTests
                 }
             }
 
-            work()
-            Thread.Sleep(300)
+            await work()
             Assert.Equal(11, Counter.value)
         ";
 
@@ -151,8 +147,7 @@ public class AsyncStateMachineResumeTests
                 }
             }
 
-            work()
-            Thread.Sleep(400)
+            await work()
             Assert.Equal(1111, Counter.value)
         ";
 
@@ -175,8 +170,7 @@ public class AsyncStateMachineResumeTests
                 Counter.value <- Counter.value + 10
             }
 
-            work()
-            Thread.Sleep(300)
+            await work()
             Assert.Equal(11, Counter.value)
         ";
 

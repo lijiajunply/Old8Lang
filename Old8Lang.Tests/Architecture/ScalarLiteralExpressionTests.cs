@@ -58,7 +58,7 @@ public class ScalarLiteralExpressionTests
     }
 
     [Fact]
-    public void TupleSyntax_PreservesNamedFieldsIdentityAndReevaluation()
+    public void TupleSyntax_PreservesNamedFieldsAndReturnsFreshInstancePerEvaluation()
     {
         var value = new ScalarLiteralExpression(new LiteralSyntax(LiteralKind.Int, 7, default));
         var syntax = new TupleLiteralExpression([value, value], ["first", "second"]);
@@ -68,13 +68,14 @@ public class ScalarLiteralExpressionTests
 
         Assert.Equal(7, Assert.IsType<IntLangValue>(result.Dot(new LangId("first"), manager)).Value);
         result.Set(0, new IntLangValue(99));
-        Assert.Same(result, syntax.Accept(visitor));
-        Assert.Equal(7, Assert.IsType<IntLangValue>(result.Get(0)).Value);
-        Assert.NotSame(result, new TupleLiteralExpression([value, value]).Accept(visitor));
+        var secondEval = Assert.IsType<TupleLangValue>(syntax.Accept(visitor));
+        Assert.NotSame(result, secondEval);
+        Assert.Equal(99, Assert.IsType<IntLangValue>(result.Get(0)).Value);
+        Assert.Equal(7, Assert.IsType<IntLangValue>(secondEval.Get(0)).Value);
     }
 
     [Fact]
-    public void DictionarySyntax_ReusesIdentityAndReevaluatesOrderedEntries()
+    public void DictionarySyntax_ReturnsFreshInstancePerEvaluationWithOrderedEntries()
     {
         var key = new ScalarLiteralExpression(LiteralSyntax.String("key", default));
         var value = new ScalarLiteralExpression(new LiteralSyntax(LiteralKind.Int, 7, default));
@@ -86,36 +87,30 @@ public class ScalarLiteralExpressionTests
         };
         var syntax = new DictionaryLiteralExpression(entries);
         var visitor = new InterpreterVisitor(new VariateManager());
-        var legacy = new DictionaryLangValue(entries.Select(entry => new TupleLangValue(entry.Key, entry.Value)).ToList());
-        var expected = Assert.IsType<DictionaryLangValue>(legacy.Accept(visitor));
         var result = Assert.IsType<DictionaryLangValue>(syntax.Accept(visitor));
 
         result.Set(new StringLangValue("key"), new IntLangValue(99));
-        expected.Set(new StringLangValue("key"), new IntLangValue(99));
-        Assert.Same(result, syntax.Accept(visitor));
-        Assert.Same(expected, legacy.Accept(visitor));
-        Assert.Equal(Assert.IsType<IntLangValue>(expected.Get(new StringLangValue("key"))).Value,
-            Assert.IsType<IntLangValue>(result.Get(new StringLangValue("key"))).Value);
-        Assert.Equal(new[] { "key", "next" }, result.Value.Select(entry => ((StringLangValue)entry.Key).Value));
-        Assert.NotSame(result, new DictionaryLiteralExpression(entries).Accept(visitor));
+        var secondEval = Assert.IsType<DictionaryLangValue>(syntax.Accept(visitor));
+        Assert.NotSame(result, secondEval);
+        Assert.Equal(99, Assert.IsType<IntLangValue>(result.Get(new StringLangValue("key"))).Value);
+        Assert.Equal(7, Assert.IsType<IntLangValue>(secondEval.Get(new StringLangValue("key"))).Value);
+        Assert.Equal(new[] { "key", "next" }, secondEval.Value.Select(entry => ((StringLangValue)entry.Key).Value));
     }
 
     [Fact]
-    public void ListSyntax_MatchesLegacyIdentityAndClearReevaluation()
+    public void ListSyntax_ReturnsFreshInstancePerEvaluation()
     {
         var element = new ScalarLiteralExpression(new LiteralSyntax(LiteralKind.Int, 7, default));
         var syntax = new ListLiteralExpression([element]);
-        var legacy = new ListLangValue(new List<LangExpression> { element });
         var visitor = new InterpreterVisitor(new VariateManager());
-        var actual = Assert.IsType<ListLangValue>(syntax.Accept(visitor));
-        var expected = Assert.IsType<ListLangValue>(legacy.Accept(visitor));
+        var first = Assert.IsType<ListLangValue>(syntax.Accept(visitor));
 
-        actual.ClearInternal();
-        expected.ClearInternal();
-        Assert.Same(actual, syntax.Accept(visitor));
-        Assert.Same(expected, legacy.Accept(visitor));
-        Assert.Equal(expected.Values.Select(value => value.ToString()), actual.Values.Select(value => value.ToString()));
-        Assert.NotSame(actual, new ListLiteralExpression([element]).Accept(visitor));
+        first.ClearInternal();
+        var second = Assert.IsType<ListLangValue>(syntax.Accept(visitor));
+        Assert.NotSame(first, second);
+        Assert.Empty(first.Values);
+        Assert.Single(second.Values);
+        Assert.Equal("7", second.Values[0].ToString());
     }
 
     [Fact]
@@ -147,7 +142,8 @@ public class ScalarLiteralExpressionTests
         var generator = new Old8Lang.AsyncGeneration.AsyncStateMachineGenerator(
             method.GetILGenerator(), new Old8Lang.Compiler.CodeGeneration.LocalManager(), block);
 
-        Assert.Equal(10, generator.GetStateIndex(new AwaitExpression(new LangId("unseen"))));
+        Assert.Throws<Old8Lang.Error.CompilerException>(() =>
+            generator.GetStateIndex(new AwaitExpression(new LangId("unseen"))));
         Assert.Equal(0, generator.GetStateIndex(listAwait));
         Assert.Equal(1, generator.GetStateIndex(arrayAwait));
         Assert.Equal(2, generator.GetStateIndex(keyAwait));
@@ -161,18 +157,18 @@ public class ScalarLiteralExpressionTests
     }
 
     [Fact]
-    public void ArraySyntax_ReusesRuntimeIdentityAndReevaluatesElements()
+    public void ArraySyntax_ReturnsFreshInstancePerEvaluation()
     {
         var literal = new ScalarLiteralExpression(new LiteralSyntax(LiteralKind.Int, 7, default));
         var syntax = new ArrayLiteralExpression([literal]);
-        var other = new ArrayLiteralExpression([literal]);
         var visitor = new InterpreterVisitor(new VariateManager());
         var first = Assert.IsType<ArrayLangValue>(syntax.Accept(visitor));
 
         first.Set(new IntLangValue(0), new IntLangValue(99));
-        Assert.Same(first, syntax.Accept(visitor));
-        Assert.Equal(7, Assert.IsType<IntLangValue>(first.Get(new IntLangValue(0))).Value);
-        Assert.NotSame(first, other.Accept(visitor));
+        var second = Assert.IsType<ArrayLangValue>(syntax.Accept(visitor));
+        Assert.NotSame(first, second);
+        Assert.Equal(99, Assert.IsType<IntLangValue>(first.Get(new IntLangValue(0))).Value);
+        Assert.Equal(7, Assert.IsType<IntLangValue>(second.Get(new IntLangValue(0))).Value);
     }
 
     [Fact]

@@ -67,6 +67,12 @@ internal static class WhileStatementRuntimeExtensions
                     return;
                 }
 
+                // 处理 return 或生成器完成
+                if (manager.IsReturn || context.IsCompleted)
+                {
+                    return;
+                }
+
                 // 处理 break
                 if (manager.ControlFlowManager.BreakFlag)
                 {
@@ -135,6 +141,12 @@ internal static class WhileStatementRuntimeExtensions
 
                 // 执行循环体
                 node.Block.Accept(RuntimeVisitors.CreateInterpreter(manager));
+
+                // 处理 return：循环体内 return 后必须立刻退出循环，避免无限循环
+                if (manager.IsReturn)
+                {
+                    break;
+                }
 
                 // 处理 break
                 if (manager.ControlFlowManager.BreakFlag)

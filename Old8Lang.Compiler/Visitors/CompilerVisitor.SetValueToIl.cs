@@ -137,13 +137,13 @@ public partial class CompilerVisitor
         }
 
         // 3. 局部变量赋值处理
-        var valueType = expression.Accept(new TypeInferenceVisitor(local)) ?? typeof(int);
+        var exprType = expression.Accept(new TypeInferenceVisitor(local)) ?? typeof(int);
+        var valueType = exprType;
 
-        // catch 块会把捕获的异常赋给外层变量（类型与初始值不同）。这类变量的槽位
-        // 一律用 object 承载：否则 catch 处的赋值会在编译期换掉槽位，
+        // catch 块会把捕获的异常赋给外层变量（类型可能与初始值不同，包括值类型变量）。
+        // 这类变量的槽位一律用 object 承载：否则 catch 处的赋值会在编译期换掉槽位，
         // 成功路径上写入的值在后续读取时变成未初始化的 null。
-        // 只对引用类型值放宽，值类型仍按原值类型收窄（保持数值宽度的动态重赋值）。
-        if (!valueType.IsValueType && local.CatchAssignedVariables.Contains(idName))
+        if (local.CatchAssignedVariables.Contains(idName))
         {
             valueType = typeof(object);
         }
@@ -174,9 +174,9 @@ public partial class CompilerVisitor
                 if (localVar.LocalType == typeof(object))
                 {
                     expression.Accept(this);
-                    if (valueType.IsValueType)
+                    if (exprType.IsValueType)
                     {
-                        ilGenerator.Emit(OpCodes.Box, valueType);
+                        ilGenerator.Emit(OpCodes.Box, exprType);
                     }
 
                     ilGenerator.Emit(OpCodes.Stloc, localVar);
@@ -190,6 +190,10 @@ public partial class CompilerVisitor
                 if (valueType == typeof(object) && localVar.LocalType != typeof(object))
                 {
                     expression.Accept(this);
+                    if (exprType.IsValueType)
+                    {
+                        ilGenerator.Emit(OpCodes.Box, exprType);
+                    }
                     ilGenerator.Emit(OpCodes.Ldtoken, localVar.LocalType);
                     ilGenerator.Emit(OpCodes.Call,
                         typeof(Type).GetMethod(nameof(Type.GetTypeFromHandle))!);
@@ -220,6 +224,10 @@ public partial class CompilerVisitor
             // 先求值到不进入 LocalManager 的临时槽，避免 lambda 捕获尚未初始化的目标槽。
             var evaluatedValue = ilGenerator.DeclareLocal(valueType);
             expression.Accept(this);
+            if (valueType == typeof(object) && exprType.IsValueType)
+            {
+                ilGenerator.Emit(OpCodes.Box, exprType);
+            }
             ilGenerator.Emit(OpCodes.Stloc, evaluatedValue);
 
             localVar = ilGenerator.DeclareLocal(valueType);
@@ -230,7 +238,11 @@ public partial class CompilerVisitor
         }
 
         expression.Accept(this);
-        ilGenerator.Emit(OpCodes.Stloc, localVar!);
+        if (localVar!.LocalType == typeof(object) && exprType.IsValueType)
+        {
+            ilGenerator.Emit(OpCodes.Box, exprType);
+        }
+        ilGenerator.Emit(OpCodes.Stloc, localVar);
     }
 
     private void EmitOperationSetValueToIl(Operation operation, string idName)
@@ -276,9 +288,33 @@ public partial class CompilerVisitor
                     return;
                 }
 
+                // 动态运算结果（object）写回已有具体类型槽（例如 for-in 中的 `sum <- sum + item`）：
+                // 运行期收敛到原槽位类型，不能替换 LocalBuilder，否则循环开头已生成的 ldloc 仍读旧槽。
+                if (type == typeof(object) && existingLocal.LocalType != typeof(object))
+                {
+                    ilGenerator.Emit(OpCodes.Ldtoken, existingLocal.LocalType);
+                    ilGenerator.Emit(OpCodes.Call,
+                        typeof(Type).GetMethod(nameof(Type.GetTypeFromHandle))!);
+                    ilGenerator.Emit(OpCodes.Call,
+                        typeof(IlValueBridge).GetMethod(nameof(IlValueBridge.CoerceDynamic))!);
+                    if (existingLocal.LocalType.IsValueType)
+                    {
+                        ilGenerator.Emit(OpCodes.Unbox_Any, existingLocal.LocalType);
+                    }
+                    else
+                    {
+                        ilGenerator.Emit(OpCodes.Castclass, existingLocal.LocalType);
+                    }
+
+                    ilGenerator.Emit(OpCodes.Stloc, existingLocal);
+                    local.LocalVarTypes[idName] = existingLocal.LocalType;
+                    return;
+                }
+
                 local.RemoveLocalVar(idName);
                 var newLocal = ilGenerator.DeclareLocal(type);
                 local.AddLocalVar(idName, newLocal);
+                local.LocalVarTypes[idName] = type;
                 ilGenerator.Emit(OpCodes.Stloc, newLocal);
             }
             else
@@ -288,8 +324,15 @@ public partial class CompilerVisitor
         }
         else
         {
-            var newLocal = ilGenerator.DeclareLocal(type);
+            var slotType = local.CatchAssignedVariables.Contains(idName) ? typeof(object) : type;
+            if (slotType == typeof(object) && type.IsValueType)
+            {
+                ilGenerator.Emit(OpCodes.Box, type);
+            }
+
+            var newLocal = ilGenerator.DeclareLocal(slotType);
             local.AddLocalVar(idName, newLocal);
+            local.LocalVarTypes[idName] = slotType;
             ilGenerator.Emit(OpCodes.Stloc, newLocal);
         }
     }

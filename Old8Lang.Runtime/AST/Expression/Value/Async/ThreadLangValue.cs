@@ -58,7 +58,7 @@ public partial class ThreadLangValue : LangValueType
             {
                 if (_exception is not null)
                 {
-                    throw new InvalidOperationError(this, "线程执行异常: " + _exception);
+                    RethrowThreadException(_exception);
                 }
 
                 // 如果 _result 为 null，返回 VoidLangValue
@@ -201,6 +201,26 @@ public partial class ThreadLangValue : LangValueType
     }
 
     /// <summary>
+    /// 统一重抛线程内捕获的异常：保留语言层原始错误（Old8Exception / LangThrownException），
+    /// 避免在解释器与 IL 模式下额外包一层“线程执行异常”导致三模式 catch 口径不一致。
+    /// </summary>
+    private void RethrowThreadException(Exception exception)
+    {
+        var unwrapped = exception;
+        while (unwrapped is System.Reflection.TargetInvocationException { InnerException: not null } tie)
+        {
+            unwrapped = tie.InnerException;
+        }
+
+        if (unwrapped is Old8Exception || unwrapped is Compiler.Helpers.LangThrownException)
+        {
+            System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(unwrapped).Throw();
+        }
+
+        throw new InvalidOperationError(this, "线程执行异常: " + (unwrapped?.Message ?? exception.Message));
+    }
+
+    /// <summary>
     /// 等待线程完成
     /// </summary>
     /// <returns>线程执行结果</returns>
@@ -218,7 +238,7 @@ public partial class ThreadLangValue : LangValueType
         {
             if (_exception is not null)
             {
-                throw new InvalidOperationError(this, "线程执行异常: " + _exception);
+                RethrowThreadException(_exception);
             }
 
             // 如果 _result 为 null，返回 VoidLangValue

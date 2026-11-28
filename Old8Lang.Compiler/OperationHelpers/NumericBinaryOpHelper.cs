@@ -14,6 +14,38 @@ namespace Old8Lang.AST.Expression.OperationHelpers;
 /// </summary>
 internal static class NumericBinaryOpHelper
 {
+    private static bool TryEmitDynamicObjectBinary(
+        LangExpression? left,
+        LangExpression? right,
+        ILGenerator il,
+        LocalManager local,
+        Type? leftType,
+        Type? rightType,
+        string methodName)
+    {
+        if (leftType != typeof(object) && rightType != typeof(object))
+        {
+            return false;
+        }
+
+        left?.Accept(RuntimeVisitors.CreateCompiler(il, local));
+        if (leftType is { IsValueType: true })
+        {
+            il.Emit(OpCodes.Box, leftType);
+        }
+
+        right?.Accept(RuntimeVisitors.CreateCompiler(il, local));
+        if (rightType is { IsValueType: true })
+        {
+            il.Emit(OpCodes.Box, rightType);
+        }
+
+        var helper = typeof(Old8Lang.InstanceMethods.Core.IlDynamicArithmetic)
+            .GetMethod(methodName, [typeof(object), typeof(object)])!;
+        il.Emit(OpCodes.Call, helper);
+        return true;
+    }
+
     private static bool TryEmitLanguageBinary(LangExpression? left, LangExpression? right,
         ILGenerator il, LocalManager local, Type? leftType, Type? rightType, string method)
     {
@@ -169,6 +201,10 @@ internal static class NumericBinaryOpHelper
             return typeof(LangValueType);
         }
 
+        if (TryEmitDynamicObjectBinary(left, right, ilGenerator, local, leftType, rightType,
+                nameof(Old8Lang.InstanceMethods.Core.IlDynamicArithmetic.Add)))
+            return typeof(object);
+
         LoadAndConvertOperands(left, right, ilGenerator, local, ref leftType, ref rightType);
 
         if (ConvertToDoubleIfNeeded(ilGenerator, leftType, rightType))
@@ -234,6 +270,10 @@ internal static class NumericBinaryOpHelper
             ilGenerator.Emit(OpCodes.Callvirt, minusMethod);
             return typeof(LangValueType);
         }
+
+        if (TryEmitDynamicObjectBinary(left, right, ilGenerator, local, leftType, rightType,
+                nameof(Old8Lang.InstanceMethods.Core.IlDynamicArithmetic.Subtract)))
+            return typeof(object);
 
         LoadAndConvertOperands(left, right, ilGenerator, local, ref leftType, ref rightType);
 
@@ -330,6 +370,10 @@ internal static class NumericBinaryOpHelper
             return typeof(int);
         }
 
+        if (TryEmitDynamicObjectBinary(left, right, ilGenerator, local, leftType, rightType,
+                nameof(Old8Lang.InstanceMethods.Core.IlDynamicArithmetic.Multiply)))
+            return typeof(object);
+
         // 加载操作数，并把 object（未注解的函数参数）按 int 拆箱
         LoadAndConvertOperands(left, right, ilGenerator, local, ref leftType, ref rightType);
 
@@ -412,6 +456,10 @@ internal static class NumericBinaryOpHelper
             return typeof(LangValueType);
         }
 
+        if (TryEmitDynamicObjectBinary(left, right, ilGenerator, local, leftType, rightType,
+                nameof(Old8Lang.InstanceMethods.Core.IlDynamicArithmetic.Divide)))
+            return typeof(object);
+
         // 加载操作数，并把 object（未注解的函数参数）按 int 拆箱
         LoadAndConvertOperands(left, right, ilGenerator, local, ref leftType, ref rightType);
 
@@ -478,6 +526,10 @@ internal static class NumericBinaryOpHelper
             return typeof(LangValueType);
         }
 
+        if (TryEmitDynamicObjectBinary(left, right, ilGenerator, local, leftType, rightType,
+                nameof(Old8Lang.InstanceMethods.Core.IlDynamicArithmetic.Modulo)))
+            return typeof(object);
+
         // 加载操作数，并把 object（未注解的函数参数）按 int 拆箱
         LoadAndConvertOperands(left, right, ilGenerator, local, ref leftType, ref rightType);
 
@@ -543,6 +595,10 @@ internal static class NumericBinaryOpHelper
             ilGenerator.Emit(OpCodes.Callvirt, powerMethod);
             return typeof(LangValueType);
         }
+
+        if (TryEmitDynamicObjectBinary(left, right, ilGenerator, local, leftType, rightType,
+                nameof(Old8Lang.InstanceMethods.Core.IlDynamicArithmetic.Power)))
+            return typeof(object);
 
         left?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));
         right?.Accept(RuntimeVisitors.CreateCompiler(ilGenerator, local));

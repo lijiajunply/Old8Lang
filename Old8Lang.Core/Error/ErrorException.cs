@@ -104,27 +104,56 @@ public class Old8Exception : Exception
     public Dictionary<string, string> VariableStates { get; set; } = new();
     
     /// <summary>
-    /// 使用 AsyncLocal 实现线程安全的调用栈，每个异步上下文有独立的调用栈
+    /// 不可变调用栈链表节点：配合 <see cref="AsyncLocal{T}"/> 实现零锁写时分支，
+    /// 子线程 / 并发 async 任务继承父调用栈前缀但绝不会共享可变 List 实例。
     /// </summary>
-    private static readonly AsyncLocal<List<CallStackFrame>> _asyncCallStack = new();
+    private sealed class CallStackNode(CallStackFrame frame, CallStackNode? previous, int count)
+    {
+        public CallStackFrame Frame { get; } = frame;
+        public CallStackNode? Previous { get; } = previous;
+        public int Count { get; } = count;
+    }
 
     /// <summary>
-    /// 当前调用栈，用于在错误发生时收集
-    /// 使用 AsyncLocal 确保每个异步上下文（包括不同线程）都有自己的调用栈副本
+    /// 使用 AsyncLocal 存放不可变调用栈链头，确保每个异步/多线程上下文写时完全隔离
+    /// </summary>
+    private static readonly AsyncLocal<CallStackNode?> _asyncCallStack = new();
+
+    /// <summary>
+    /// 当前调用栈快照（从外层到内层），用于在错误发生时收集
     /// </summary>
     public static List<CallStackFrame> CurrentCallStack
     {
         get
         {
-            if (_asyncCallStack.Value is null)
+            var head = _asyncCallStack.Value;
+            if (head is null)
             {
-                _asyncCallStack.Value = [];
+                return [];
             }
-            return _asyncCallStack.Value;
+
+            var frames = new CallStackFrame[head.Count];
+            var index = head.Count - 1;
+            for (var node = head; node is not null && index >= 0; node = node.Previous)
+            {
+                frames[index--] = node.Frame;
+            }
+
+            return [.. frames];
         }
         set
         {
-            _asyncCallStack.Value = value;
+            CallStackNode? head = null;
+            if (value is not null)
+            {
+                var count = 0;
+                foreach (var frame in value)
+                {
+                    head = new CallStackNode(frame, head, ++count);
+                }
+            }
+
+            _asyncCallStack.Value = head;
         }
     }
 
@@ -135,7 +164,11 @@ public class Old8Exception : Exception
     /// <param name="position">源代码位置</param>
     public static void PushCallStack(string functionName, SourcePosition position)
     {
-        CurrentCallStack.Add(new CallStackFrame(functionName, position));
+        var head = _asyncCallStack.Value;
+        _asyncCallStack.Value = new CallStackNode(
+            new CallStackFrame(functionName, position),
+            head,
+            (head?.Count ?? 0) + 1);
     }
 
     /// <summary>
@@ -143,9 +176,10 @@ public class Old8Exception : Exception
     /// </summary>
     public static void PopCallStack()
     {
-        if (CurrentCallStack.Count > 0)
+        var head = _asyncCallStack.Value;
+        if (head is not null)
         {
-            CurrentCallStack.RemoveAt(CurrentCallStack.Count - 1);
+            _asyncCallStack.Value = head.Previous;
         }
     }
 
@@ -154,7 +188,7 @@ public class Old8Exception : Exception
     /// </summary>
     public static void ClearCallStack()
     {
-        CurrentCallStack.Clear();
+        _asyncCallStack.Value = null;
     }
 
     /// <summary>

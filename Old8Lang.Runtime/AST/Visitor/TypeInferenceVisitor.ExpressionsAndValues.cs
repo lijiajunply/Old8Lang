@@ -683,6 +683,17 @@ public partial class TypeInferenceVisitor
         if (node.Opera == LangTokenType.Star || node.Opera == LangTokenType.Plus || node.Opera == LangTokenType.Minus ||
             node.Opera == LangTokenType.Slash || node.Opera == LangTokenType.Percent || node.Opera == LangTokenType.Caret)
         {
+            if (node.Opera == LangTokenType.Star && leftType == typeof(string))
+            {
+                return typeof(string);
+            }
+
+            // 任一操作数静态类型为 object 时走运行期动态算术，结果类型为 object
+            if (leftType == typeof(object) || rightType == typeof(object))
+            {
+                return typeof(object);
+            }
+
             // 如果有浮点数，返回double
             if (leftType == typeof(double) || rightType == typeof(double))
             {

@@ -394,6 +394,12 @@ public partial class InterpreterVisitor
 
                     node.Block.Accept(this);
 
+                    // 处理 return：循环体内 return 后立刻退出循环
+                    if (manager.IsReturn)
+                    {
+                        break;
+                    }
+
                     // 处理yield：如果循环体中遇到yield，返回以暂停执行
                     if (manager.IsYield)
                     {

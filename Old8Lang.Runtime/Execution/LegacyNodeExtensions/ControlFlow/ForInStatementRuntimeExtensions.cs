@@ -62,6 +62,12 @@ internal static partial class ForInStatementRuntimeExtensions
                             // 执行循环体
                             node.Body.Accept(RuntimeVisitors.CreateInterpreter(manager));
 
+                            // 处理 return
+                            if (manager.IsReturn)
+                            {
+                                break;
+                            }
+
                             // 处理break
                             if (manager.ControlFlowManager.BreakFlag)
                             {
@@ -109,6 +115,12 @@ internal static partial class ForInStatementRuntimeExtensions
 
                             // 执行循环体
                             node.Body.Accept(RuntimeVisitors.CreateInterpreter(manager));
+
+                            // 处理 return
+                            if (manager.IsReturn)
+                            {
+                                break;
+                            }
 
                             // 处理break
                             if (manager.ControlFlowManager.BreakFlag)
@@ -158,6 +170,12 @@ internal static partial class ForInStatementRuntimeExtensions
 
                             // 执行循环体
                             node.Body.Accept(RuntimeVisitors.CreateInterpreter(manager));
+
+                            // 处理 return
+                            if (manager.IsReturn)
+                            {
+                                break;
+                            }
 
                             // 处理break
                             if (manager.ControlFlowManager.BreakFlag)
@@ -226,6 +244,12 @@ internal static partial class ForInStatementRuntimeExtensions
 
                     // 执行循环体
                     node.Body.Accept(RuntimeVisitors.CreateInterpreter(manager));
+
+                    // 处理 return
+                    if (manager.IsReturn)
+                    {
+                        break;
+                    }
 
                     // 处理break
                     if (manager.ControlFlowManager.BreakFlag)

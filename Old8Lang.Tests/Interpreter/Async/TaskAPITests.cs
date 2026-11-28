@@ -140,7 +140,7 @@ public class TaskAPITests
                 return 10
             })
             continuationTask <- originalTask.ContinueWith((result) -> {
-                return result() * 5
+                return result * 5
             })
             result <- continuationTask.Result
         ";
@@ -169,7 +169,7 @@ public class TaskAPITests
             results <- allTasks.Result
             sum <- 0
             for value in results {
-                sum <- sum + value()
+                sum <- sum + value
             }
             result <- sum
         ";
@@ -189,17 +189,12 @@ public class TaskAPITests
     [Fact]
     public void TaskAPI_WhenAny_HandlesFirstCompletedTask()
     {
-        // Arrange
+        // Arrange: 使用 TaskCompletionSource 确定性控制先后完成顺序，避免受线程池调度抖动影响
         var code = @"
-            fastTask <- Task.Run(() -> {
-                await Task.Delay(10)
-                return ""fast""
-            })
-            slowTask <- Task.Run(() -> {
-                await Task.Delay(100)
-                return ""slow""
-            })
-            firstTask <- Task.WhenAny([fastTask, slowTask])
+            fastTcs <- TaskCompletionSource()
+            slowTcs <- TaskCompletionSource()
+            fastTcs.SetResult(""fast"")
+            firstTask <- Task.WhenAny([fastTcs.Task, slowTcs.Task])
             result <- firstTask.Result
         ";
         var interpreter = new LangInterpreter();
@@ -451,7 +446,7 @@ public class TaskAPITests
             allResults <- Task.WhenAll(tasks)
             totalSum <- 0
             for taskResult in allResults.Result {
-                totalSum <- totalSum + taskResult()
+                totalSum <- totalSum + taskResult
             }
             result <- totalSum
         ";
@@ -651,7 +646,7 @@ public class TaskAPITests
                 results <- Task.WhenAll(tasks)
                 sum <- 0
                 for result in results.Result {
-                    sum <- sum + result()
+                    sum <- sum + result
                 }
 
                 // Step 4: Final validation
@@ -713,14 +708,14 @@ public class TaskAPITests
                 await Task.Delay(10)
             }
             async func slowTask() {
-                await Task.Delay(80)
+                await Task.Delay(500)
             }
 
             allTasks <- {fastTask(), fastTask()}
             Task.WaitAll(allTasks)
             allDone <- allTasks[0].IsCompleted && allTasks[1].IsCompleted
 
-            anyTasks <- {fastTask(), slowTask()}
+            anyTasks <- {Task.Completed(), slowTask()}
             firstIndex <- Task.WaitAny(anyTasks)
         ";
         var interpreter = new LangInterpreter();

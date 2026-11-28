@@ -26,6 +26,11 @@ internal static class AwaitExpressionCompilerExtensions
         // 如果类型是 object 或未携带静态 GetAwaiter，则运行期规范化为 Task<object>
         if (exprType == typeof(object) || exprType.GetMethod("GetAwaiter") is null)
         {
+            if (exprType.IsValueType)
+            {
+                il.Emit(OpCodes.Box, exprType);
+            }
+
             il.Emit(OpCodes.Call,
                 typeof(Old8Lang.InstanceMethods.Core.IlRuntimeFunctions)
                     .GetMethod(nameof(Old8Lang.InstanceMethods.Core.IlRuntimeFunctions.ToAwaitableTask))!);

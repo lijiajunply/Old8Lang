@@ -612,13 +612,15 @@ internal static partial class LinqExpressionRuntimeExtensions
         // 用独立查询上下文复用逐行绑定逻辑。
         var continuationNode = new LinqExpression(
             new FromClause(continuation.Variable, node.FromClause.DataSource),
-            continuation.BodyClauses, continuation.TerminationClause);
+            continuation.BodyClauses, continuation.TerminationClause, continuation.Continuation);
 
         continuationNode.WithLinqScope(ilGenerator, local, () =>
         {
             foreach (var clause in continuation.BodyClauses)
                 continuationNode.GenerateClauseIL(clause, ilGenerator, local);
             continuationNode.GenerateTerminationClauseIL(continuation.TerminationClause, ilGenerator, local);
+            if (continuation.Continuation is not null)
+                continuationNode.GenerateContinuationIL(continuation.Continuation, ilGenerator, local);
         });
     }
 

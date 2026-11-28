@@ -348,15 +348,17 @@ t3.Start()";
     /// 测试线程执行顺序
     /// </summary>
     [Fact]
-    public async Task Run_ThreadExecutionOrder_WorksCorrectly()
+    public void Run_ThreadExecutionOrder_WorksCorrectly()
     {
-        // Arrange
+        // Arrange: 使用 Mutex 保护共享列表写入并显式 Join 等待全部线程结束，消除竞态与定时等待抖动
         var code = @"
 results <- {}
+mtx <- MutexCreate()
 
 func appendResult(id: int) -> void {
-    Thread.Sleep(10)
+    MutexLock(mtx)
     results.Add(id)
+    MutexUnlock(mtx)
 }
 
 t1 <- Spawn(appendResult, 1)
@@ -367,16 +369,16 @@ t1.Start()
 t2.Start()
 t3.Start()
 
-Thread.Sleep(10)
+t1.Join()
+t2.Join()
+t3.Join()
+MutexDispose(mtx)
 ";
         var interpreter = new LangInterpreter();
 
         // Act
         var ast = interpreter.Build(code);
         ast.Run(interpreter.Manager);
-
-        // Give threads time to complete
-        await Task.Delay(100);
 
         // Assert
         var results = interpreter.Manager.GetValue(new LangId("results"));

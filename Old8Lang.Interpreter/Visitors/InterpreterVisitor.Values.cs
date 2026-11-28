@@ -453,6 +453,10 @@ public partial class InterpreterVisitor
             {
                 // 没有找到匹配的函数，使用原来的方式查找
                 var idResult = node.Id.Accept(this);
+                if (idResult is AST.Expression.ModuleObjects.LazySymbolProxy lazyProxy)
+                {
+                    idResult = lazyProxy.ResolveSymbol();
+                }
                 result = idResult;
 
                 // 后续处理...
@@ -525,12 +529,20 @@ public partial class InterpreterVisitor
                     var args = node.Ids.Select(id => id.Accept(this)).ToList();
                     result = threadMethodWrapper.Invoke(args, node.Position);
                 }
+                else if (idResult is not NativeAnyLangValue)
+                {
+                    throw new InvalidOperationError(node, $"对象 '{node.Id.IdName}' (类型: {idResult.TypeToString()}) 不可调用");
+                }
             }
         }
         else
         {
             // 如果没有找到重载函数，使用原来的方式查找
             var idResult = node.Id.Accept(this);
+            if (idResult is AST.Expression.ModuleObjects.LazySymbolProxy lazyProxy)
+            {
+                idResult = lazyProxy.ResolveSymbol();
+            }
             result = idResult;
 
             // 如果idResult是TypeTemplate，则创建其实例
@@ -607,6 +619,10 @@ public partial class InterpreterVisitor
                 // 执行静态方法
                 var args = node.Ids.Select(id => id.Accept(this)).ToList();
                 result = threadMethodWrapper.Invoke(args, node.Position);
+            }
+            else if (idResult is not NativeAnyLangValue)
+            {
+                throw new InvalidOperationError(node, $"对象 '{node.Id.IdName}' (类型: {idResult.TypeToString()}) 不可调用");
             }
         }
 

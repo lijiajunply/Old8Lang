@@ -13,14 +13,30 @@ namespace Old8Lang.Compiler;
 /// </remarks>
 public static class IlCompilerOptions
 {
-    /// <summary>调试输出开关，默认为关闭。</summary>
-    public static bool DebugOutputEnabled { get; set; }
+    private static readonly AsyncLocal<bool?> DebugOutputState = new();
+    private static readonly AsyncLocal<bool?> IlVerificationState = new();
+    private static readonly AsyncLocal<bool?> AsyncStateMachineAwaitState = new();
 
-    /// <summary>IL 代码验证开关，默认为开启。</summary>
-    public static bool IlVerificationEnabled { get; set; } = true;
+    /// <summary>调试输出开关，默认为关闭（按异步执行上下文隔离，避免并发测试串味）。</summary>
+    public static bool DebugOutputEnabled
+    {
+        get => DebugOutputState.Value ?? false;
+        set => DebugOutputState.Value = value;
+    }
 
-    /// <summary>启用异步状态机 await 编译，默认为开启。</summary>
-    public static bool EnableAsyncStateMachineAwait { get; set; } = true;
+    /// <summary>IL 代码验证开关，默认为开启（按异步执行上下文隔离）。</summary>
+    public static bool IlVerificationEnabled
+    {
+        get => IlVerificationState.Value ?? true;
+        set => IlVerificationState.Value = value;
+    }
+
+    /// <summary>启用异步状态机 await 编译，默认为开启（按异步执行上下文隔离）。</summary>
+    public static bool EnableAsyncStateMachineAwait
+    {
+        get => AsyncStateMachineAwaitState.Value ?? true;
+        set => AsyncStateMachineAwaitState.Value = value;
+    }
 
     /// <summary>
     /// 把文件头指令应用到编译配置。

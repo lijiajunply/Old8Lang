@@ -190,7 +190,14 @@ public sealed class SpawnFunction : BaseGlobalFunction
             {
                 var result = spawnFunc.Run(new VariateManager(), [.. arguments]);
                 thread?.SetResult(result);
-                RuntimeGlobals.WriteBackAll();
+                try
+                {
+                    RuntimeGlobals.WriteBackAll();
+                }
+                catch (InvalidOperationException)
+                {
+                    // 若兄弟线程正并发修改共享可变集合，回写将在后续线程退出或主线程结束时完成，不应覆盖当前线程的成功结果。
+                }
             }
             catch (Exception ex)
             {

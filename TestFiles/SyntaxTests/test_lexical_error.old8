@@ -43,3 +43,4 @@ invalid_bool4 <- FALSE // 应该是小写 false
 // 无效空值
 invalid_null1 <- Null // 应该是小写 null
 invalid_null2 <- NULL // 应该是小写 null
+// error

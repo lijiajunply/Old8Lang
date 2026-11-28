@@ -21,7 +21,7 @@ public class LazySymbolProxy(
     /// 解析并获取真实符号
     /// </summary>
     /// <returns>真实符号值</returns>
-    internal LangValueType ResolveSymbol()
+    public LangValueType ResolveSymbol()
     {
         if (_isResolved) return _cachedSymbol!;
         lock (_resolveLock)

@@ -6,8 +6,20 @@ namespace Old8Lang.Tests.Compiler.FileHeader;
 /// 文件头配置指令测试 - 测试编译器/解释器配置指令
 /// </summary>
 [Collection("Sequential")]
-public class FileHeaderConfigTests
+public class FileHeaderConfigTests : IDisposable
 {
+    private readonly bool _prevDebug = Old8Lang.Compiler.IlCompilerOptions.DebugOutputEnabled;
+    private readonly bool _prevVerify = Old8Lang.Compiler.IlCompilerOptions.IlVerificationEnabled;
+    private readonly bool _prevTypeInference = Old8Lang.TypeSystem.TypeInferenceConfig.Instance.EnableTypeInference;
+    private readonly bool _prevTypeInferenceDebug = Old8Lang.TypeSystem.TypeInferenceConfig.Instance.DebugOutput;
+
+    public void Dispose()
+    {
+        Old8Lang.Compiler.IlCompilerOptions.DebugOutputEnabled = _prevDebug;
+        Old8Lang.Compiler.IlCompilerOptions.IlVerificationEnabled = _prevVerify;
+        Old8Lang.TypeSystem.TypeInferenceConfig.Instance.EnableTypeInference = _prevTypeInference;
+        Old8Lang.TypeSystem.TypeInferenceConfig.Instance.DebugOutput = _prevTypeInferenceDebug;
+    }
     #region debug 指令测试
 
     /// <summary>

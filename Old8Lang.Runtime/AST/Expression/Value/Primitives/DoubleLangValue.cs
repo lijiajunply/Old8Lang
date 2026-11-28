@@ -24,6 +24,8 @@ public partial class DoubleLangValue(double doubleValue = 0, SourcePosition posi
 
     public override LangValueType Plus(LangValueType otherLangValueType)
     {
+        if (otherLangValueType is EnumLangValue enumVal)
+            otherLangValueType = IntLangValue.Create(enumVal.Value);
         if (otherLangValueType is StringLangValue)
         {
             // 字符串拼接：数字 + 字符串 = 字符串
@@ -44,6 +46,8 @@ public partial class DoubleLangValue(double doubleValue = 0, SourcePosition posi
 
     public override LangValueType Minus(LangValueType otherLangValueType)
     {
+        if (otherLangValueType is EnumLangValue enumVal)
+            otherLangValueType = IntLangValue.Create(enumVal.Value);
         if (otherLangValueType is not IntLangValue and not DoubleLangValue)
             throw new InvalidOperationError(this, $"不支持浮点数与类型 '{otherLangValueType.GetType().Name}' 的减法操作");
 
@@ -58,6 +62,8 @@ public partial class DoubleLangValue(double doubleValue = 0, SourcePosition posi
 
     public override LangValueType Times(LangValueType otherLangValueType)
     {
+        if (otherLangValueType is EnumLangValue enumVal)
+            otherLangValueType = IntLangValue.Create(enumVal.Value);
         if (otherLangValueType is not IntLangValue and not DoubleLangValue)
             throw new InvalidOperationError(this, $"不支持浮点数与类型 '{otherLangValueType.GetType().Name}' 的乘法操作");
 
@@ -72,6 +78,8 @@ public partial class DoubleLangValue(double doubleValue = 0, SourcePosition posi
 
     public override LangValueType Divide(LangValueType otherLangValueType)
     {
+        if (otherLangValueType is EnumLangValue enumVal)
+            otherLangValueType = IntLangValue.Create(enumVal.Value);
         if (otherLangValueType is IntLangValue intValue)
         {
             if (intValue.Value == 0)
@@ -97,6 +105,8 @@ public partial class DoubleLangValue(double doubleValue = 0, SourcePosition posi
 
     public override LangValueType Mod(LangValueType otherLangValueType)
     {
+        if (otherLangValueType is EnumLangValue enumVal)
+            otherLangValueType = IntLangValue.Create(enumVal.Value);
         double divisor;
         if (otherLangValueType is IntLangValue intValue)
         {

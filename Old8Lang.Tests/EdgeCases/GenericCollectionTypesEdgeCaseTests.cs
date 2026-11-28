@@ -487,27 +487,21 @@ func test() -> int {
     #region 解释器模式灵活性测试
 
     /// <summary>
-    /// 测试解释器模式允许混合类型（带类型注解）
+    /// 测试解释器模式对带泛型类型注解的集合字面量执行元素类型检查（三模式统一语义）
     /// </summary>
     [Fact]
-    public void Interpreter_MixedTypesWithAnnotation_ExecutesSuccessfully()
+    public void Interpreter_MixedTypesWithAnnotation_ThrowsTypeError()
     {
         // Arrange
         var code = @"
-// 解释器模式下，类型注解不强制
 items:list<int> <- {1, ""hello"", 3.14, true}
 result <- len(items)
 ";
         var interpreter = new LangInterpreter();
 
-        // Act
+        // Act & Assert
         var ast = interpreter.Build(code);
-        ast.Run(interpreter.Manager);
-
-        // Assert
-        var result = interpreter.Manager.GetValue(new LangId("result"));
-        Assert.NotNull(result);
-        Assert.Equal(4, ((IntLangValue)result).Value);
+        Assert.Throws<Old8Lang.Error.TypeError>(() => ast.Run(interpreter.Manager));
     }
 
     /// <summary>

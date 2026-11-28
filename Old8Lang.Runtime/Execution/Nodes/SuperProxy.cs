@@ -63,7 +63,7 @@ public partial class SuperProxy(AnyLangValue currentInstance, VariateManager var
         }
 
         var method = SelectMethod(methods, instance.Ids);
-        return ExecuteParentMethod(method, instance.Ids, manager);
+        return ExecuteParentMethod(method, parentMetadata, instance.Ids, manager);
     }
 
     /// <summary>
@@ -71,7 +71,7 @@ public partial class SuperProxy(AnyLangValue currentInstance, VariateManager var
     /// </summary>
     internal LangValueType CallParentConstructor(Instance instance, VariateManager manager)
     {
-        // 获取父类元数据（使用当前实例的直接父类）
+        // 获取父类元数据（使用当前执行类的直接父类）
         var parentMetadata = GetDirectParentMetadata();
         if (parentMetadata is null)
         {
@@ -95,7 +95,7 @@ public partial class SuperProxy(AnyLangValue currentInstance, VariateManager var
         var initMethod = SelectMethod(initMethods, instance.Ids);
 
         // 在当前实例的上下文中执行父类构造函数
-        return ExecuteParentMethod(initMethod, instance.Ids, manager);
+        return ExecuteParentMethod(initMethod, parentMetadata, instance.Ids, manager);
     }
 
     /// <summary>
@@ -147,11 +147,24 @@ public partial class SuperProxy(AnyLangValue currentInstance, VariateManager var
     }
 
     /// <summary>
-    /// 获取直接父类的元数据
+    /// 获取直接父类的元数据（沿当前正在执行方法所属类向上解析，避免三层及以上继承无限递归）
     /// </summary>
     internal ClassMetadata? GetDirectParentMetadata()
     {
-        var parentClassName = currentInstance.Metadata.ParentClassName;
+        var executingClassName = variateManager.CurrentExecutingClassName;
+        string? parentClassName;
+
+        if (!string.IsNullOrEmpty(executingClassName) &&
+            !string.Equals(executingClassName, currentInstance.Metadata.ClassName, StringComparison.Ordinal))
+        {
+            var executingMetadata = GetParentMetadata(executingClassName, variateManager);
+            parentClassName = executingMetadata?.ParentClassName;
+        }
+        else
+        {
+            parentClassName = currentInstance.Metadata.ParentClassName;
+        }
+
         if (string.IsNullOrEmpty(parentClassName))
         {
             return null;
@@ -180,7 +193,11 @@ public partial class SuperProxy(AnyLangValue currentInstance, VariateManager var
     /// <summary>
     /// 执行父类方法
     /// </summary>
-    internal LangValueType ExecuteParentMethod(LangMethodInfo methodInfo, List<LangExpression> arguments, VariateManager manager)
+    internal LangValueType ExecuteParentMethod(
+        LangMethodInfo methodInfo,
+        ClassMetadata parentMetadata,
+        List<LangExpression> arguments,
+        VariateManager manager)
     {
         // 计算参数值（在调用者作用域中）
         var parameterValues = arguments.Select(arg => arg.Accept(RuntimeVisitors.CreateInterpreter(manager))).ToList();
@@ -188,6 +205,8 @@ public partial class SuperProxy(AnyLangValue currentInstance, VariateManager var
 
         // 创建方法执行作用域(基于调用者作用域,能访问外部变量和类型定义)
         var executionManager = manager.NewManger();
+        // 将当前执行类推进到被调用方法所属的父类，使父类内部再调 super 时继续向上解析祖类
+        executionManager.CurrentExecutingClassName = methodInfo.OriginClassName ?? parentMetadata.ClassName;
 
         // 1. 设置 this 指针为当前实例
         executionManager.Set(new LangId("this"), currentInstance);

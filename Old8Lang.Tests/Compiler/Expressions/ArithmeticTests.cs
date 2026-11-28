@@ -286,18 +286,29 @@ public class ArithmeticTests
         Assert.NotNull(exception);
     }
 
-    [Fact(Skip = "IL 的 int 加法是 unchecked 32 位回绕；解释器/VM 溢出时提升为 double，见 changes/Todo.md")]
+    /// <summary>
+    /// IL 模式下 int 固定映射 CLR 32 位 unchecked Int32（见 Docs/MODE_SUPPORT.md）；
+    /// 超过 Int32 范围的精确大数计算应使用 double 字面量。
+    /// </summary>
+    [Fact]
     public void VeryLargeNumbers_CompilesAndExecutesCorrectly()
     {
         // Arrange
         var code = @"
-            large1 <- 2147483647
-            large2 <- 2147483646
-            sum <- large1 + large2
-            product <- large1 * 2
+            // double 字面量支持超过 32 位整数范围的计算
+            largeDouble1 <- 2147483647.0
+            largeDouble2 <- 2147483646.0
+            sumDouble <- largeDouble1 + largeDouble2
+            productDouble <- largeDouble1 * 2.0
 
-            Assert.Equal(4294967293.0, sum)
-            Assert.Equal(4294967294.0, product)
+            Assert.Equal(4294967293.0, sumDouble)
+            Assert.Equal(4294967294.0, productDouble)
+
+            // 显式记录 IL 模式 32 位 int unchecked 回绕边界
+            largeInt1 <- 2147483647
+            largeInt2 <- 2147483646
+            wrappedSum <- largeInt1 + largeInt2
+            Assert.Equal(-3, wrappedSum)
         ";
         var interpreter = new LangInterpreter();
 

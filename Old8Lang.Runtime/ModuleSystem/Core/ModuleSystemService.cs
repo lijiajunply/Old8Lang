@@ -270,14 +270,17 @@ public class ModuleSystemService
             else if (options.ModuleAlias is not null)
             {
                 // 带别名的导入: import "module" as alias
-                // 直接在当前作用域执行模块代码，这样函数可以访问模块变量
-                loadResult.Block.Accept(RuntimeVisitors.CreateInterpreter(manager));
+                // 在独立模块作用域中执行，避免不同模块的同名顶层变量互相覆盖或污染调用者作用域
+                var moduleManager = CreateIsolatedModuleManager(manager, absolutePath);
+                loadResult.Block.Accept(RuntimeVisitors.CreateInterpreter(moduleManager));
+
+                // 更新模块内函数的捕获作用域，使模块函数持续绑定到本模块作用域
+                UpdateFunctionCapturedScopes(moduleManager.ImportInfos.ToList(), moduleManager, bindUnboundFunctions: true);
 
                 // 提取符号创建模块对象
-                var symbols = _symbolExtractor.ExtractSymbols(manager);
+                var symbols = _symbolExtractor.ExtractSymbols(moduleManager);
                 var moduleName = Path.GetFileNameWithoutExtension(modulePath);
-                // 传递 manager 作为捕获作用域，确保函数可以访问模块中的变量
-                var moduleObj = UnifiedModule.FromSymbols(moduleName, symbols, default, manager);
+                var moduleObj = UnifiedModule.FromSymbols(moduleName, symbols, default, moduleManager);
                 _symbolRegistry.RegisterModule(manager, options.ModuleAlias, moduleObj);
                 result.ModuleObject = moduleObj;
                 result.IsSuccess = true;
@@ -286,15 +289,19 @@ public class ModuleSystemService
             else
             {
                 // 普通导入: import "module"
-                // 直接在当前作用域执行模块代码，这样函数可以访问模块变量
-                loadResult.Block.Accept(RuntimeVisitors.CreateInterpreter(manager));
+                // 模块体在独立作用域中执行（其内部函数绑定到自身模块作用域，不会被其它模块同名变量覆盖），
+                // 同时按 Old8Lang 语义注册模块对象并将导出符号注入当前作用域供直接调用与级联再导出。
+                var moduleManager = CreateIsolatedModuleManager(manager, absolutePath);
+                loadResult.Block.Accept(RuntimeVisitors.CreateInterpreter(moduleManager));
+
+                UpdateFunctionCapturedScopes(moduleManager.ImportInfos.ToList(), moduleManager, bindUnboundFunctions: true);
 
                 // 提取符号创建模块对象
                 var moduleName = Path.GetFileNameWithoutExtension(modulePath);
-                var symbols = _symbolExtractor.ExtractSymbols(manager);
-                // 传递 manager 作为捕获作用域，确保函数可以访问模块中的变量
-                var moduleObj = UnifiedModule.FromSymbols(moduleName, symbols, default, manager);
+                var symbols = _symbolExtractor.ExtractSymbols(moduleManager);
+                var moduleObj = UnifiedModule.FromSymbols(moduleName, symbols, default, moduleManager);
                 _symbolRegistry.RegisterModule(manager, moduleName, moduleObj);
+                RegisterPlainImportSymbols(manager, symbols);
                 result.ModuleObject = moduleObj;
                 result.IsSuccess = true;
                 manager.LoadedModuleExports[absolutePath] = symbols;
@@ -365,15 +372,29 @@ public class ModuleSystemService
         }
         else
         {
-            // import "module"：重建模块对象
+            // import "module"：重建模块对象，并将导出符号注入当前作用域
             var moduleObj = UnifiedModule.FromSymbols(moduleName, symbols, default, manager);
             _symbolRegistry.RegisterModule(manager, moduleName, moduleObj);
+            RegisterPlainImportSymbols(manager, symbols);
             result.ModuleObject = moduleObj;
         }
 
         result.ExtractedSymbols = symbols;
         result.IsSuccess = true;
         return result;
+    }
+
+    private static void RegisterPlainImportSymbols(VariateManager manager, Dictionary<string, LangValueType> symbols)
+    {
+        var currentScope = manager.Scopes[^1];
+        foreach (var (symbolName, symbolValue) in symbols)
+        {
+            currentScope[symbolName] = symbolValue;
+            if (symbolValue is ImportInfo importInfo && !manager.ImportInfos.Contains(importInfo))
+            {
+                manager.AddClassAndFunc(importInfo);
+            }
+        }
     }
 
     /// <summary>
@@ -397,11 +418,31 @@ public class ModuleSystemService
     public SymbolRegistry SymbolRegistry => _symbolRegistry;
 
     /// <summary>
+    /// 为被导入模块创建独立的作用域管理器，共享宿主目录、循环依赖栈与已加载模块导出表。
+    /// </summary>
+    private static VariateManager CreateIsolatedModuleManager(VariateManager callerManager, string moduleAbsolutePath)
+    {
+        return new VariateManager
+        {
+            LangInfo = callerManager.LangInfo,
+            StandardLibraries = callerManager.StandardLibraries,
+            Path = moduleAbsolutePath,
+            Interpreter = callerManager.Interpreter,
+            ImportStack = callerManager.ImportStack,
+            LoadedModuleExports = callerManager.LoadedModuleExports
+        };
+    }
+
+    /// <summary>
     /// 更新函数的 CapturedScope，确保它们包含模块中定义的所有变量
     /// </summary>
     /// <param name="importInfos">新增的 ImportInfo 列表</param>
     /// <param name="manager">当前的变量管理器（包含模块执行后的完整作用域）</param>
-    private static void UpdateFunctionCapturedScopes(List<ImportInfo> importInfos, VariateManager manager)
+    /// <param name="bindUnboundFunctions">是否同时为尚未绑定捕获作用域的模块顶层函数绑定作用域</param>
+    private static void UpdateFunctionCapturedScopes(
+        List<ImportInfo> importInfos,
+        VariateManager manager,
+        bool bindUnboundFunctions = false)
     {
         // 创建一个映射，用于跟踪需要更新的函数
         var updatedFunctions = new Dictionary<string, ImportInfo>();
@@ -412,7 +453,7 @@ public class ModuleSystemService
             var importInfo = importInfos[i];
 
             // 只处理 FuncLangValue
-            if (importInfo is FuncLangValue func && func.GetCapturedScope() is not null)
+            if (importInfo is FuncLangValue func && (bindUnboundFunctions || func.GetCapturedScope() is not null))
             {
                 // 创建新的函数副本，使用当前的完整作用域
                 var updatedFunc = new FuncLangValue(
@@ -439,7 +480,7 @@ public class ModuleSystemService
                 }
             }
             // 同样处理 AsyncFuncLangValue
-            else if (importInfo is AsyncFuncLangValue asyncFunc && asyncFunc.GetCapturedScope() is not null)
+            else if (importInfo is AsyncFuncLangValue asyncFunc && (bindUnboundFunctions || asyncFunc.GetCapturedScope() is not null))
             {
                 // 创建新的异步函数副本，使用当前的完整作用域
                 var updatedAsyncFunc = new AsyncFuncLangValue(

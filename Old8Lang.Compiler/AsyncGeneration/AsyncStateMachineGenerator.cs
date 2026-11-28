@@ -108,11 +108,11 @@ public class AsyncStateMachineGenerator : IAsyncStateMachineGenerator
     {
         IlGenerator = ilGenerator;
         LocalManager = localManager;
-        BlockStatement = blockStatement;
         IsAsyncGenerator = isAsyncGenerator;
+        BlockStatement = new AsyncExpressionAwaitLowerer(isAsyncGenerator).LowerBlock(blockStatement);
 
         // 初始化：识别 await 位置，并按所在受保护区域分组
-        AnalyzeStatement(blockStatement, _rootRegion, unsupportedContext: null);
+        AnalyzeStatement(BlockStatement, _rootRegion, unsupportedContext: null);
         _analysisComplete = true;
     }
 

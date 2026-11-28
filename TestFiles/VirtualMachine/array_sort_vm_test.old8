@@ -8,8 +8,8 @@
 // 说明：
 //   - VM 中数组字面量 [3, 1, 2] 的运行时类型是原生 object?[]，排序结果也是数组，
 //     所以用 s[i] / s.Count() / s.Join(",") 校验，而不是直接打印数组。
-//   - string 按长度排序（与解释器/IL 的 StringLangValue.Less 语义一致），
-//     长度相同时再按序号比较，保证 6 种算法结果完全一致。
+//   - string 按字典序排序（CompareOrdinal，与解释器/IL 的 StringLangValue.Less 语义一致），
+//     保证 6 种算法结果完全一致。
 //   - 全部断言失败都会 throw，正常结束时打印 All Array Sort VM Tests Passed。
 
 // ================= 共享输入 =================
@@ -28,7 +28,7 @@ if r.Count() != 3 { throw "QuickSort 结果长度错误" }
 r <- srcNeg.QuickSort()
 if r.Join(",") != "-3,-3,-1,0,5,5" { throw "QuickSort 负数+重复失败: " + r.Join(",") }
 r <- srcStr.QuickSort()
-if r.Join(",") != "a,bb,dd,ccc" { throw "QuickSort 字符串失败: " + r.Join(",") }
+if r.Join(",") != "a,bb,ccc,dd" { throw "QuickSort 字符串失败: " + r.Join(",") }
 r <- srcRev.QuickSort()
 if r.Join(",") != "0,1,2,3,4,5,6,7,8,9" { throw "QuickSort 逆序失败: " + r.Join(",") }
 r <- srcOne.QuickSort()
@@ -46,7 +46,7 @@ if r.Join(",") != "1,2,3" { throw "HeapSort 基本整数失败: " + r.Join(",") 
 r <- srcNeg.HeapSort()
 if r.Join(",") != "-3,-3,-1,0,5,5" { throw "HeapSort 负数+重复失败: " + r.Join(",") }
 r <- srcStr.HeapSort()
-if r.Join(",") != "a,bb,dd,ccc" { throw "HeapSort 字符串失败: " + r.Join(",") }
+if r.Join(",") != "a,bb,ccc,dd" { throw "HeapSort 字符串失败: " + r.Join(",") }
 r <- srcRev.HeapSort()
 if r.Join(",") != "0,1,2,3,4,5,6,7,8,9" { throw "HeapSort 逆序失败: " + r.Join(",") }
 r <- srcOne.HeapSort()
@@ -64,7 +64,7 @@ if r.Join(",") != "1,2,3" { throw "SelectionSort 基本整数失败: " + r.Join(
 r <- srcNeg.SelectionSort()
 if r.Join(",") != "-3,-3,-1,0,5,5" { throw "SelectionSort 负数+重复失败: " + r.Join(",") }
 r <- srcStr.SelectionSort()
-if r.Join(",") != "a,bb,dd,ccc" { throw "SelectionSort 字符串失败: " + r.Join(",") }
+if r.Join(",") != "a,bb,ccc,dd" { throw "SelectionSort 字符串失败: " + r.Join(",") }
 r <- srcRev.SelectionSort()
 if r.Join(",") != "0,1,2,3,4,5,6,7,8,9" { throw "SelectionSort 逆序失败: " + r.Join(",") }
 r <- srcOne.SelectionSort()
@@ -82,7 +82,7 @@ if r.Join(",") != "1,2,3" { throw "InsertionSort 基本整数失败: " + r.Join(
 r <- srcNeg.InsertionSort()
 if r.Join(",") != "-3,-3,-1,0,5,5" { throw "InsertionSort 负数+重复失败: " + r.Join(",") }
 r <- srcStr.InsertionSort()
-if r.Join(",") != "a,bb,dd,ccc" { throw "InsertionSort 字符串失败: " + r.Join(",") }
+if r.Join(",") != "a,bb,ccc,dd" { throw "InsertionSort 字符串失败: " + r.Join(",") }
 r <- srcRev.InsertionSort()
 if r.Join(",") != "0,1,2,3,4,5,6,7,8,9" { throw "InsertionSort 逆序失败: " + r.Join(",") }
 r <- srcOne.InsertionSort()
@@ -100,7 +100,7 @@ if r.Join(",") != "1,2,3" { throw "MergeSort 基本整数失败: " + r.Join(",")
 r <- srcNeg.MergeSort()
 if r.Join(",") != "-3,-3,-1,0,5,5" { throw "MergeSort 负数+重复失败: " + r.Join(",") }
 r <- srcStr.MergeSort()
-if r.Join(",") != "a,bb,dd,ccc" { throw "MergeSort 字符串失败: " + r.Join(",") }
+if r.Join(",") != "a,bb,ccc,dd" { throw "MergeSort 字符串失败: " + r.Join(",") }
 r <- srcRev.MergeSort()
 if r.Join(",") != "0,1,2,3,4,5,6,7,8,9" { throw "MergeSort 逆序失败: " + r.Join(",") }
 r <- srcOne.MergeSort()
@@ -118,7 +118,7 @@ if r.Join(",") != "1,2,3" { throw "BubbleSort 基本整数失败: " + r.Join(","
 r <- srcNeg.BubbleSort()
 if r.Join(",") != "-3,-3,-1,0,5,5" { throw "BubbleSort 负数+重复失败: " + r.Join(",") }
 r <- srcStr.BubbleSort()
-if r.Join(",") != "a,bb,dd,ccc" { throw "BubbleSort 字符串失败: " + r.Join(",") }
+if r.Join(",") != "a,bb,ccc,dd" { throw "BubbleSort 字符串失败: " + r.Join(",") }
 r <- srcRev.BubbleSort()
 if r.Join(",") != "0,1,2,3,4,5,6,7,8,9" { throw "BubbleSort 逆序失败: " + r.Join(",") }
 r <- srcOne.BubbleSort()
@@ -170,7 +170,7 @@ if !s2.IsSorted() { throw "空数组应视为已排序" }
 s3 <- [42]
 if s3.Sort().Join(",") != "42" { throw "Sort 单元素失败" }
 s4 <- ["bb", "a", "ccc", "dd"]
-if s4.Sort().Join(",") != "a,bb,dd,ccc" { throw "Sort 字符串失败: " + s4.Sort().Join(",") }
+if s4.Sort().Join(",") != "a,bb,ccc,dd" { throw "Sort 字符串失败: " + s4.Sort().Join(",") }
 s5 <- [1, 2, 3]
 if !s5.IsSorted() { throw "已排序数组 IsSorted 应为 true" }
 s6 <- [3, null, 1]

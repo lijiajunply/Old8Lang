@@ -16,6 +16,8 @@ namespace Old8Lang.ExternProviders;
 /// </summary>
 public class PythonProvider : IExternProvider
 {
+    private static readonly Lock InitLock = new();
+    private static nint _mainThreadState;
     private readonly ExternType _pythonType;
 
     /// <summary>
@@ -24,27 +26,46 @@ public class PythonProvider : IExternProvider
     /// </summary>
     public static void Shutdown()
     {
-        if (!PythonEngine.IsInitialized)
+        lock (InitLock)
         {
-            return;
-        }
+            if (!PythonEngine.IsInitialized)
+            {
+                return;
+            }
 
-        try
-        {
-            PythonEngine.Shutdown();
-        }
-        catch (PlatformNotSupportedException)
-        {
-            // pythonnet 3.0.5 cannot serialize its shutdown state on .NET 10,
-            // because BinaryFormatter is removed. Invoke its native finalizer
-            // directly so the embedded interpreter does not keep the process alive.
-            var runtimeType = typeof(PythonEngine).Assembly.GetType("Python.Runtime.Runtime");
-            var finalizeProperty = runtimeType?.GetProperty(
-                "PyFinalize",
-                BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
-            var finalizeDelegate = finalizeProperty?.GetValue(null);
-            var invoke = finalizeDelegate?.GetType().GetMethod("Invoke", Type.EmptyTypes);
-            invoke?.Invoke(finalizeDelegate, null);
+            if (_mainThreadState != 0)
+            {
+                try
+                {
+                    PythonEngine.EndAllowThreads(_mainThreadState);
+                }
+                catch
+                {
+                    // 忽略非初始化线程释放状态异常，继续尝试清理运行时
+                }
+                finally
+                {
+                    _mainThreadState = 0;
+                }
+            }
+
+            try
+            {
+                PythonEngine.Shutdown();
+            }
+            catch (PlatformNotSupportedException)
+            {
+                // pythonnet 3.0.5 cannot serialize its shutdown state on .NET 10,
+                // because BinaryFormatter is removed. Invoke its native finalizer
+                // directly so the embedded interpreter does not keep the process alive.
+                var runtimeType = typeof(PythonEngine).Assembly.GetType("Python.Runtime.Runtime");
+                var finalizeProperty = runtimeType?.GetProperty(
+                    "PyFinalize",
+                    BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
+                var finalizeDelegate = finalizeProperty?.GetValue(null);
+                var invoke = finalizeDelegate?.GetType().GetMethod("Invoke", Type.EmptyTypes);
+                invoke?.Invoke(finalizeDelegate, null);
+            }
         }
     }
 
@@ -75,31 +96,39 @@ public class PythonProvider : IExternProvider
         CallingConventionType defaultCallingConvention,
         VariateManager manager)
     {
-        // 初始化 Python 运行时(仅初始化一次)
+        // 初始化 Python 运行时(仅初始化一次)，初始化后立即释放主线程 GIL，
+        // 避免 xUnit 等多线程宿主在其它 ThreadPool 线程进入 Py.GIL() 时永久死锁。
         if (!PythonEngine.IsInitialized)
         {
-            // 检测并设置 Python DLL 路径
-            var pythonDll = DetectPythonDll();
-            if (!string.IsNullOrEmpty(pythonDll))
+            lock (InitLock)
             {
-                Python.Runtime.Runtime.PythonDLL = pythonDll;
-            }
-            else
-            {
-                throw new ImportError(default(SourcePosition), "Python",
-                    "无法找到 Python 运行时。请确保系统已安装 Python 3.7 或更高版本。\n" +
-                    "或者手动设置环境变量 PYTHONNET_PYDLL 指向 Python 动态库路径。");
-            }
+                if (!PythonEngine.IsInitialized)
+                {
+                    // 检测并设置 Python DLL 路径
+                    var pythonDll = DetectPythonDll();
+                    if (!string.IsNullOrEmpty(pythonDll))
+                    {
+                        Python.Runtime.Runtime.PythonDLL = pythonDll;
+                    }
+                    else
+                    {
+                        throw new ImportError(default(SourcePosition), "Python",
+                            "无法找到 Python 运行时。请确保系统已安装 Python 3.7 或更高版本。\n" +
+                            "或者手动设置环境变量 PYTHONNET_PYDLL 指向 Python 动态库路径。");
+                    }
 
-            try
-            {
-                PythonEngine.Initialize();
-            }
-            catch (Exception ex)
-            {
-                throw new ImportError(default(SourcePosition), "Python",
-                    $"Python 运行时初始化失败：{ex.Message}\n" +
-                    $"Python DLL 路径：{Python.Runtime.Runtime.PythonDLL}");
+                    try
+                    {
+                        PythonEngine.Initialize();
+                        _mainThreadState = PythonEngine.BeginAllowThreads();
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new ImportError(default(SourcePosition), "Python",
+                            $"Python 运行时初始化失败：{ex.Message}\n" +
+                            $"Python DLL 路径：{Python.Runtime.Runtime.PythonDLL}");
+                    }
+                }
             }
         }
 

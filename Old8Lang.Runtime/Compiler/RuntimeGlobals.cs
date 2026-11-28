@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Reflection.Emit;
 using System.Threading;
 using Old8Lang.AST;
@@ -27,9 +28,9 @@ public static class RuntimeGlobals
         public bool HasValue;
     }
 
-    private static readonly AsyncLocal<Dictionary<string, Slot>?> Slots = new();
+    private static readonly AsyncLocal<ConcurrentDictionary<string, Slot>?> Slots = new();
 
-    private static Dictionary<string, Slot>? _slots
+    private static ConcurrentDictionary<string, Slot>? _slots
     {
         get => Slots.Value;
         set => Slots.Value = value;
@@ -46,7 +47,7 @@ public static class RuntimeGlobals
     public static object? InstallContext(object? context)
     {
         var previous = _slots;
-        _slots = context as Dictionary<string, Slot>;
+        _slots = context as ConcurrentDictionary<string, Slot>;
         return previous;
     }
 
@@ -62,7 +63,7 @@ public static class RuntimeGlobals
     /// <param name="slotTypes">需要创建的槽位（名称 → 静态类型）</param>
     public static void Initialize(IReadOnlyDictionary<string, Type> slotTypes)
     {
-        var slots = new Dictionary<string, Slot>(StringComparer.Ordinal);
+        var slots = new ConcurrentDictionary<string, Slot>(StringComparer.Ordinal);
         foreach (var name in slotTypes.Keys)
         {
             slots[name] = new Slot();
@@ -92,12 +93,8 @@ public static class RuntimeGlobals
     /// </summary>
     public static void Set(string name, object? value)
     {
-        _slots ??= new Dictionary<string, Slot>(StringComparer.Ordinal);
-        if (!_slots.TryGetValue(name, out var slot))
-        {
-            slot = new Slot();
-            _slots[name] = slot;
-        }
+        _slots ??= new ConcurrentDictionary<string, Slot>(StringComparer.Ordinal);
+        var slot = _slots.GetOrAdd(name, static _ => new Slot());
 
         slot.Value = value;
         slot.HasValue = true;

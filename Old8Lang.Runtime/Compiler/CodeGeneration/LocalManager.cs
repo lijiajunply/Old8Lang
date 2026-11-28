@@ -854,8 +854,8 @@ public class LocalManager
         if (AsyncStateMachineGenerator != null)
         {
             AsyncStateMachineGenerator.DefineVariable(name, type);
-            // 记录类型，以便后续推断
-            LocalVarTypes[name] = type;
+            // 若字段已存在，必须保留字段实际类型，不能被后续动态类型（如 object）覆盖
+            LocalVarTypes[name] = AsyncStateMachineGenerator.GetVariableType(name) ?? type;
         }
         else
         {
