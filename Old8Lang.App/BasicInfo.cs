@@ -51,14 +51,15 @@ public static class BasicInfo
     env                    管理项目环境配置
 
   调试与性能分析命令：
+    --dap                  启动标准 DAP（Debug Adapter Protocol）虚拟机调试服务
     debug-start <文件路径> 启动调试会话（挂上调试器运行文件）
     debug-bp <子命令>      断点管理：add / func / list / remove / clear
     debug <命令>           调试控制：continue / step / stepinto / stepover / stepout / pause / stop
     profile <子命令>       性能分析会话：start / stop / status / clear
 
   信息命令：
-    -h                     显示此帮助信息
-    -var                   显示当前版本号
+    -h, --help             显示此帮助信息
+    -v, --version, -var    显示当前版本号
 
 通用选项：
   -d, --debug            启用调试输出，显示详细的编译过程信息

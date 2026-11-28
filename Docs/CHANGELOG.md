@@ -9,7 +9,9 @@
 
 ---
 
-## 2026-11-28
+## v1.0.0 (2026-11-28)
+
+Old8Lang 1.0.0 正式发布：解释模式、IL 模式与虚拟机模式三大后端核心语义对齐，完整提供异步与并发、泛型与约束、LINQ、LSP/DAP 工具链与统一远程包管理。
 
 **语法 / 语义**
 
@@ -20,6 +22,8 @@
 - 三种模式统一在变量赋值时递归校验带元素类型注解的集合（如 `list<int>`、`dict<string, int>`），并统一 `spawn` 线程 `Join()` 后的异常消息口径。
 
 **API**
+
+- 命令行新增 `-v` / `--version`（等价于 `-var`）与 `--help`（等价于 `-h`）别名，版本号正式更新为 `1.0.0`。
 
 - 统一远程包管理协议为 `Old8Lang.PackageManager.Server`：新增 `old8lang search` 与 `old8lang registry` 命令（支持通过 `--registry`、`OLD8LANG_REGISTRY`、`o8package.json` 的 `registry` 字段或 `~/.old8lang/config.json` 切换到自建私有服务器），`old8lang publish` 支持直接上传包及签名到远程仓库（`--local-only` 保留仅本地打包），安装包自动解压到 `{packagesDir}/{packageId}@{version}/` 并支持读取 `o8package.json` 的 `main` 入口。
 - 移除直接从 HTTP/HTTPS URL 导入模块（`import "https://..."`），统一改为通过 `old8lang install` 安装第三方包。

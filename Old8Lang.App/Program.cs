@@ -145,8 +145,14 @@ public abstract class Program
         CommandRegistry.Register(new ExecuteBytecodeCommand());
 
         // 信息命令
-        CommandRegistry.Register(new HelpCommand());
-        CommandRegistry.Register(new VersionCommand());
+        var helpCommand = new HelpCommand();
+        CommandRegistry.Register(helpCommand);
+        CommandRegistry.Register(new CommandAlias("--help", helpCommand, "-h 命令的别名"));
+
+        var versionCommand = new VersionCommand();
+        CommandRegistry.Register(versionCommand);
+        CommandRegistry.Register(new CommandAlias("-v", versionCommand, "-var 命令的别名"));
+        CommandRegistry.Register(new CommandAlias("--version", versionCommand, "-var 命令的别名"));
 
         // 项目管理命令
         CommandRegistry.Register(new InitCommand());

@@ -7,7 +7,7 @@ public class VersionCommand : ICommand
 {
     public string Name => "-var";
     public string Description => "显示当前版本号";
-    public string Help => "使用: Old8Lang.App -var";
+    public string Help => "使用: Old8Lang.App -v | --version | -var";
 
     public int Execute(string[] args)
     {
