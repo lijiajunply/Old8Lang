@@ -1,19 +1,23 @@
+using Old8Lang.Error;
+
 namespace Old8Lang.AST.Expression.Intermediates;
 
 /// <summary>
-/// 范围表达式，创建一个整数数组
+/// 范围表达式，创建整数或字符数组
 /// </summary>
 /// <param name="start"></param>
 /// <param name="end"></param>
 /// <param name="position"></param>
 /// <param name="includeStart">是否包含起始值</param>
 /// <param name="includeEnd">是否包含结束值</param>
+/// <param name="step">可选的步长表达式</param>
 public partial class RangeLangValue(
     LangExpression? start,
     LangExpression? end,
     SourcePosition position = default,
     bool includeStart = true,
-    bool includeEnd = true) : LangValueType(position)
+    bool includeEnd = true,
+    LangExpression? step = null) : LangValueType(position)
 {
 
     /// <summary>
@@ -26,45 +30,72 @@ public partial class RangeLangValue(
     /// </summary>
     public LangExpression? End { get; } = end;
 
+    public LangExpression? Step { get; } = step;
+
     public bool IncludeStart { get; } = includeStart;
     public bool IncludeEnd { get; } = includeEnd;
 
-    /// <summary>
-    /// 创建范围数组的辅助方法(用于 IL 模式)
-    /// </summary>
-    public static int[] CreateRangeArray(int start, int end, bool includeStart, bool includeEnd)
+    /// <summary>创建单位步长的整数范围。</summary>
+    public static int[] CreateRangeArray(int start, int end, bool includeStart, bool includeEnd) =>
+        CreateSteppedRangeArray(start, end, 1, includeStart, includeEnd);
+
+    /// <summary>创建指定步长的整数范围。</summary>
+    public static int[] CreateSteppedRangeArray(int start, int end, int step, bool includeStart, bool includeEnd) =>
+        CreateElements(start, end, step, includeStart, includeEnd, static value => value);
+
+    /// <summary>按 UTF-16 码元顺序创建字符范围。</summary>
+    public static char[] CreateCharacterRangeArray(char start, char end, int step, bool includeStart, bool includeEnd) =>
+        CreateElements(start, end, step, includeStart, includeEnd, static value => (char)value);
+
+    internal static Array CreateRange(object? start, object? end, object? step, bool includeStart, bool includeEnd,
+        SourcePosition position)
     {
-        var results = new List<int>();
-
-        // 方向由**原始端点**决定，排除端点只会收窄区间，不能把方向翻转。
-        // 例如 [5>~<5] 的区间是 (5, 5)，应为空；此前先 +1/-1 得到 6~4，
-        // 再按 6 > 4 判成反向范围，错误地产生 [6, 5, 4]。
-        if (start <= end)
+        var stride = RequireRangeStep(step, position);
+        return (start, end) switch
         {
-            var lo = includeStart ? start : start + 1;
-            var hi = includeEnd ? end : end - 1;
-            for (var i = lo; i <= hi; i++)
-            {
-                results.Add(i);
-            }
-        }
-        else
-        {
-            var hi = includeStart ? start : start - 1;
-            var lo = includeEnd ? end : end + 1;
-            for (var i = hi; i >= lo; i--)
-            {
-                results.Add(i);
-            }
-        }
+            (int first, int last) => CreateElements(first, last, stride, includeStart, includeEnd,
+                static value => value, position),
+            (char first, char last) => CreateElements(first, last, stride, includeStart, includeEnd,
+                static value => (char)value, position),
+            _ => throw new TypeError(position, "范围端点必须同为整数或同为字符")
+        };
+    }
 
-        return results.ToArray();
+    /// <summary>校验 IL 模式下运行期确定类型的步长。</summary>
+    public static int RequireRangeStep(object? step) => RequireRangeStep(step, default);
+
+    private static int RequireRangeStep(object? step, SourcePosition position) =>
+        step is int stride ? stride : throw new TypeError(position, "范围步长必须是整数");
+
+    private static T[] CreateElements<T>(int start, int end, int step, bool includeStart, bool includeEnd,
+        Func<int, T> convert, SourcePosition position = default)
+    {
+        if (step <= 0)
+            throw new InvalidOperationError(position, "范围步长必须大于 0");
+
+        // 使用 long 计算距离与偏移，避免触及 int 边界时回绕。
+        var distance = Math.Abs((long)end - start) - (includeEnd ? 0 : 1);
+        var firstOffset = includeStart ? 0 : step;
+        if (distance < firstOffset)
+            return [];
+
+        var count = (distance - firstOffset) / step + 1;
+        if (count > Array.MaxLength)
+            throw new OutOfMemoryError(position, "范围元素数超过数组长度上限");
+
+        var direction = start <= end ? 1 : -1;
+        var results = new T[(int)count];
+        var offset = (long)firstOffset;
+        for (var index = 0; index < results.Length; index++, offset += step)
+            results[index] = convert((int)(start + direction * offset));
+
+        return results;
     }
 
     public override string ToString()
     {
         var startSymbol = IncludeStart ? "[" : "(";
         var endSymbol = IncludeEnd ? "]" : ")";
-        return $"{startSymbol}{Start}~{End}{endSymbol}";
+        return $"{startSymbol}{Start}~{End}{(Step is null ? "" : $":{Step}")}{endSymbol}";
     }
 }

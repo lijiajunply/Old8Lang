@@ -330,7 +330,7 @@ arrayLiteral = "[" expression ( "," expression )* "]" ;
 
 tupleLiteral = "(" expression "," expression ( "," expression )* ")" ;
 
-rangeLiteral = "[" expression "~" expression "]" ;
+rangeLiteral = "[" expression ( "~" | "~<" | ">~" | ">~<" ) expression [ ":" expression ] "]" ;
 
 sliceLiteral = identifier "[" expression ":" expression "]" ;
 

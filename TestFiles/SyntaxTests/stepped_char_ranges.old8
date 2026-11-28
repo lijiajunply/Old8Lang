@@ -1,0 +1,3 @@
+PrintLine([1~10:2])
+PrintLine(['A'~'Z'])
+PrintLine(['F'>~<'A':1 + 1])

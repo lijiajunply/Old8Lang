@@ -206,7 +206,7 @@ internal sealed class AsyncExpressionAwaitLowerer(bool isAsyncGenerator)
             case DictionaryLiteralExpression dict:
                 return dict.Entries.Any(e => ContainsAwait(e.Key) || ContainsAwait(e.Value));
             case RangeLiteralExpression range:
-                return ContainsAwait(range.Start) || ContainsAwait(range.End);
+                return ContainsAwait(range.Start) || ContainsAwait(range.End) || ContainsAwait(range.Step);
             case SliceExpression slice:
                 return ContainsAwait(slice.Start) || ContainsAwait(slice.End) || ContainsAwait(slice.Step);
             case IndexExpression idx:
@@ -671,11 +671,13 @@ internal sealed class AsyncExpressionAwaitLowerer(bool isAsyncGenerator)
                 var items = new List<LangExpression>();
                 if (range.Start is not null) items.Add(range.Start);
                 if (range.End is not null) items.Add(range.End);
+                if (range.Step is not null) items.Add(range.Step);
                 var lowered = LowerSequence(items, prefix, forceHoistAllAwaits: true);
                 var idx = 0;
                 var start = range.Start is not null ? lowered[idx++] : null;
-                var end = range.End is not null ? lowered[idx] : null;
-                return new RangeLiteralExpression(start, end, range.Position, range.IncludeStart, range.IncludeEnd);
+                var end = range.End is not null ? lowered[idx++] : null;
+                var step = range.Step is not null ? lowered[idx] : null;
+                return new RangeLiteralExpression(start, end, range.Position, range.IncludeStart, range.IncludeEnd, step);
             }
 
             case SliceExpression slice:

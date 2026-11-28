@@ -546,6 +546,8 @@ public class AsyncStateMachineGenerator : IAsyncStateMachineGenerator
                 AnalyzeExpression(rangeSyntax.Start, region, unsupportedContext, pendingValues);
             if (rangeSyntax.End is not null)
                 AnalyzeExpression(rangeSyntax.End, region, unsupportedContext, pendingValues: true);
+            if (rangeSyntax.Step is not null)
+                AnalyzeExpression(rangeSyntax.Step, region, unsupportedContext, pendingValues: true);
             return;
         }
 
@@ -938,7 +940,8 @@ public class AsyncStateMachineGenerator : IAsyncStateMachineGenerator
                        ContainsSuspendPoint(sliceExpr.End) ||
                        ContainsSuspendPoint(sliceExpr.Step);
             case RangeLiteralExpression rangeExpr:
-                return ContainsSuspendPoint(rangeExpr.Start) || ContainsSuspendPoint(rangeExpr.End);
+                return ContainsSuspendPoint(rangeExpr.Start) || ContainsSuspendPoint(rangeExpr.End) ||
+                       ContainsSuspendPoint(rangeExpr.Step);
             case TupleLiteralExpression tupleExpr:
                 return tupleExpr.Elements.Any(ContainsSuspendPoint);
             case DictionaryLiteralExpression dictExpr:

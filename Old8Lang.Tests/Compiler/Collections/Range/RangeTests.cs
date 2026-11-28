@@ -171,30 +171,30 @@ public class RangeTests(ITestOutputHelper output)
         Assert.Null(exception);
     }
 
-    [Fact(Skip = "Range with step is not yet implemented")]
+    [Fact]
     public void RangesWithDifferentStep_CompilesAndExecutesCorrectly()
     {
         // Arrange
         var code = @"
             range_1 <- [1~10:2]
-            range_2 <- [1~10:2]
+            range_2 <- [1~10:3]
 
-            // Test different step sizes
             sum_1 <- 0
-            sum_2 <- 0
-            i <- 1
-            while i < 10 {
+            i <- 0
+            while i < range_1.Length {
                 sum_1 <- sum_1 + range_1[i]
                 i <- i + 1
             }
-            i <- 1
-            while i < 10 {
+
+            sum_2 <- 0
+            i <- 0
+            while i < range_2.Length {
                 sum_2 <- sum_2 + range_2[i]
                 i <- i + 1
             }
 
-            Assert.Equal(12, sum_1)
-            Assert.Equal(12, sum_2)
+            Assert.Equal(25, sum_1)
+            Assert.Equal(22, sum_2)
         ";
         var interpreter = new LangInterpreter();
 
@@ -207,7 +207,7 @@ public class RangeTests(ITestOutputHelper output)
         Assert.Null(exception);
     }
 
-    [Fact(Skip = "Character ranges are not yet supported in compiler mode")]
+    [Fact]
     public void CharacterRange_CompilesAndExecutesCorrectly()
     {
         // Arrange

@@ -1,0 +1,26 @@
+step <- 1 + 1
+numbers <- [1~10:step]
+PrintLine(numbers)
+Assert.Equal(5, numbers.Length)
+Assert.Equal(9, numbers[4])
+
+reverseNumbers <- [10>~<2:3]
+PrintLine(reverseNumbers)
+Assert.Equal(2, reverseNumbers.Length)
+Assert.Equal(7, reverseNumbers[0])
+Assert.Equal(4, reverseNumbers[1])
+
+start <- 'A'
+end <- 'Z'
+letters <- [start~end]
+PrintLine(letters)
+Assert.Equal(26, letters.Length)
+Assert.Equal('Z', letters[25])
+
+steppedLetters <- ['F'~<'A':2]
+PrintLine(steppedLetters)
+Assert.Equal(3, steppedLetters.Length)
+Assert.Equal('B', steppedLetters[2])
+
+Assert.Equal(0, [5>~5:2].Length)
+Assert.Equal(2147483647, [2147483647~2147483647:2][0])

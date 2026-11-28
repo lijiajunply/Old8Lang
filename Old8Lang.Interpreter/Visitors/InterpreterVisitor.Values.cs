@@ -8,6 +8,7 @@ using Old8Lang.AST.Expression.Value;
 using Old8Lang.Error;
 using Old8Lang.AsyncGeneration;
 using Old8Lang.TypeSystem;
+using Old8Lang.Syntax;
 
 namespace Old8Lang.AST.Visitor;
 
@@ -153,27 +154,14 @@ public partial class InterpreterVisitor
     /// </summary>
     public LangValueType VisitRangeLangValue(RangeLangValue node)
     {
-        // 完整迁移自 RangeLangValue.Run()
-        // 范围表达式，创建一个整数数组
-        var results = new List<LangValueType>();
+        var start = (node.Start?.Accept(this) as ILiteralSyntax)?.LiteralValue;
+        var end = (node.End?.Accept(this) as ILiteralSyntax)?.LiteralValue;
+        var step = node.Step is null ? 1 : (node.Step.Accept(this) as IntLangValue)?.Value;
+        var range = RangeLangValue.CreateRange(start, end, step, node.IncludeStart, node.IncludeEnd, node.Position);
 
-        var startValue = node.Start?.Accept(this);
-        var endValue = node.End?.Accept(this);
-
-        if (startValue is not IntLangValue startIntValue || endValue is not IntLangValue endIntValue)
-            throw new TypeError(node, "IntValue",
-                $"RangeValue: start 或 end 不是 IntValue，实际得到了 {startValue?.GetType().Name} 和 {endValue?.GetType().Name}");
-
-        // 与 IL 模式共用同一套区间算法：方向由原始端点决定，排除端点只收窄区间。
-        // 不要在这里各自实现——两份实现曾对 [5>~<5] 给出 [6, 5, 4]（应为空）。
-        var rangeValues = RangeLangValue.CreateRangeArray(
-            startIntValue.Value, endIntValue.Value, node.IncludeStart, node.IncludeEnd);
-        foreach (var value in rangeValues)
-        {
-            results.Add(new IntLangValue(value));
-        }
-
-        return new ArrayLangValue(results);
+        return range is char[] characters
+            ? new ArrayLangValue(characters.Select(value => (LangValueType)new CharLangValue(value)).ToList())
+            : new ArrayLangValue(((int[])range).Select(value => (LangValueType)new IntLangValue(value)).ToList());
     }
 
     /// <summary>

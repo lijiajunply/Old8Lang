@@ -1125,12 +1125,8 @@ return typeof(object);
     
     }
 
-    public Type VisitRangeLangValue(RangeLangValue node)
-    {
-
-return typeof(int[]);
-    
-    }
+    public Type VisitRangeLangValue(RangeLangValue node) =>
+        node.Start?.Accept(this) == typeof(char) ? typeof(char[]) : typeof(int[]);
 
     public Type VisitSliceLangValue(SliceLangValue node)
     {
